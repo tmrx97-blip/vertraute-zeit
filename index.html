@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vertraute Zeit - Aufgaben</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body style="margin:0; background-color:#F7F9FB;">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        const todos = [
+            { id: 1, task: "BGV-Bestaetigung abwarten / nachhaken", responsible: "Thomas Marx", deadline: "Ende Maerz 2026", prio: "rot", phase: "sofort", logicGroup: "Versicherung", logicOrder: 1, note: "Ohne BGV keine Absicherung. Wenn bis Ende Maerz keine Police, aktiv nachhaken." },
+            { id: 2, task: "Website-Texte: Preise korrigieren", responsible: "Marketing", deadline: "Vor Einpflege", prio: "rot", phase: "sofort", logicGroup: "Versicherung", logicOrder: 2, note: "935 zu 695 und 1.430 zu 960. Drei Stellen: Paket 1, Paket 2, Checkliste." },
+            { id: 3, task: "Website-Texte: km-Pauschale korrigieren", responsible: "Marketing", deadline: "Vor Einpflege", prio: "rot", phase: "sofort", logicGroup: "Versicherung", logicOrder: 3, note: "Leistungsseite Abschnitt 5: 80 Cent zu 50 Cent." },
+            { id: 4, task: "Einverstaendnis Brigitte K. einholen", responsible: "Thomas Marx", deadline: "Vor Launch", prio: "rot", phase: "sofort", logicGroup: "Versicherung", logicOrder: 4, note: "Schriftlich. Ohne Einverstaendnis darf Testimonial nicht online." },
+            { id: 5, task: "Jimdo: Footer 45a/45b auf ALLEN Seiten loeschen", responsible: "TM / Marketing", deadline: "April 2026", prio: "gelb", phase: "april", logicGroup: "Website", logicOrder: 1, note: "Auf jeder einzelnen Seite pruefen." },
+            { id: 6, task: "Jimdo: Hero-Ueberschrift ersetzen", responsible: "Marketing", deadline: "April 2026", prio: "gelb", phase: "april", logicGroup: "Website", logicOrder: 2, note: "Gegen Einsamkeit gibt es ein gutes Mittel: ZEIT." },
+            { id: 7, task: "Jimdo: Pflegekasse-Block loeschen (Startseite)", responsible: "Marketing", deadline: "April 2026", prio: "gelb", phase: "april", logicGroup: "Website", logicOrder: 3, note: "Block komplett entfernen." },
+            { id: 8, task: "Jimdo: Fokus Pflegegrade loeschen (Leistung)", responsible: "Marketing", deadline: "April 2026", prio: "gelb", phase: "april", logicGroup: "Website", logicOrder: 4, note: "Leistungsseite komplett entfernen." },
+            { id: 9, task: "Jimdo: Alte Pakete + Infografik loeschen (Preis)", responsible: "Marketing", deadline: "April 2026", prio: "gelb", phase: "april", logicGroup: "Website", logicOrder: 5, note: "Preisseite komplett ersetzen." },
+            { id: 10, task: "Jimdo: Neue Pakete eintragen (695 / 960)", responsible: "Marketing", deadline: "April 2026", prio: "gelb", phase: "april", logicGroup: "Website", logicOrder: 6, note: "Preisseite. Nur diese zwei Pakete." },
+            { id: 11, task: "Jimdo: 32 Jahre zu 35 Jahre ueberall", responsible: "Marketing", deadline: "April 2026", prio: "gelb", phase: "april", logicGroup: "Website", logicOrder: 7, note: "Startseite, Ueber mich, Leistungsseite." },
+            { id: 12, task: "Jimdo: Kontaktformular umbenennen", responsible: "Marketing", deadline: "April 2026", prio: "gelb", phase: "april", logicGroup: "Website", logicOrder: 8, note: "Kopf-aktiv-Erfurt zu Vertraute Zeit Erfurt" },
+            { id: 13, task: "Jimdo: Netzwerk-Grafik einbauen", responsible: "Marketing", deadline: "April 2026", prio: "gelb", phase: "april", logicGroup: "Website", logicOrder: 9, note: "JPEG freigegeben, saubere Raender." },
+            { id: 14, task: "Jimdo: Logo einbauen (Querformat)", responsible: "Marketing", deadline: "April 2026", prio: "gelb", phase: "april", logicGroup: "Website", logicOrder: 10, note: "IMG_2728.png fuer Header." },
+            { id: 15, task: "Jimdo: Farbwelt auf Stahlblau umstellen", responsible: "Marketing", deadline: "April 2026", prio: "gelb", phase: "april", logicGroup: "Website", logicOrder: 11, note: "Kein Gruen, kein Teal. Stahlblau." },
+            { id: 16, task: "Jimdo: Impressum BGV-Nummer ergaenzen", responsible: "Thomas Marx", deadline: "April 2026", prio: "gelb", phase: "april", logicGroup: "Versicherung", logicOrder: 5, note: "V003 485/131" },
+            { id: 17, task: "Jimdo: Datenschutzerklaerung erstellen", responsible: "Anwalt", deadline: "April 2026", prio: "gelb", phase: "april", logicGroup: "Versicherung", logicOrder: 6, note: "Impressum-Pflicht. Jimdo hat ggf. Generator." },
+            { id: 18, task: "Domain Strato pruefen / kuendigen", responsible: "Thomas Marx", deadline: "23. Apr 2026", prio: "gelb", phase: "april", logicGroup: "Website", logicOrder: 12, note: "Faelligkeit 23.4. Rechtzeitig entscheiden." },
+            { id: 19, task: "Kunden-Dokumente: Logo einbauen", responsible: "Marketing", deadline: "April 2026", prio: "gelb", phase: "april", logicGroup: "Dokumente", logicOrder: 1, note: "Aufnahmebogen, Willkommensbrief, DSGVO, Schweigepflicht, AGB." },
+            { id: 20, task: "Website-Launch", responsible: "TM / Marketing", deadline: "1. Mai 2026", prio: "gruen", phase: "mai", logicGroup: "Go Live", logicOrder: 1, note: "Alle Korrekturen vorher abschliessen!" },
+            { id: 21, task: "B2B-Folder Aerzte erstellen (4x DIN A4)", responsible: "Marketing", deadline: "1. Mai 2026", prio: "gruen", phase: "mai", logicGroup: "Vertrieb", logicOrder: 1, note: "Evidenz, Netzwerk, Angebot, Kontakt, ZEIT zu handeln." },
+            { id: 22, task: "Infoblatt Patienten erstellen (1 Seite)", responsible: "Marketing", deadline: "Mai 2026", prio: "gruen", phase: "mai", logicGroup: "Vertrieb", logicOrder: 2, note: "Das Blatt, das der Arzt dem Patienten hinlegt." },
+            { id: 23, task: "Erste Arztgespraeche fuehren", responsible: "Thomas Marx", deadline: "20. Mai 2026", prio: "gruen", phase: "mai", logicGroup: "Vertrieb", logicOrder: 3, note: "Kurzprofil V8 + Netzwerk-Grafik + B2B-Folder mitnehmen." },
+            { id: 24, task: "Leistungsnachweis-Formular erstellen", responsible: "Marketing", deadline: "Vor Betriebsstart", prio: "gruen", phase: "mai", logicGroup: "Dokumente", logicOrder: 2, note: "Datum, Dauer, Taetigkeit. Dokumentation und Rechnungsgrundlage." },
+            { id: 25, task: "Kurzprofil V9 schaerfen", responsible: "Marketing", deadline: "Nach Launch", prio: "blau", phase: "nachlaunch", logicGroup: "Vertrieb", logicOrder: 4, note: "Mit finalen Website-Texten abgleichen." },
+            { id: 26, task: "Google Business Profil anlegen", responsible: "TM / Marketing", deadline: "Nach Launch", prio: "blau", phase: "nachlaunch", logicGroup: "Go Live", logicOrder: 2, note: "Logo Querformat verwenden." },
+            { id: 27, task: "Flyer Apotheken / Arztpraxen", responsible: "Marketing", deadline: "Nach Launch", prio: "blau", phase: "nachlaunch", logicGroup: "Vertrieb", logicOrder: 5, note: "Kompakter als B2B-Folder, B2C-Sprache." },
+            { id: 28, task: "Visitenkarten erstellen", responsible: "Marketing", deadline: "Nach Launch", prio: "blau", phase: "nachlaunch", logicGroup: "Go Live", logicOrder: 3, note: "Logo Querformat, Stahlblau, Kontaktdaten." },
+            { id: 29, task: "Erste-Hilfe-Ausruestung pruefen", responsible: "Thomas Marx", deadline: "Halbjaehrlich", prio: "blau", phase: "laufend", logicGroup: "Betrieb", logicOrder: 1, note: "Checkliste nutzen. Naechste Pruefung eintragen." },
+            { id: 30, task: "Beobachtungsprotokoll ueberpruefen", responsible: "UB", deadline: "Jaehrlich", prio: "blau", phase: "laufend", logicGroup: "Betrieb", logicOrder: 2, note: "Versionsnummer hochzaehlen wenn angepasst." }
+        ];
+
+        const prioMeta = {
+            rot: { label: "SOFORT / KRITISCH", color: "#C0392B", bg: "#FDF2F2", border: "#E74C3C" },
+            gelb: { label: "APRIL - VOR LAUNCH", color: "#92700C", bg: "#FFF9E6", border: "#F1C40F" },
+            gruen: { label: "MAI 2026", color: "#1E7A3A", bg: "#F0FAF4", border: "#27AE60" },
+            blau: { label: "NACH LAUNCH / LAUFEND", color: "#2C5282", bg: "#EBF4FF", border: "#4A6A8F" }
+        };
+
+        const phaseOrder = ["sofort", "april", "mai", "nachlaunch", "laufend"];
+        const phaseNames = { sofort: "Sofort", april: "April 2026", mai: "Mai 2026", nachlaunch: "Nach Launch", laufend: "Laufend" };
+        const phaseColors = { sofort: "#C0392B", april: "#D4A017", mai: "#27AE60", nachlaunch: "#4A6A8F", laufend: "#2C3E50" };
+
+        const logicGroupOrder = ["Versicherung", "Website", "Dokumente", "Go Live", "Vertrieb", "Betrieb"];
+        const logicColors = { Versicherung: "#C0392B", Website: "#4A6A8F", Dokumente: "#7D6B4F", "Go Live": "#27AE60", Vertrieb: "#8E44AD", Betrieb: "#2C3E50" };
+
+        function Card({ todo, accentColor }) {
+            return (
+                <div style={{ background: "#fff", borderLeft: "4px solid " + accentColor, borderRadius: "6px", padding: "14px 18px", marginBottom: "10px", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px" }}>
+                        <div style={{ flex: 1 }}>
+                            <div style={{ fontWeight: 700, fontSize: "14px", color: "#2C3E50", lineHeight: 1.4 }}>{todo.task}</div>
+                            <div style={{ fontSize: "12px", color: "#7A8A9E", marginTop: "4px" }}>{todo.note}</div>
+                        </div>
+                        <div style={{ textAlign: "right", flexShrink: 0 }}>
+                            <div style={{ fontSize: "11px", fontWeight: 600, color: "#fff", background: accentColor, padding: "2px 8px", borderRadius: "3px", display: "inline-block", marginBottom: "4px" }}>{todo.deadline}</div>
+                            <div style={{ fontSize: "11px", color: "#7A8A9E" }}>{todo.responsible}</div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function SectionHeader({ title, color, count }) {
+            return (
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px", paddingBottom: "8px", borderBottom: "2px solid " + color }}>
+                    <span style={{ fontWeight: 800, fontSize: "15px", color: color, letterSpacing: "0.02em", textTransform: "uppercase" }}>{title}</span>
+                    <span style={{ background: color, color: "#fff", fontSize: "11px", fontWeight: 700, padding: "1px 8px", borderRadius: "10px" }}>{count}</span>
+                </div>
+            );
+        }
+
+        function App() {
+            const [view, setView] = useState("prio");
+
+            const tabs = [
+                { key: "prio", label: "Nach Prioritaet" },
+                { key: "zeit", label: "Zeitliche Abfolge" },
+                { key: "logik", label: "Logische Abfolge" }
+            ];
+
+            return (
+                <div style={{ fontFamily: "system-ui, -apple-system, sans-serif", maxWidth: "760px", margin: "0 auto", padding: "24px 16px", color: "#2C3E50", background: "#F7F9FB", minHeight: "100vh" }}>
+                    <div style={{ textAlign: "center", marginBottom: "28px" }}>
+                        <div style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.15em", color: "#4A6A8F", textTransform: "uppercase", marginBottom: "6px" }}>Vertraute Zeit Erfurt</div>
+                        <h1 style={{ fontSize: "26px", fontWeight: 800, color: "#2C3E50", margin: "0 0 4px 0" }}>Offene Aufgaben</h1>
+                        <div style={{ fontSize: "13px", color: "#7A8A9E" }}>Stand: 15. Maerz 2026 - 30 Aufgaben</div>
+                    </div>
+
+                    <div style={{ display: "flex", gap: "8px", marginBottom: "24px", justifyContent: "center", flexWrap: "wrap" }}>
+                        {["rot", "gelb", "gruen", "blau"].map(p => {
+                            const cfg = prioMeta[p];
+                            const count = todos.filter(t => t.prio === p).length;
+                            const label = p === "rot" ? "Kritisch" : p === "gelb" ? "Vor Launch" : p === "gruen" ? "Mai" : "Danach";
+                            return (
+                                <div key={p} style={{ background: cfg.bg, border: "1px solid " + cfg.border, borderRadius: "6px", padding: "8px 16px", textAlign: "center", minWidth: "110px" }}>
+                                    <div style={{ fontSize: "22px", fontWeight: 800, color: cfg.color }}>{count}</div>
+                                    <div style={{ fontSize: "10px", fontWeight: 600, color: cfg.color, textTransform: "uppercase" }}>{label}</div>
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    <div style={{ display: "flex", gap: "4px", marginBottom: "28px", background: "#E8ECF1", borderRadius: "8px", padding: "3px" }}>
+                        {tabs.map(v => {
+                            const isActive = view === v.key;
+                            return (
+                                <button key={v.key} onClick={() => setView(v.key)} style={{ flex: 1, padding: "10px 8px", border: "none", borderRadius: "6px", fontWeight: 700, fontSize: "13px", cursor: "pointer", background: isActive ? "#fff" : "transparent", color: isActive ? "#2C3E50" : "#7A8A9E", boxShadow: isActive ? "0 1px 3px rgba(0,0,0,0.1)" : "none" }}>
+                                    {v.label}
+                                </button>
+                            );
+                        })}
+                    </div>
+
+                    {view === "prio" && ["rot", "gelb", "gruen", "blau"].map(p => {
+                        const items = todos.filter(t => t.prio === p);
+                        const cfg = prioMeta[p];
+                        return (
+                            <div key={p} style={{ marginBottom: "32px" }}>
+                                <SectionHeader title={cfg.label} color={cfg.color} count={items.length} />
+                                {items.map(t => <Card key={t.id} todo={t} accentColor={cfg.color} />)}
+                            </div>
+                        );
+                    })}
+
+                    {view === "zeit" && phaseOrder.map(ph => {
+                        const items = todos.filter(t => t.phase === ph);
+                        const col = phaseColors[ph];
+                        return (
+                            <div key={ph} style={{ marginBottom: "32px" }}>
+                                <SectionHeader title={phaseNames[ph]} color={col} count={items.length} />
+                                {items.map(t => <Card key={t.id} todo={t} accentColor={col} />)}
+                            </div>
+                        );
+                    })}
+
+                    {view === "logik" && logicGroupOrder.map(g => {
+                        const items = todos.filter(t => t.logicGroup === g).sort((a, c) => a.logicOrder - c.logicOrder);
+                        if (items.length === 0) return null;
+                        const col = logicColors[g];
+                        return (
+                            <div key={g} style={{ marginBottom: "32px" }}>
+                                <SectionHeader title={g} color={col} count={items.length} />
+                                {items.map((t, i) => (
+                                    <div key={t.id} style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
+                                        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0, width: "28px", paddingTop: "14px" }}>
+                                            <div style={{ width: "24px", height: "24px", borderRadius: "50%", background: col, color: "#fff", fontSize: "11px", fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center" }}>{i + 1}</div>
+                                            {i < items.length - 1 && <div style={{ width: "2px", height: "40px", background: col + "33", marginTop: "4px" }} />}
+                                        </div>
+                                        <div style={{ flex: 1 }}><Card todo={t} accentColor={col} /></div>
+                                    </div>
+                                ))}
+                            </div>
+                        );
+                    })}
+
+                    <div style={{ textAlign: "center", fontSize: "11px", color: "#7A8A9E", marginTop: "32px", paddingTop: "16px", borderTop: "1px solid #E0E5EB" }}>
+                        Vertraute ZEIT - Thomas Marx, Dipl.-Med. - Stand 15. Maerz 2026
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
