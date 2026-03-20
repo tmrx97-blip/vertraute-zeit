@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Einsamkeits-Selbsttest – Vertraute Zeit</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Source+Serif+4:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #faf6f0;
+    --warm-white: #fdf9f4;
+    --sand: #e8ddd0;
+    --terracotta: #c4714a;
+    --terracotta-light: #d9896a;
+    --terracotta-pale: #f5ede7;
+    --deep: #3a2e26;
+    --mid: #6b5a4e;
+    --light-text: #9c8878;
+    --green-calm: #6b8f71;
+    --green-pale: #eaf2eb;
+    --shadow: rgba(58,46,38,0.10);
+  }
+
+- { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+background-color: var(–cream);
+font-family: ‘Source Serif 4’, Georgia, serif;
+color: var(–deep);
+min-height: 100vh;
+display: flex;
+align-items: flex-start;
+justify-content: center;
+padding: 40px 20px 80px;
+}
+
+.wrapper {
+max-width: 680px;
+width: 100%;
+}
+
+/* HEADER */
+.site-header {
+text-align: center;
+margin-bottom: 48px;
+padding-bottom: 28px;
+border-bottom: 1px solid var(–sand);
+}
+
+.logo-name {
+font-family: ‘Playfair Display’, Georgia, serif;
+font-size: 15px;
+letter-spacing: 0.18em;
+color: var(–light-text);
+text-transform: uppercase;
+margin-bottom: 6px;
+}
+
+.logo-sub {
+font-size: 13px;
+color: var(–light-text);
+font-weight: 300;
+letter-spacing: 0.05em;
+}
+
+/* INTRO CARD */
+.intro-card {
+background: var(–warm-white);
+border: 1px solid var(–sand);
+border-radius: 16px;
+padding: 40px 44px;
+margin-bottom: 32px;
+box-shadow: 0 4px 24px var(–shadow);
+position: relative;
+overflow: hidden;
+}
+
+.intro-card::before {
+content: ‘’;
+position: absolute;
+top: 0; left: 0; right: 0;
+height: 4px;
+background: linear-gradient(90deg, var(–terracotta), var(–terracotta-light));
+border-radius: 16px 16px 0 0;
+}
+
+.intro-eyebrow {
+font-size: 12px;
+letter-spacing: 0.20em;
+text-transform: uppercase;
+color: var(–terracotta);
+margin-bottom: 14px;
+font-weight: 500;
+}
+
+.intro-title {
+font-family: ‘Playfair Display’, Georgia, serif;
+font-size: 30px;
+line-height: 1.25;
+color: var(–deep);
+margin-bottom: 18px;
+font-weight: 600;
+}
+
+.intro-text {
+font-size: 16.5px;
+line-height: 1.75;
+color: var(–mid);
+font-weight: 300;
+}
+
+.intro-note {
+margin-top: 20px;
+padding: 14px 18px;
+background: var(–terracotta-pale);
+border-radius: 10px;
+font-size: 14px;
+color: var(–mid);
+line-height: 1.6;
+}
+
+/* PROGRESS */
+.progress-bar-wrap {
+margin-bottom: 28px;
+}
+
+.progress-label {
+display: flex;
+justify-content: space-between;
+font-size: 13px;
+color: var(–light-text);
+margin-bottom: 8px;
+}
+
+.progress-track {
+height: 6px;
+background: var(–sand);
+border-radius: 99px;
+overflow: hidden;
+}
+
+.progress-fill {
+height: 100%;
+background: linear-gradient(90deg, var(–terracotta), var(–terracotta-light));
+border-radius: 99px;
+transition: width 0.5s ease;
+width: 0%;
+}
+
+/* QUESTION CARD */
+.question-card {
+background: var(–warm-white);
+border: 1px solid var(–sand);
+border-radius: 16px;
+padding: 36px 44px;
+margin-bottom: 20px;
+box-shadow: 0 4px 24px var(–shadow);
+animation: fadeIn 0.4s ease;
+display: none;
+}
+
+.question-card.active { display: block; }
+
+@keyframes fadeIn {
+from { opacity: 0; transform: translateY(12px); }
+to   { opacity: 1; transform: translateY(0); }
+}
+
+.q-number {
+font-size: 12px;
+letter-spacing: 0.18em;
+text-transform: uppercase;
+color: var(–terracotta);
+margin-bottom: 12px;
+font-weight: 500;
+}
+
+.q-text {
+font-family: ‘Playfair Display’, Georgia, serif;
+font-size: 21px;
+line-height: 1.4;
+color: var(–deep);
+margin-bottom: 8px;
+}
+
+.q-sub {
+font-size: 15px;
+color: var(–light-text);
+line-height: 1.6;
+margin-bottom: 28px;
+font-weight: 300;
+font-style: italic;
+}
+
+/* ANSWERS */
+.answers {
+display: flex;
+flex-direction: column;
+gap: 10px;
+}
+
+.answer-btn {
+display: flex;
+align-items: center;
+gap: 16px;
+padding: 18px 22px;
+background: var(–cream);
+border: 2px solid var(–sand);
+border-radius: 12px;
+cursor: pointer;
+font-family: ‘Source Serif 4’, Georgia, serif;
+font-size: 16px;
+color: var(–mid);
+text-align: left;
+transition: all 0.22s ease;
+line-height: 1.4;
+position: relative;
+}
+
+.answer-btn:hover {
+border-color: var(–terracotta-light);
+background: var(–terracotta-pale);
+color: var(–deep);
+transform: translateX(5px);
+box-shadow: 0 3px 14px rgba(196,113,74,0.15);
+}
+
+/* SELECTED – volle Farbe, klar sichtbar */
+.answer-btn.selected {
+border-color: var(–terracotta);
+background: var(–terracotta);
+color: #ffffff;
+transform: translateX(5px);
+box-shadow: 0 5px 20px rgba(196,113,74,0.40);
+animation: selectPulse 0.3s ease;
+}
+
+@keyframes selectPulse {
+0%   { transform: translateX(5px) scale(1); }
+40%  { transform: translateX(5px) scale(1.025); }
+100% { transform: translateX(5px) scale(1); }
+}
+
+/* Dot – normaler Zustand */
+.answer-dot {
+width: 26px;
+height: 26px;
+border-radius: 50%;
+border: 2px solid var(–sand);
+flex-shrink: 0;
+display: flex;
+align-items: center;
+justify-content: center;
+transition: all 0.22s;
+font-size: 0;
+background: white;
+}
+
+/* Dot – hover */
+.answer-btn:hover .answer-dot {
+border-color: var(–terracotta-light);
+background: var(–terracotta-pale);
+}
+
+/* Dot – selected: wird zum Häkchen */
+.answer-btn.selected .answer-dot {
+border-color: rgba(255,255,255,0.6);
+background: rgba(255,255,255,0.25);
+font-size: 14px;
+color: white;
+font-weight: 700;
+}
+
+.answer-btn.selected .answer-dot::after {
+content: ‘✓’;
+color: white;
+font-size: 15px;
+font-weight: 700;
+line-height: 1;
+}
+
+.answer-btn:hover .answer-dot::after {
+content: ‘’;
+}
+
+/* NAV BUTTONS */
+.nav-row {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-top: 28px;
+gap: 12px;
+}
+
+.btn-back, .btn-next {
+padding: 13px 28px;
+border-radius: 10px;
+font-family: ‘Source Serif 4’, Georgia, serif;
+font-size: 15px;
+cursor: pointer;
+transition: all 0.2s;
+border: none;
+}
+
+.btn-back {
+background: transparent;
+color: var(–light-text);
+border: 1.5px solid var(–sand);
+}
+
+.btn-back:hover {
+border-color: var(–mid);
+color: var(–mid);
+}
+
+.btn-next {
+background: var(–terracotta);
+color: white;
+font-weight: 500;
+letter-spacing: 0.03em;
+box-shadow: 0 4px 16px rgba(196,113,74,0.30);
+}
+
+.btn-next:hover {
+background: var(–terracotta-light);
+transform: translateY(-1px);
+box-shadow: 0 6px 20px rgba(196,113,74,0.35);
+}
+
+.btn-next:disabled {
+background: var(–sand);
+color: var(–light-text);
+box-shadow: none;
+cursor: not-allowed;
+transform: none;
+opacity: 0.65;
+}
+
+@keyframes btnActivate {
+0%   { transform: scale(1); }
+50%  { transform: scale(1.08); box-shadow: 0 8px 26px rgba(196,113,74,0.50); }
+100% { transform: scale(1); }
+}
+
+.btn-next.just-enabled {
+animation: btnActivate 0.35s ease;
+}
+
+/* START BUTTON */
+.btn-start {
+display: block;
+width: 100%;
+padding: 18px;
+margin-top: 28px;
+background: var(–terracotta);
+color: white;
+border: none;
+border-radius: 12px;
+font-family: ‘Playfair Display’, Georgia, serif;
+font-size: 18px;
+cursor: pointer;
+transition: all 0.2s;
+box-shadow: 0 4px 20px rgba(196,113,74,0.30);
+letter-spacing: 0.02em;
+}
+
+.btn-start:hover {
+background: var(–terracotta-light);
+transform: translateY(-2px);
+box-shadow: 0 8px 28px rgba(196,113,74,0.35);
+}
+
+/* RESULT */
+.result-card {
+background: var(–warm-white);
+border: 1px solid var(–sand);
+border-radius: 16px;
+padding: 44px;
+box-shadow: 0 4px 24px var(–shadow);
+display: none;
+animation: fadeIn 0.5s ease;
+}
+
+.result-card.active { display: block; }
+
+.result-icon {
+font-size: 48px;
+margin-bottom: 18px;
+display: block;
+}
+
+.result-level {
+font-size: 12px;
+letter-spacing: 0.20em;
+text-transform: uppercase;
+color: var(–terracotta);
+margin-bottom: 10px;
+font-weight: 500;
+}
+
+.result-title {
+font-family: ‘Playfair Display’, Georgia, serif;
+font-size: 26px;
+line-height: 1.3;
+color: var(–deep);
+margin-bottom: 20px;
+}
+
+.result-text {
+font-size: 16px;
+line-height: 1.8;
+color: var(–mid);
+margin-bottom: 28px;
+font-weight: 300;
+}
+
+.result-bar-wrap {
+margin-bottom: 32px;
+}
+
+.result-bar-label {
+display: flex;
+justify-content: space-between;
+font-size: 13px;
+color: var(–light-text);
+margin-bottom: 8px;
+}
+
+.result-bar-track {
+height: 10px;
+background: var(–sand);
+border-radius: 99px;
+overflow: hidden;
+}
+
+.result-bar-fill {
+height: 100%;
+border-radius: 99px;
+transition: width 1s ease 0.3s;
+width: 0%;
+}
+
+/* COACHING BOX */
+.coaching-box {
+background: linear-gradient(135deg, #f9f2ec, #f4ede6);
+border: 1px solid #e0cfc4;
+border-radius: 14px;
+padding: 28px 32px;
+margin-bottom: 24px;
+position: relative;
+overflow: hidden;
+}
+
+.coaching-box::before {
+content: ‘’;
+position: absolute;
+left: 0; top: 0; bottom: 0;
+width: 4px;
+background: linear-gradient(180deg, var(–terracotta), var(–terracotta-light));
+border-radius: 4px 0 0 4px;
+}
+
+.coaching-eyebrow {
+font-size: 11px;
+letter-spacing: 0.18em;
+text-transform: uppercase;
+color: var(–terracotta);
+margin-bottom: 10px;
+font-weight: 500;
+}
+
+.coaching-title {
+font-family: ‘Playfair Display’, Georgia, serif;
+font-size: 19px;
+color: var(–deep);
+margin-bottom: 10px;
+}
+
+.coaching-text {
+font-size: 15px;
+line-height: 1.7;
+color: var(–mid);
+font-weight: 300;
+margin-bottom: 18px;
+}
+
+.btn-coaching {
+display: inline-block;
+padding: 12px 26px;
+background: var(–terracotta);
+color: white;
+border-radius: 10px;
+font-family: ‘Source Serif 4’, Georgia, serif;
+font-size: 15px;
+text-decoration: none;
+transition: all 0.2s;
+box-shadow: 0 4px 14px rgba(196,113,74,0.28);
+}
+
+.btn-coaching:hover {
+background: var(–terracotta-light);
+transform: translateY(-1px);
+}
+
+/* CRISIS BOX */
+.crisis-box {
+background: var(–green-pale);
+border: 1px solid #b8d4bc;
+border-radius: 12px;
+padding: 20px 24px;
+margin-bottom: 24px;
+}
+
+.crisis-title {
+font-size: 14px;
+font-weight: 500;
+color: var(–green-calm);
+margin-bottom: 6px;
+letter-spacing: 0.04em;
+}
+
+.crisis-text {
+font-size: 14px;
+color: #4a6b4e;
+line-height: 1.65;
+}
+
+.crisis-phone {
+font-family: ‘Playfair Display’, Georgia, serif;
+font-size: 18px;
+color: var(–green-calm);
+font-weight: 600;
+display: block;
+margin-top: 8px;
+}
+
+/* RESTART */
+.btn-restart {
+background: transparent;
+border: 1.5px solid var(–sand);
+color: var(–light-text);
+padding: 12px 24px;
+border-radius: 10px;
+font-family: ‘Source Serif 4’, Georgia, serif;
+font-size: 14px;
+cursor: pointer;
+transition: all 0.2s;
+}
+
+.btn-restart:hover {
+border-color: var(–mid);
+color: var(–mid);
+}
+
+/* LEGAL NOTE */
+.legal-note {
+margin-top: 36px;
+padding-top: 20px;
+border-top: 1px solid var(–sand);
+font-size: 12.5px;
+color: var(–light-text);
+line-height: 1.7;
+text-align: center;
+}
+
+/* HIDDEN */
+.hidden { display: none !important; }
+
+@media (max-width: 520px) {
+.intro-card, .question-card, .result-card { padding: 28px 24px; }
+.intro-title { font-size: 24px; }
+.q-text { font-size: 18px; }
+}
+</style>
+
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- HEADER -->
+
+  <div class="site-header">
+    <div class="logo-name">Vertraute Zeit</div>
+    <div class="logo-sub">Thomas Marx · Begleitung &amp; Begegnung</div>
+  </div>
+
+  <!-- INTRO -->
+
+  <div class="intro-card" id="introCard">
+    <div class="intro-eyebrow">Selbstreflexion</div>
+    <h1 class="intro-title">Fühle ich mich einsam?<br><em style="font-weight:400">Ein ehrlicher Selbsttest.</em></h1>
+    <p class="intro-text">
+      Einsamkeit hat viele Gesichter. Manchmal ist sie laut – manchmal kaum spürbar, 
+      aber trotzdem da. Dieser Test hilft Ihnen, Ihr eigenes Erleben besser zu verstehen. 
+      Er basiert auf anerkannten wissenschaftlichen Grundlagen der Einsamkeitsforschung 
+      und ist in wenigen Minuten ausgefüllt.
+    </p>
+    <div class="intro-note">
+      🕐 <strong>Ca. 3 Minuten</strong> &nbsp;·&nbsp; 
+      8 Fragen &nbsp;·&nbsp; 
+      Ihre Antworten bleiben anonym
+    </div>
+    <button class="btn-start" onclick="startTest()">Jetzt beginnen</button>
+  </div>
+
+  <!-- PROGRESS -->
+
+  <div class="progress-bar-wrap hidden" id="progressWrap">
+    <div class="progress-label">
+      <span id="progressText">Frage 1 von 8</span>
+      <span id="progressPct">0 %</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+  </div>
+
+  <!-- QUESTIONS -->
+
+  <div class="question-card" id="q1">
+    <div class="q-number">Frage 1 von 8</div>
+    <div class="q-text">Vermissen Sie Menschen, mit denen Sie wirklich reden können?</div>
+    <div class="q-sub">Nicht nur Smalltalk – sondern echte, offene Gespräche über das, was Sie bewegt.</div>
+    <div class="answers">
+      <button class="answer-btn" onclick="selectAnswer(1,0,this)"><span class="answer-dot"></span>Nein, ich habe solche Menschen in meinem Leben.</button>
+      <button class="answer-btn" onclick="selectAnswer(1,1,this)"><span class="answer-dot"></span>Manchmal vermisse ich das, aber es ist selten.</button>
+      <button class="answer-btn" onclick="selectAnswer(1,2,this)"><span class="answer-dot"></span>Ja, ich merke das öfter – und es fehlt mir.</button>
+      <button class="answer-btn" onclick="selectAnswer(1,3,this)"><span class="answer-dot"></span>Ja, fast täglich. Ich habe niemanden, dem ich mich wirklich anvertrauen kann.</button>
+    </div>
+    <div class="nav-row">
+      <span></span>
+      <button class="btn-next" id="next1" onclick="nextQuestion(1,2)" disabled>Weiter →</button>
+    </div>
+  </div>
+
+  <div class="question-card" id="q2">
+    <div class="q-number">Frage 2 von 8</div>
+    <div class="q-text">Haben Sie das Gefühl, wirklich dazuzugehören?</div>
+    <div class="q-sub">In Ihrer Familie, Ihrem Freundeskreis, Ihrer Nachbarschaft oder Gemeinschaft.</div>
+    <div class="answers">
+      <button class="answer-btn" onclick="selectAnswer(2,0,this)"><span class="answer-dot"></span>Ja, ich fühle mich eingebunden und zugehörig.</button>
+      <button class="answer-btn" onclick="selectAnswer(2,1,this)"><span class="answer-dot"></span>Meistens schon – aber manchmal fühle ich mich wie außen vor.</button>
+      <button class="answer-btn" onclick="selectAnswer(2,2,this)"><span class="answer-dot"></span>Eher nicht. Dieses Gefühl der Zugehörigkeit fehlt mir oft.</button>
+      <button class="answer-btn" onclick="selectAnswer(2,3,this)"><span class="answer-dot"></span>Nein. Ich fühle mich meistens ausgeschlossen oder übersehen.</button>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="prevQuestion(2,1)">← Zurück</button>
+      <button class="btn-next" id="next2" onclick="nextQuestion(2,3)" disabled>Weiter →</button>
+    </div>
+  </div>
+
+  <div class="question-card" id="q3">
+    <div class="q-number">Frage 3 von 8</div>
+    <div class="q-text">Haben Sie das Gefühl, dass andere Menschen Sie wirklich verstehen?</div>
+    <div class="q-sub">Nicht nur oberflächlich – sondern so, wie Sie wirklich sind, mit dem, was Sie durchmachen.</div>
+    <div class="answers">
+      <button class="answer-btn" onclick="selectAnswer(3,0,this)"><span class="answer-dot"></span>Ja, ich fühle mich von nahestehenden Menschen verstanden.</button>
+      <button class="answer-btn" onclick="selectAnswer(3,1,this)"><span class="answer-dot"></span>Teilweise – bei manchen Themen bleibe ich lieber bei mir.</button>
+      <button class="answer-btn" onclick="selectAnswer(3,2,this)"><span class="answer-dot"></span>Oft nicht. Ich habe das Gefühl, dass mich kaum jemand wirklich kennt.</button>
+      <button class="answer-btn" onclick="selectAnswer(3,3,this)"><span class="answer-dot"></span>Nein. Ich fühle mich von niemandem wirklich gesehen oder verstanden.</button>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="prevQuestion(3,2)">← Zurück</button>
+      <button class="btn-next" id="next3" onclick="nextQuestion(3,4)" disabled>Weiter →</button>
+    </div>
+  </div>
+
+  <div class="question-card" id="q4">
+    <div class="q-number">Frage 4 von 8</div>
+    <div class="q-text">Wie erleben Sie Ihren Alltag?</div>
+    <div class="q-sub">Denken Sie an eine typische Woche – was überwiegt?</div>
+    <div class="answers">
+      <button class="answer-btn" onclick="selectAnswer(4,0,this)"><span class="answer-dot"></span>Er ist erfüllt – mit Kontakten, Aufgaben, Dingen, die mir Freude machen.</button>
+      <button class="answer-btn" onclick="selectAnswer(4,1,this)"><span class="answer-dot"></span>Er hat gute Momente, aber manchmal spüre ich eine Leere.</button>
+      <button class="answer-btn" onclick="selectAnswer(4,2,this)"><span class="answer-dot"></span>Ich funktioniere, aber ein tieferes Gefühl von Sinn oder Verbindung fehlt mir oft.</button>
+      <button class="answer-btn" onclick="selectAnswer(4,3,this)"><span class="answer-dot"></span>Er fühlt sich leer an. Ich bewältige die Tage, aber echtes Leben spüre ich kaum.</button>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="prevQuestion(4,3)">← Zurück</button>
+      <button class="btn-next" id="next4" onclick="nextQuestion(4,5)" disabled>Weiter →</button>
+    </div>
+  </div>
+
+  <div class="question-card" id="q5">
+    <div class="q-number">Frage 5 von 8</div>
+    <div class="q-text">Meiden Sie manchmal soziale Kontakte – aus Angst oder Erschöpfung?</div>
+    <div class="q-sub">Zum Beispiel Einladungen absagen, nicht ans Telefon gehen, lieber allein bleiben.</div>
+    <div class="answers">
+      <button class="answer-btn" onclick="selectAnswer(5,0,this)"><span class="answer-dot"></span>Nein, ich freue mich in der Regel auf Begegnungen.</button>
+      <button class="answer-btn" onclick="selectAnswer(5,1,this)"><span class="answer-dot"></span>Gelegentlich – aber das ist eher Ausnahme als Regel.</button>
+      <button class="answer-btn" onclick="selectAnswer(5,2,this)"><span class="answer-dot"></span>Öfter schon. Es fällt mir manchmal schwer, auf andere zuzugehen.</button>
+      <button class="answer-btn" onclick="selectAnswer(5,3,this)"><span class="answer-dot"></span>Ja, häufig. Der Gedanke an soziale Situationen bereitet mir Unbehagen.</button>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="prevQuestion(5,4)">← Zurück</button>
+      <button class="btn-next" id="next5" onclick="nextQuestion(5,6)" disabled>Weiter →</button>
+    </div>
+  </div>
+
+  <div class="question-card" id="q6">
+    <div class="q-number">Frage 6 von 8</div>
+    <div class="q-text">Haben Sie Menschen, an die Sie sich in schwierigen Momenten wenden können?</div>
+    <div class="q-sub">Nicht nur für praktische Hilfe – sondern für echten emotionalen Beistand.</div>
+    <div class="answers">
+      <button class="answer-btn" onclick="selectAnswer(6,0,this)"><span class="answer-dot"></span>Ja, ich weiß, an wen ich mich wenden kann – und tue das auch.</button>
+      <button class="answer-btn" onclick="selectAnswer(6,1,this)"><span class="answer-dot"></span>Es gibt Menschen, aber ich zögere manchmal, sie zu belasten.</button>
+      <button class="answer-btn" onclick="selectAnswer(6,2,this)"><span class="answer-dot"></span>Kaum jemand. Ich löse Dinge meist allein mit mir aus.</button>
+      <button class="answer-btn" onclick="selectAnswer(6,3,this)"><span class="answer-dot"></span>Nein. Ich habe niemanden, dem ich mich anvertrauen könnte.</button>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="prevQuestion(6,5)">← Zurück</button>
+      <button class="btn-next" id="next6" onclick="nextQuestion(6,7)" disabled>Weiter →</button>
+    </div>
+  </div>
+
+  <div class="question-card" id="q7">
+    <div class="q-number">Frage 7 von 8</div>
+    <div class="q-text">Wie lange begleitet Sie das Gefühl der Einsamkeit schon?</div>
+    <div class="q-sub">Versuchen Sie, ehrlich zurückzublicken – ohne sich zu beurteilen.</div>
+    <div class="answers">
+      <button class="answer-btn" onclick="selectAnswer(7,0,this)"><span class="answer-dot"></span>Eigentlich kaum – ich erlebe mich als gut eingebunden.</button>
+      <button class="answer-btn" onclick="selectAnswer(7,1,this)"><span class="answer-dot"></span>Es gab Phasen, aber das geht wieder vorbei.</button>
+      <button class="answer-btn" onclick="selectAnswer(7,2,this)"><span class="answer-dot"></span>Schon eine Weile – seit einem bestimmten Ereignis oder Lebensabschnitt.</button>
+      <button class="answer-btn" onclick="selectAnswer(7,3,this)"><span class="answer-dot"></span>Schon sehr lange. Es fühlt sich an, als wäre das einfach mein Zustand.</button>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="prevQuestion(7,6)">← Zurück</button>
+      <button class="btn-next" id="next7" onclick="nextQuestion(7,8)" disabled>Weiter →</button>
+    </div>
+  </div>
+
+  <div class="question-card" id="q8">
+    <div class="q-number">Frage 8 von 8</div>
+    <div class="q-text">Wenn Sie an die nächsten Monate denken – was überwiegt?</div>
+    <div class="q-sub">Kein Richtig oder Falsch – nur Ihr ehrliches Gefühl.</div>
+    <div class="answers">
+      <button class="answer-btn" onclick="selectAnswer(8,0,this)"><span class="answer-dot"></span>Vorfreude. Ich erwarte Begegnungen, Erlebnisse, schöne Momente.</button>
+      <button class="answer-btn" onclick="selectAnswer(8,1,this)"><span class="answer-dot"></span>Ambivalenz. Gutes und Unsicheres halten sich die Waage.</button>
+      <button class="answer-btn" onclick="selectAnswer(8,2,this)"><span class="answer-dot"></span>Leere. Ich sehe wenig, worauf ich mich wirklich freue.</button>
+      <button class="answer-btn" onclick="selectAnswer(8,3,this)"><span class="answer-dot"></span>Erschöpfung. Die Vorstellung, allein durch die Zeit zu gehen, belastet mich.</button>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="prevQuestion(8,7)">← Zurück</button>
+      <button class="btn-next" id="next8" onclick="showResult()" disabled>Ergebnis anzeigen →</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+
+  <div class="result-card" id="resultCard">
+
+```
+<div id="resultContent"></div>
+
+<div class="legal-note">
+  Dieser Test dient der persönlichen Selbstreflexion und ersetzt keine professionelle 
+  psychologische oder medizinische Diagnose. Er basiert auf wissenschaftlich 
+  anerkannten Konzepten der Einsamkeitsforschung (UCLA Loneliness Scale; 
+  KNE Expertise 1/2022, Prof. Dr. Maike Luhmann, Ruhr-Universität Bochum).
+</div>
+```
+
+  </div>
+
+</div><!-- .wrapper -->
+
+<script>
+  const answers = {};
+
+  function startTest() {
+    document.getElementById('introCard').classList.add('hidden');
+    document.getElementById('progressWrap').classList.remove('hidden');
+    showQuestion(1);
+    updateProgress(1);
+  }
+
+  function showQuestion(n) {
+    document.querySelectorAll('.question-card').forEach(c => c.classList.remove('active'));
+    document.getElementById('q' + n).classList.add('active');
+    updateProgress(n);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function updateProgress(n) {
+    const pct = Math.round(((n - 1) / 8) * 100);
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressText').textContent = 'Frage ' + n + ' von 8';
+    document.getElementById('progressPct').textContent = pct + ' %';
+  }
+
+  function selectAnswer(qNum, val, btn) {
+    const card = document.getElementById('q' + qNum);
+    card.querySelectorAll('.answer-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    answers[qNum] = val;
+    const nextBtn = document.getElementById('next' + qNum);
+    nextBtn.disabled = false;
+    nextBtn.classList.remove('just-enabled');
+    void nextBtn.offsetWidth; // reflow für Animation-Reset
+    nextBtn.classList.add('just-enabled');
+  }
+
+  function nextQuestion(current, next) {
+    if (answers[current] === undefined) return;
+    showQuestion(next);
+  }
+
+  function prevQuestion(current, prev) {
+    document.getElementById('q' + current).classList.remove('active');
+    showQuestion(prev);
+  }
+
+  function showResult() {
+    // Score: 0–3 per question → 0–24 total
+    let score = 0;
+    for (let i = 1; i <= 8; i++) {
+      score += (answers[i] || 0);
+    }
+
+    document.querySelectorAll('.question-card').forEach(c => c.classList.remove('active'));
+    document.getElementById('progressWrap').classList.add('hidden');
+
+    const rc = document.getElementById('resultCard');
+    rc.classList.add('active');
+
+    const pct = Math.round((score / 24) * 100);
+
+    let icon, level, title, text, color, showCrisis = false, coachingIntro;
+
+    if (score <= 5) {
+      icon = '🌿';
+      level = 'Gut eingebunden';
+      title = 'Sie sind gut verankert.';
+      text = `Ihre Antworten zeigen, dass Sie sich in Ihrem sozialen Leben grundsätzlich wohlfühlen. 
+      Sie haben Beziehungen, die Ihnen guttun, und Menschen, auf die Sie zählen können. 
+      Das ist etwas Wertvolles – und es lohnt sich, das aktiv zu pflegen. 
+      Vielleicht gibt es trotzdem einzelne Bereiche, in denen Sie sich mehr Verbindung wünschen. 
+      Das ist ganz normal und gehört zum Leben.`;
+      color = '#6b8f71';
+      coachingIntro = `Manchmal ist es schön, über das eigene Leben, die eigenen Beziehungen und Wünsche 
+      mit jemandem zu sprechen – ohne Anlass, einfach weil es gut tut. Dafür bin ich da.`;
+    } else if (score <= 11) {
+      icon = '🌥️';
+      level = 'Leichte bis mittlere Einsamkeit';
+      title = 'Es gibt Momente, in denen Sie sich allein fühlen.';
+      text = `Ihre Antworten zeigen ein gemischtes Bild: Es gibt Verbindung in Ihrem Leben, 
+      aber auch Momente, in denen Sie sich unverstanden, außen vor oder innerlich allein fühlen. 
+      Das kennen viele Menschen – besonders in Lebensphasen, in denen sich vieles verändert hat. 
+      Dieses Gefühl verdient Aufmerksamkeit. Es ist kein Zeichen von Schwäche, sondern ein Hinweis, 
+      dass etwas in Ihrem sozialen Leben mehr Raum braucht.`;
+      color = '#c4a24a';
+      coachingIntro = `Genau für solche Momente und Lebensphasen begleite ich Menschen. 
+      Manchmal hilft es sehr, das, was man innerlich trägt, in einem vertrauensvollen 
+      Gespräch auszusprechen.`;
+    } else if (score <= 17) {
+      icon = '🌫️';
+      level = 'Deutliche Einsamkeit';
+      title = 'Das Gefühl der Einsamkeit begleitet Sie spürbar.';
+      text = `Ihre Antworten zeigen, dass Einsamkeit in Ihrem Alltag eine echte Rolle spielt. 
+      Vielleicht vermissen Sie echte Gespräche, tiefe Verbundenheit oder einfach Menschen, 
+      die wirklich da sind. Dieses Gefühl kann schwer wiegen – besonders wenn es schon eine 
+      Weile andauert. Bitte wissen Sie: Sie sind damit nicht allein, auch wenn es sich so anfühlt. 
+      Und es gibt Wege, daran etwas zu verändern – Schritt für Schritt.`;
+      color = '#c4714a';
+      showCrisis = true;
+      coachingIntro = `Ich begleite Menschen, die genau das erleben, was Sie beschreiben. 
+      In einem ersten, unverbindlichen Gespräch können wir gemeinsam schauen, was Ihnen 
+      guttun könnte und wie ich Sie dabei unterstützen kann.`;
+    } else {
+      icon = '🌑';
+      level = 'Ausgeprägte Einsamkeit';
+      title = 'Sie tragen gerade etwas Schweres.';
+      text = `Ihre Antworten deuten auf eine tiefe, möglicherweise schon länger andauernde Einsamkeit hin. 
+      Das ist eine ernste Belastung – körperlich, seelisch und im Alltag. Es ist wichtig, 
+      dass Sie das nicht alleine tragen. Bitte suchen Sie sich Unterstützung – sei es ein 
+      vertrauensvolles Gespräch, professionelle Begleitung oder ein erster kleiner Schritt 
+      in Richtung Verbindung. Sie verdienen es, sich weniger allein zu fühlen.`;
+      color = '#8b5e3c';
+      showCrisis = true;
+      coachingIntro = `Gerade in dieser Situation ist es wichtig, nicht allein zu bleiben. 
+      Ich stehe für ein erstes offenes Gespräch zur Verfügung – kostenlos, ohne Verpflichtung, 
+      mit echtem Interesse an Ihrer Situation.`;
+    }
+
+    let html = `
+      <span class="result-icon">${icon}</span>
+      <div class="result-level">${level}</div>
+      <h2 class="result-title">${title}</h2>
+      <p class="result-text">${text}</p>
+
+      <div class="result-bar-wrap">
+        <div class="result-bar-label">
+          <span>Einsamkeits-Belastung</span>
+          <span id="pctLabel">0 %</span>
+        </div>
+        <div class="result-bar-track">
+          <div class="result-bar-fill" id="resultBar" style="background: ${color};"></div>
+        </div>
+      </div>
+    `;
+
+    if (showCrisis) {
+      html += `
+        <div class="crisis-box">
+          <div class="crisis-title">Wenn Sie sich stark belastet fühlen</div>
+          <p class="crisis-text">
+            Die Telefonseelsorge ist kostenlos, anonym und rund um die Uhr erreichbar – 
+            für alle, die gerade jemanden zum Reden brauchen.
+            <span class="crisis-phone">📞 0800 111 0 111</span>
+          </p>
+        </div>
+      `;
+    }
+
+    html += `
+      <div class="coaching-box">
+        <div class="coaching-eyebrow">Vertraute Zeit · Thomas Marx</div>
+        <div class="coaching-title">Begleitung, die zuhört.</div>
+        <p class="coaching-text">${coachingIntro}</p>
+        <a href="mailto:kontakt@vertraute-zeit.de" class="btn-coaching">Gespräch anfragen →</a>
+      </div>
+
+      <button class="btn-restart" onclick="restartTest()">Test neu starten</button>
+    `;
+
+    document.getElementById('resultContent').innerHTML = html;
+
+    // Animate bar
+    setTimeout(() => {
+      document.getElementById('resultBar').style.width = pct + '%';
+      let current = 0;
+      const interval = setInterval(() => {
+        current += 2;
+        if (current >= pct) { current = pct; clearInterval(interval); }
+        document.getElementById('pctLabel').textContent = current + ' %';
+      }, 20);
+    }, 300);
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function restartTest() {
+    for (let i = 1; i <= 8; i++) delete answers[i];
+    document.querySelectorAll('.answer-btn').forEach(b => b.classList.remove('selected'));
+    document.querySelectorAll('.btn-next').forEach(b => b.disabled = true);
+    document.getElementById('resultCard').classList.remove('active');
+    document.getElementById('introCard').classList.remove('hidden');
+    document.getElementById('progressWrap').classList.add('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+
+</body>
+</html>
