@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Klienten Tracker - Clean Edition</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; padding: 20px; max-width: 800px; margin: auto; background-color: #f4f4f7; color: #1d1d1f; }
+        .card { background: #ffffff; padding: 24px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 24px; border: 1px solid #e5e5ea; }
+        h2 { border-bottom: 2px solid #007AFF; padding-bottom: 8px; margin-top: 0; font-size: 22px; }
+        label { display: block; margin-top: 14px; font-weight: 600; font-size: 14px; color: #333; }
+        input, select { width: 100%; padding: 12px; margin-top: 6px; box-sizing: border-box; border: 1px solid #c7c7cc; border-radius: 8px; font-size: 16px; background-color: #fafafa; }
+        input:focus, select:focus { outline: none; border-color: #007AFF; background-color: #fff; }
+        button { width: 100%; padding: 16px; margin-top: 24px; background-color: #007AFF; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; }
+        button:active { background-color: #0056b3; }
+        .btn-danger { background-color: #ff3b30; }
+        .btn-danger:active { background-color: #cc2e26; }
+        table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 14px; }
+        th, td { border: 1px solid #e5e5ea; padding: 10px; text-align: left; }
+        th { background-color: #f2f2f7; font-weight: 600; }
+        .success-msg { text-align: center; margin-top: 16px; padding: 16px; background: #e5fbe5; border: 1px solid #34c759; border-radius: 8px; display: none; }
+        .chart-box { position: relative; width: 100%; margin: 24px 0; }
+        .section-header { margin-top: 32px; color: #1d1d1f; border-bottom: 1px solid #e5e5ea; padding-bottom: 6px; font-size: 18px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>1. Kurzbefragung (Nach Begegnung)</h2>
+        <input type="text" id="k_name" placeholder="Name des Klienten (z.B. Max Mustermann)">
+        <label>Datum der Begegnung</label><input type="date" id="k_datum">
+
+        <label>Stimmung (1-10)</label><input type="number" id="k_1" min="1" max="10">
+        <label>Schlafqualität (1-10)</label><input type="number" id="k_2" min="1" max="10">
+        <label>Schmerzfreiheit (1-10)</label><input type="number" id="k_3" min="1" max="10">
+        <label>Energielevel (1-10)</label><input type="number" id="k_4" min="1" max="10">
+        <label>Verbundenheit heute (1-10)</label><input type="number" id="k_5" min="1" max="10">
+
+        <button onclick="App.speichereKurz()">Eintrag speichern</button>
+        <div id="msg_kurz" class="success-msg">
+            <h1 id="k_ampel" style="font-size: 44px; margin: 0 0 8px 0;"></h1>
+            <strong style="color: #248a3d;">Erfolgreich gespeichert!</strong>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>2. Langzeit-Evaluation (Alle 6 Monate)</h2>
+        <input type="text" id="l_name" placeholder="Name des Klienten (z.B. Max Mustermann)">
+        <label>Datum der Evaluation</label><input type="date" id="l_datum">
+
+        <label>Gemeinschaftsgefühl (1-10)</label><input type="number" id="l_1" min="1" max="10">
+        <label>Zahl sozialer Kontakte pro Woche (Absolut)</label><input type="number" id="l_2" min="0">
+        <label>Eigeninitiative (1-10)</label><input type="number" id="l_3" min="1" max="10">
+        <label>Vertrauen in andere (1-10)</label><input type="number" id="l_4" min="1" max="10">
+        <label>Zukunftsausblick (1-10)</label><input type="number" id="l_5" min="1" max="10">
+
+        <button onclick="App.speichereLang()">Eintrag speichern</button>
+        <div id="msg_lang" class="success-msg">
+            <h2 id="l_balken" style="margin: 0 0 8px 0; color: #34c759;"></h2>
+            <strong style="color: #248a3d;">Erfolgreich gespeichert!</strong>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>3. Klienten-Akte (Auswertung)</h2>
+        <select id="ui_select" onchange="App.rendereAkte()">
+            <option value="">-- Klienten auswählen --</option>
+        </select>
+
+        <div id="akte_container" style="display:none;">
+            <h3 style="color: #007AFF; font-size: 24px; margin-top: 24px;">Akte: <span id="akte_name"></span></h3>
+            
+            <div class="section-header">A. Kurzbefragungen (Tagesform)</div>
+            <div class="chart-box"><canvas id="chart_kurz"></canvas></div>
+            <div style="overflow-x:auto;"><table id="tab_kurz"></table></div>
+
+            <div class="section-header">B. Langzeit-Evaluation (Entwicklung)</div>
+            <div class="chart-box"><canvas id="chart_lang"></canvas></div>
+            <div style="overflow-x:auto;"><table id="tab_lang"></table></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>4. System-Verwaltung</h2>
+        <button class="btn-danger" onclick="App.datenLoeschen()">Alle Systemdaten unwiderruflich löschen</button>
+    </div>
+
+    <script>
+        "use strict";
+
+        // ==========================================
+        // MODULE 1: Data Storage & Retrieval
+        // ==========================================
+        const Database = {
+            keys: { kurz: "db_kurz_v2", lang: "db_lang_v2" },
+            
+            laden: function(key) {
+                try { return JSON.parse(localStorage.getItem(key)) || []; } 
+                catch(e) { return []; }
+            },
+            speichern: function(key, data) {
+                localStorage.setItem(key, JSON.stringify(data));
+            },
+            loeschen: function() {
+                localStorage.removeItem(this.keys.kurz);
+                localStorage.removeItem(this.keys.lang);
+            }
+        };
+
+        // ==========================================
+        // MODULE 2: Input & Validation Helpers
+        // ==========================================
+        const Utils = {
+            heuteISO: function() {
+                const d = new Date();
+                return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+            },
+            lokalerTimestamp: function(isoString) {
+                if(!isoString) return 0;
+                const teile = isoString.split("-");
+                if(teile.length !== 3) return 0;
+                return new Date(teile[0], teile[1]-1, teile[2]).getTime();
+            },
+            sichererText: function(str) {
+                if(!str) return "";
+                return String(str).trim().replace(/[&<>"']/g, function(m) {
+                    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+                });
+            },
+            leseZahl: function(id, min, max) {
+                const raw = document.getElementById(id).value;
+                if(raw === "") return null;
+                const val = Number(raw);
+                if(isNaN(val) || (min !== null && val < min) || (max !== null && val > max)) return null;
+                return val;
+            },
+            leseText: function(id) {
+                return this.sichererText(document.getElementById(id).value);
+            },
+            setzeWert: function(id, val) {
+                document.getElementById(id).value = val;
+            },
+            zeigeErfolg: function(id_msg) {
+                const el = document.getElementById(id_msg);
+                el.style.display = "block";
+                setTimeout(() => { el.style.display = "none"; }, 4000);
+            }
+        };
+
+        // ==========================================
+        // MODULE 3: Chart.js Management
+        // ==========================================
+        const ChartManager = {
+            instanzKurz: null,
+            instanzLang: null,
+            
+            zeichneKurz: function(labels, d1, d2, d3, d4, d5) {
+                if(this.instanzKurz) this.instanzKurz.destroy();
+                this.instanzKurz = new Chart(document.getElementById('chart_kurz'), {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            { label: 'Stimmung', data: d1, borderColor: '#FF3B30', tension: 0.3, spanGaps: true },
+                            { label: 'Schlaf', data: d2, borderColor: '#007AFF', tension: 0.3, spanGaps: true },
+                            { label: 'Schmerz', data: d3, borderColor: '#FF9500', tension: 0.3, spanGaps: true },
+                            { label: 'Energie', data: d4, borderColor: '#34C759', tension: 0.3, spanGaps: true },
+                            { label: 'Verbundenheit', data: d5, borderColor: '#5856D6', tension: 0.3, spanGaps: true }
+                        ]
+                    },
+                    options: { responsive: true, scales: { y: { min: 1, max: 10 } } }
+                });
+            },
+            zeichneLang: function(labels, d1, d3, d4, d5) {
+                if(this.instanzLang) this.instanzLang.destroy();
+                this.instanzLang = new Chart(document.getElementById('chart_lang'), {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            { label: 'Gemeinschaft', data: d1, borderColor: '#FF2D55', tension: 0.3, spanGaps: true },
+                            { label: 'Initiative', data: d3, borderColor: '#AF52DE', tension: 0.3, spanGaps: true },
+                            { label: 'Vertrauen', data: d4, borderColor: '#34C759', tension: 0.3, spanGaps: true },
+                            { label: 'Zukunft', data: d5, borderColor: '#00C7BE', tension: 0.3, spanGaps: true }
+                        ]
+                    },
+                    options: { responsive: true, scales: { y: { min: 1, max: 10 } } }
+                });
+            }
+        };
+
+        // ==========================================
+        // MODULE 4: Main Application Logic
+        // ==========================================
+        const App = {
+            init: function() {
+                Utils.setzeWert("k_datum", Utils.heuteISO());
+                Utils.setzeWert("l_datum", Utils.heuteISO());
+                this.updateDropdown();
+            },
+
+            speichereKurz: function() {
+                const name = Utils.leseText("k_name");
+                const isoDatum = document.getElementById("k_datum").value;
+                const v1 = Utils.leseZahl("k_1",1,10);
+                const v2 = Utils.leseZahl("k_2",1,10);
+                const v3 = Utils.leseZahl("k_3",1,10);
+                const v4 = Utils.leseZahl("k_4",1,10);
+                const v5 = Utils.leseZahl("k_5",1,10);
+
+                if(!name || !isoDatum || [v1,v2,v3,v4,v5].includes(null)) {
+                    alert("Bitte Name, Datum und alle 5 Werte (1-10) korrekt eingeben."); return;
+                }
+
+                const score = Number(((v1+v2+v3+v4+v5)/5).toFixed(1));
+                const ampel = score >= 7 ? "🟢" : (score >= 5 ? "🟡" : "🔴");
+
+                const daten = Database.laden(Database.keys.kurz);
+                daten.push({
+                    name: name,
+                    isoDatum: isoDatum,
+                    ts: Utils.lokalerTimestamp(isoDatum),
+                    anzeigeDatum: new Date(Utils.lokalerTimestamp(isoDatum)).toLocaleDateString('de-DE'),
+                    v1, v2, v3, v4, v5, ampel
+                });
+                Database.speichern(Database.keys.kurz, daten);
+
+                document.getElementById("k_ampel").innerText = ampel;
+                Utils.zeigeErfolg("msg_kurz");
+
+                ["k_name","k_1","k_2","k_3","k_4","k_5"].forEach(id => Utils.setzeWert(id, ""));
+                Utils.setzeWert("k_datum", Utils.heuteISO());
+
+                this.updateDropdown();
+                this.rendereAkte();
+            },
+
+            speichereLang: function() {
+                const name = Utils.leseText("l_name");
+                const isoDatum = document.getElementById("l_datum").value;
+                const v1 = Utils.leseZahl("l_1",1,10);
+                const v2 = Utils.leseZahl("l_2",0,999); // Kontakte
+                const v3 = Utils.leseZahl("l_3",1,10);
+                const v4 = Utils.leseZahl("l_4",1,10);
+                const v5 = Utils.leseZahl("l_5",1,10);
+
+                if(!name || !isoDatum || [v1,v2,v3,v4,v5].includes(null)) {
+                    alert("Bitte Name, Datum und alle 5 Werte korrekt eingeben."); return;
+                }
+
+                const score = Number(((v1+v3+v4+v5)/4).toFixed(1));
+                const balken = "🟩".repeat(Math.round(score));
+
+                const daten = Database.laden(Database.keys.lang);
+                daten.push({
+                    name: name,
+                    isoDatum: isoDatum,
+                    ts: Utils.lokalerTimestamp(isoDatum),
+                    anzeigeDatum: new Date(Utils.lokalerTimestamp(isoDatum)).toLocaleDateString('de-DE'),
+                    v1, v2, v3, v4, v5, balken
+                });
+                Database.speichern(Database.keys.lang, daten);
+
+                document.getElementById("l_balken").innerText = balken;
+                Utils.zeigeErfolg("msg_lang");
+
+                ["l_name","l_1","l_2","l_3","l_4","l_5"].forEach(id => Utils.setzeWert(id, ""));
+                Utils.setzeWert("l_datum", Utils.heuteISO());
+
+                this.updateDropdown();
+                this.rendereAkte();
+            },
+
+            updateDropdown: function() {
+                const datenK = Database.laden(Database.keys.kurz);
+                const datenL = Database.laden(Database.keys.lang);
+                const namenSet = new Set([...datenK.map(e=>e.name), ...datenL.map(e=>e.name)]);
+                
+                const select = document.getElementById("ui_select");
+                const currentVal = select.value;
+                
+                select.innerHTML = '<option value="">-- Klienten auswählen --</option>';
+                Array.from(namenSet).sort().forEach(n => {
+                    select.add(new Option(n, n));
+                });
+                if(namenSet.has(currentVal)) select.value = currentVal;
+            },
+
+            rendereAkte: function() {
+                const name = document.getElementById("ui_select").value;
+                const container = document.getElementById("akte_container");
+                
+                if(!name) { container.style.display = "none"; return; }
+                
+                container.style.display = "block";
+                document.getElementById("akte_name").innerText = name;
+
+                const datenK = Database.laden(Database.keys.kurz).filter(e => e.name === name).sort((a,b) => a.ts - b.ts);
+                const datenL = Database.laden(Database.keys.lang).filter(e => e.name === name).sort((a,b) => a.ts - b.ts);
+
+                // Build Kurz
+                let htmlK = "<tr><th>Datum</th><th>Stimmung</th><th>Schlaf</th><th>Schmerz</th><th>Energie</th><th>Verbund.</th></tr>";
+                let lblK=[], dK1=[], dK2=[], dK3=[], dK4=[], dK5=[];
+                
+                if(datenK.length > 0) {
+                    datenK.forEach(r => {
+                        htmlK += `<tr><td>${r.anzeigeDatum}</td><td>${r.v1}</td><td>${r.v2}</td><td>${r.v3}</td><td>${r.v4}</td><td>${r.v5}</td></tr>`;
+                        lblK.push(r.anzeigeDatum); dK1.push(r.v1); dK2.push(r.v2); dK3.push(r.v3); dK4.push(r.v4); dK5.push(r.v5);
+                    });
+                } else { htmlK += "<tr><td colspan='6'>Keine Einträge</td></tr>"; }
+                
+                document.getElementById("tab_kurz").innerHTML = htmlK;
+                ChartManager.zeichneKurz(lblK, dK1, dK2, dK3, dK4, dK5);
+
+                // Build Lang
+                let htmlL = "<tr><th>Datum</th><th>Gemeinsch.</th><th>Initiative</th><th>Vertrauen</th><th>Zukunft</th><th>Kontakte</th></tr>";
+                let lblL=[], dL1=[], dL3=[], dL4=[], dL5=[];
+
+                if(datenL.length > 0) {
+                    datenL.forEach(r => {
+                        htmlL += `<tr><td>${r.anzeigeDatum}</td><td>${r.v1}</td><td>${r.v3}</td><td>${r.v4}</td><td>${r.v5}</td><td>${r.v2}</td></tr>`;
+                        lblL.push(r.anzeigeDatum); dL1.push(r.v1); dL3.push(r.v3); dL4.push(r.v4); dL5.push(r.v5);
+                    });
+                } else { htmlL += "<tr><td colspan='6'>Keine Einträge</td></tr>"; }
+
+                document.getElementById("tab_lang").innerHTML = htmlL;
+                ChartManager.zeichneLang(lblL, dL1, dL3, dL4, dL5);
+            },
+
+            datenLoeschen: function() {
+                if(confirm("ACHTUNG: Möchten Sie wirklich ALLE Daten unwiderruflich löschen?")) {
+                    Database.loeschen();
+                    document.getElementById("akte_container").style.display = "none";
+                    this.updateDropdown();
+                    alert("Daten wurden gelöscht.");
+                }
+            }
+        };
+
+        // Start App
+        App.init();
+    </script>
+</body>
+</html>
