@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vertraute Zeit | Professional Suite</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root { --p: #0056b3; --bg: #f4f7f9; --c: #ffffff; --t: #212529; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--t); margin: 0; padding: 15px; }
+        .wrapper { max-width: 1300px; margin: auto; }
+        
+        /* Professional Header */
+        header { display: flex; justify-content: space-between; align-items: center; padding: 20px; background: var(--p); color: white; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .selector-box { display: flex; align-items: center; gap: 15px; }
+        select { padding: 10px; border-radius: 6px; font-weight: bold; border: 2px solid white; font-size: 1em; }
+        #k-alias { padding: 10px; border-radius: 6px; border: none; width: 120px; font-weight: bold; }
+
+        /* Tools & Actions */
+        .card { background: var(--c); border-radius: 12px; padding: 25px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .btn-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 20px; }
+        button { padding: 12px; border: none; border-radius: 8px; font-weight: bold; color: white; cursor: pointer; transition: 0.2s; }
+        .b-add { background: #17a2b8; } .b-csv { background: #6c757d; } .b-print { background: #6f42c1; } .b-del { background: #dc3545; }
+        button:hover { opacity: 0.8; transform: translateY(-1px); }
+
+        /* Table & Inputs */
+        .table-area { overflow-x: auto; border-radius: 10px; border: 1px solid #dee2e6; }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        th, td { border: 1px solid #dee2e6; padding: 10px; text-align: center; }
+        th { background: #f8f9fa; font-size: 0.85em; }
+        td:first-child { text-align: left; font-weight: bold; background: #fff; position: sticky; left: 0; z-index: 5; width: 280px; border-right: 2px solid #dee2e6; }
+        .cat { background: #eef6ff !important; color: var(--p); text-align: left !important; font-weight: 800; text-transform: uppercase; font-size: 0.8em; }
+        
+        .val-sel { width: 65px; padding: 6px; border-radius: 5px; border: 1px solid #ccc; font-size: 1.1em; cursor: pointer; }
+        .date-inp { width: 100px; font-size: 0.8em; padding: 4px; border: 1px solid #ddd; margin-top: 5px; display: block; }
+
+        /* Analysis Dashboard */
+        .grid-eval { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 25px; }
+        .box { padding: 20px; border-radius: 10px; background: #fdfdfd; border-left: 8px solid var(--p); box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .label { font-size: 0.75em; color: #6c757d; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        .value { font-size: 1.2em; font-weight: bold; display: block; margin-top: 8px; color: #333; }
+        #chart-wrap { height: 500px; padding: 10px; }
+
+        /* Print Optimization */
+        @media print {
+            .btn-bar, header, .cat, .val-sel, .b-add, .b-del { display: none !important; }
+            .card { box-shadow: none; border: 1px solid #000; }
+            body { background: white; }
+            #chart-wrap { height: 350px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <header>
+        <div style="font-size: 1.4em;"><strong>Vertraute Zeit</strong> | Professional</div>
+        <div class="selector-box">
+            <input type="text" id="k-alias" placeholder="Initialen..." oninput="sync()">
+            <select id="k-select" onchange="load()"></select>
+        </div>
+    </header>
+
+    <div class="card">
+        <div class="btn-bar">
+            <button class="b-add" onclick="addT()">➕ Zeitraum (T) hinzufügen</button>
+            <button class="b-csv" onclick="exportCSV()">📥 CSV Export</button>
+            <button class="b-print" onclick="window.print()">🖨 Bericht drucken (PDF)</button>
+            <button class="b-del" onclick="reset()">⚠ Akte leeren</button>
+        </div>
+        
+        <div class="table-area">
+            <table>
+                <thead><tr id="h-row"><th>Parameter / Verlauf</th></tr></thead>
+                <tbody id="b-rows"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <div id="chart-wrap"><canvas id="masterChart"></canvas></div>
+        <div class="grid-eval">
+            <div class="box"><span class="label">Aktueller Entwicklungs-Status</span><span id="ev-status" class="value">-</span></div>
+            <div class="box"><span class="label">Größter Kompetenzgewinn</span><span id="ev-best" class="value">-</span></div>
+            <div class="box"><span class="label">Vordringliches Fokus-Thema</span><span id="ev-worst" class="value">-</span></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const setup = [
+        { c: "Soziale Resonanz (1-5)", s: 5, i: ["Lust auf Menschen", "Kleine Gespräche", "Neue Kontakte", "Um Hilfe bitten", "Etwas zu geben", "Freude/Unternehmung", "Teilnahme am Leben", "Zukunftspläne"] },
+        { c: "Befinden & Verfassung", s: 10, i: ["Zufriedenheit (1-10)", "Einsamkeitserleben (1-10)*", "Selbstwirksamkeit (1-5)", "Schlafqualität (1-10)", "Vorfreude (1-5)", "Sinnhaftigkeit", "Körperwahrnehmung (1-5)*", "Zukunftsorientierung"] },
+        { c: "Verhalten & Alltag", s: 10, i: ["Teilnahmeverhalten", "Soziale Kontakte", "Alltagsaktivitäten", "Arztbesuche*", "Kognitive Aktivität", "Körperliche Aktivität", "Ernährung"] },
+        { c: "Langfristige Ziele", s: 10, i: ["Netzwerkgröße", "Lebensqualität (1-10)", "Selbstbild", "Zielerreichung", "Rückfälle*"] },
+        { c: "Gruppe & Gemeinschaft", s: 5, i: ["Vertraute Momente", "Gemeinschaftserleben", "Ritual-Treue", "Initiative Gruppe", "Transfer Alltag"] }
+    ];
+
+    const flat = setup.flatMap(s => s.i.map(name => ({name, scale: s.s})));
+    let currentT = 4; let chart = null;
+
+    const kSel = document.getElementById('k-select');
+    for(let i=1; i<=100; i++) {
+        let o = document.createElement('option'); o.value = i; o.innerText = "Akte #" + i;
+        kSel.appendChild(o);
+    }
+
+    function buildTable() {
+        const h = document.getElementById('h-row'); h.innerHTML = '<th>Parameter</th>';
+        for(let t=1; t<=currentT; t++) {
+            h.innerHTML += `<th>T${t}<br><input type="date" class="date-inp" id="d-${t-1}" onchange="sync()"></th>`;
+        }
+        const b = document.getElementById('b-rows'); b.innerHTML = '';
+        let idx = 0;
+        setup.forEach(g => {
+            let tr = b.insertRow(); tr.innerHTML = `<td colspan="${currentT+1}" class="cat">${g.c}</td>`;
+            g.i.forEach(name => {
+                let r = b.insertRow(); r.insertCell(0).innerText = name;
+                for(let t=0; t<currentT; t++) {
+                    let td = r.insertCell(-1);
+                    let s = document.createElement('select');
+                    s.className = 'val-sel'; s.id = `v-${idx}-${t}`; s.onchange = sync;
+                    for(let v=0; v<=g.s; v++) {
+                        let opt = document.createElement('option');
+                        opt.value = v; opt.innerText = v === 0 ? "-" : v;
+                        s.appendChild(opt);
+                    }
+                    td.appendChild(s);
+                }
+                idx++;
+            });
+        });
+    }
+
+    function sync() {
+        save();
+        const res = calc();
+        draw(res);
+        evalu(res);
+    }
+
+    function calc() {
+        let datasets = []; let trend = Array(currentT).fill(0); let itemsData = [];
+        flat.forEach((item, r) => {
+            let points = [];
+            for(let t=0; t<currentT; t++) {
+                let v = parseInt(document.getElementById(`v-${r}-${t}`).value) || 0;
+                let tV = item.name.includes('*') ? ((v > 0) ? (item.scale + 1 - v) : 0) : v;
+                points.push(v); trend[t] += tV;
+            }
+            itemsData.push({ name: item.name, diff: (points[currentT-1] || 0) - (points[0] || 0), last: points[currentT-1] || 0 });
+            datasets.push({ label: item.name, data: points, hidden: true, borderColor: `hsl(${r*15}, 60%, 75%)` });
+        });
+        return { datasets, trend: trend.map(v => (v/flat.length).toFixed(2)), itemsData };
+    }
+
+    function evalu(data) {
+        const t = data.trend; const d = t[currentT-1] - t[0];
+        document.getElementById('ev-status').innerText = d > 0.3 ? "📈 Signifikante Verbesserung" : (d < -0.3 ? "📉 Rückläufige Tendenz" : "➡ Stabiler Verlauf");
+        const best = [...data.itemsData].sort((a,b) => b.diff - a.diff)[0];
+        document.getElementById('ev-best').innerText = best && best.diff > 0 ? best.name : "-";
+        const worst = [...data.itemsData].sort((a,b) => a.last - b.last)[0];
+        document.getElementById('ev-worst').innerText = worst ? worst.name : "-";
+    }
+
+    function draw(data) {
+        const ctx = document.getElementById('masterChart').getContext('2d');
+        if(chart) chart.destroy();
+        chart = new Chart(ctx, {
+            type: 'line',
+            data: { 
+                labels: Array.from({length: currentT}, (_,i) => {
+                    const d = document.getElementById(`d-${i}`).value;
+                    return d ? d.split('-').reverse().slice(0,2).join('.') : "T"+(i+1);
+                }), 
+                datasets: [...data.datasets, { label: 'GESAMTTREND', data: data.trend, borderColor: 'black', borderWidth: 5, pointRadius: 5, fill: false }] 
+            },
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 10 } } }
+        });
+    }
+
+    function save() {
+        const id = kSel.value; let vals = []; let dates = [];
+        for(let t=0; t<currentT; t++) dates.push(document.getElementById(`d-${t}`).value);
+        for(let r=0; r<flat.length; r++) {
+            let row = []; for(let t=0; t<currentT; t++) row.push(document.getElementById(`v-${r}-${t}`).value);
+            vals.push(row);
+        }
+        localStorage.setItem('akte_pro_' + id, JSON.stringify({t: currentT, v: vals, d: dates, a: document.getElementById('k-alias').value}));
+    }
+
+    function load() {
+        const id = kSel.value; const s = localStorage.getItem('akte_pro_' + id);
+        if(s) {
+            const b = JSON.parse(s); currentT = b.t; buildTable();
+            document.getElementById('k-alias').value = b.a || "";
+            if(b.d) b.d.forEach((date, i) => { if(document.getElementById(`d-${i}`)) document.getElementById(`d-${i}`).value = date; });
+            b.v.forEach((row, r) => row.forEach((v, t) => {
+                const el = document.getElementById(`v-${r}-${t}`); if(el) el.value = v;
+            }));
+        } else {
+            currentT = 4; document.getElementById('k-alias').value = ""; buildTable();
+        }
+        sync();
+    }
+
+    function addT() { currentT++; buildTable(); save(); sync(); }
+    function reset() { if(confirm("Gesamte Akte unwiderruflich leeren?")) { localStorage.removeItem('akte_pro_' + kSel.value); load(); } }
+
+    function exportCSV() {
+        let csv = "Parameter;" + Array.from({length: currentT}, (_,i) => document.getElementById(`d-${i}`).value || "T"+(i+1)).join(";") + "\n";
+        flat.forEach((item, r) => {
+            csv += `"${item.name}";`;
+            for(let t=0; t<currentT; t++) csv += `${document.getElementById(`v-${r}-${t}`).value};`;
+            csv += "\n";
+        });
+        const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+        const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+        a.download = `Analyse_${document.getElementById('k-alias').value || kSel.value}.csv`; a.click();
+    }
+
+    window.onload = load;
+</script>
+</body>
+</html>
