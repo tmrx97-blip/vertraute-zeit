@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vertraute Zeit | Master-Zentrale 100</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root { --p: #0056b3; --bg: #f8f9fa; --c: #ffffff; --t: #212529; --s: #28a745; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--t); margin: 0; padding: 10px; }
+        .wrapper { max-width: 1300px; margin: auto; }
+        
+        /* Header & Selector */
+        header { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: var(--p); color: white; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        select { padding: 10px; border-radius: 5px; font-size: 1.1em; font-weight: bold; border: 2px solid white; cursor: pointer; }
+        
+        /* Cards */
+        .card { background: var(--c); border-radius: 10px; padding: 20px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .btn-bar { display: flex; gap: 10px; margin-bottom: 15px; }
+        button { flex: 1; padding: 12px; border: none; border-radius: 6px; font-weight: bold; color: white; cursor: pointer; font-size: 0.9em; }
+        .b-add { background: #17a2b8; } .b-csv { background: #6c757d; } .b-del { background: #dc3545; }
+
+        /* Table Design */
+        .table-area { overflow-x: auto; border: 1px solid #dee2e6; border-radius: 8px; max-height: 600px; }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        th, td { border: 1px solid #dee2e6; padding: 10px; text-align: center; }
+        th { background: #e9ecef; position: sticky; top: 0; z-index: 10; }
+        td:first-child { text-align: left; font-weight: bold; background: #fdfdfd; position: sticky; left: 0; z-index: 5; border-right: 2px solid #dee2e6; width: 260px; }
+        .cat { background: #f0f7ff !important; color: var(--p); text-align: left !important; padding: 8px 15px; font-weight: 800; text-transform: uppercase; border-bottom: 2px solid var(--p); }
+        input { width: 45px; padding: 6px; text-align: center; border: 1px solid #ced4da; border-radius: 4px; font-size: 1em; }
+        input:focus { border-color: var(--p); outline: none; background: #fffde7; }
+
+        /* Analytics */
+        .grid-eval { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-top: 20px; }
+        .box { padding: 15px; border-radius: 8px; background: #fdfdfd; border-left: 6px solid var(--p); box-shadow: inset 0 0 5px rgba(0,0,0,0.02); }
+        .label { font-size: 0.85em; color: #6c757d; font-weight: bold; }
+        .value { font-size: 1.1em; font-weight: bold; display: block; margin-top: 4px; }
+        #chart-wrap { height: 450px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <header>
+        <div><strong>Vertraute Zeit</strong> | Multi-Akte</div>
+        <div>
+            <select id="k-select" onchange="switchKlient()">
+                </select>
+        </div>
+    </header>
+
+    <div class="card">
+        <div class="btn-bar">
+            <button class="b-add" onclick="addT()">➕ Messzeitpunkt (T) hinzu</button>
+            <button class="b-csv" onclick="exportCSV()">📥 Akte als CSV (Excel)</button>
+            <button class="b-del" onclick="reset()">⚠ Akte leeren</button>
+        </div>
+
+        <div class="table-area">
+            <table>
+                <thead><tr id="h-row"><th>Parameter</th></tr></thead>
+                <tbody id="b-rows"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>📈 Trend & Analyse</h2>
+        <div id="chart-wrap"><canvas id="masterChart"></canvas></div>
+        
+        <div class="grid-eval">
+            <div class="box"><span class="label">Entwicklungs-Status:</span><span id="ev-status" class="value">-</span></div>
+            <div class="box"><span class="label">Größter Fortschritt:</span><span id="ev-best" class="value">-</span></div>
+            <div class="box"><span class="label">Niedrigster aktueller Wert:</span><span id="ev-worst" class="value">-</span></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const setup = [
+        { c: "Tabelle 1: Soziale Resonanz (1-5)", i: ["Lust auf Menschen", "Kleine Gespräche", "Neue Kontakte", "Um Hilfe bitten", "Etwas zu geben", "Freude/Unternehmung", "Teilnahme am Leben", "Zukunftspläne"] },
+        { c: "Tabelle 2: Befinden (Mixed)", i: ["Zufriedenheit (1-10)", "Einsamkeitserleben (1-10)*", "Selbstwirksamkeit (1-5)", "Soziale Initiative", "Schlafqualität (1-10)", "Vorfreude (1-5)", "Sinnhaftigkeit", "Körperwahrnehmung (1-5)*", "Zukunftsorientierung"] },
+        { c: "Tabelle 3: Verhalten & Alltag", i: ["Teilnahmeverhalten", "Soziale Kontakte", "Alltagsaktivitäten", "Arztbesuche*", "Kognitive Aktivität", "Körperliche Aktivität", "Ernährung", "Kreativität"] },
+        { c: "Tabelle 4: Langfristig (6 Monate)", i: ["Netzwerkgröße", "Lebensqualität (1-10)", "Selbstbild", "Zielerreichung", "Rückfälle*", "Hilfe-Inanspruchnahme"] },
+        { c: "Tabelle 5: Gruppe", i: ["Vertraute Momente", "Gemeinschaftserleben", "Ritual-Treue", "Initiative Gruppe", "Transfer Alltag"] }
+    ];
+
+    const flat = setup.flatMap(s => s.i);
+    let currentT = 4; let chart = null;
+
+    // Selector 1-100 bauen
+    const sel = document.getElementById('k-select');
+    for(let i=1; i<=100; i++) {
+        let o = document.createElement('option'); o.value = i; o.innerText = "Klient Nr. " + i;
+        sel.appendChild(o);
+    }
+
+    function switchKlient() { load(); }
+
+    function buildTable() {
+        const h = document.getElementById('h-row'); h.innerHTML = '<th>Parameter</th>';
+        for(let t=1; t<=currentT; t++) h.innerHTML += `<th>T${t}</th>`;
+
+        const b = document.getElementById('b-rows'); b.innerHTML = '';
+        let idx = 0;
+        setup.forEach(g => {
+            let tr = b.insertRow(); tr.innerHTML = `<td colspan="${currentT+1}" class="cat">${g.c}</td>`;
+            g.i.forEach(name => {
+                let r = b.insertRow(); r.insertCell(0).innerText = name;
+                for(let t=0; t<currentT; t++) {
+                    r.insertCell(-1).innerHTML = `<input type="number" id="v-${idx}-${t}" oninput="sync()">`;
+                }
+                idx++;
+            });
+        });
+    }
+
+    function sync() {
+        save();
+        const results = calc();
+        draw(results);
+        evalu(results);
+    }
+
+    function calc() {
+        let datasets = []; let trend = Array(currentT).fill(0);
+        let itemsData = [];
+
+        flat.forEach((name, r) => {
+            let points = [];
+            for(let t=0; t<currentT; t++) {
+                let v = parseFloat(document.getElementById(`v-${r}-${t}`).value) || 0;
+                let max = name.includes('1-10') ? 10 : 5;
+                let tV = name.includes('*') ? ( (v > 0) ? (max + 1 - v) : 0 ) : v;
+                points.push(v); trend[t] += tV;
+            }
+            itemsData.push({ name, diff: (points[currentT-1] || 0) - (points[0] || 0), last: points[currentT-1] || 0 });
+            datasets.push({ label: name, data: points, hidden: true, borderColor: `hsl(${r*15}, 65%, 75%)` });
+        });
+
+        return { datasets, trend: trend.map(v => (v/flat.length).toFixed(2)), itemsData };
+    }
+
+    function evalu(data) {
+        const t = data.trend;
+        const d = t[currentT-1] - t[0];
+        document.getElementById('ev-status').innerText = d > 0.4 ? "📈 Besserung" : (d < -0.4 ? "📉 Rückläufig" : "➡ Stabil");
+        
+        const best = [...data.itemsData].sort((a,b) => b.diff - a.diff)[0];
+        document.getElementById('ev-best').innerText = best ? best.name : "-";
+        
+        const worst = [...data.itemsData].sort((a,b) => a.last - b.last)[0];
+        document.getElementById('ev-worst').innerText = worst ? worst.name : "-";
+    }
+
+    function draw(data) {
+        const ctx = document.getElementById('masterChart').getContext('2d');
+        if(chart) chart.destroy();
+        chart = new Chart(ctx, {
+            type: 'line',
+            data: { 
+                labels: Array.from({length: currentT}, (_,i) => "T"+(i+1)), 
+                datasets: [...data.datasets, { label: 'ERFOLGS-TREND', data: data.trend, borderColor: 'black', borderWidth: 5, pointRadius: 5, fill: false }] 
+            },
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 10 } } }
+        });
+    }
+
+    function save() {
+        const id = sel.value; let vals = [];
+        for(let r=0; r<flat.length; r++) {
+            let row = []; for(let t=0; t<currentT; t++) row.push(document.getElementById(`v-${r}-${t}`).value);
+            vals.push(row);
+        }
+        localStorage.setItem('akte_v3_' + id, JSON.stringify({t: currentT, v: vals}));
+    }
+
+    function load() {
+        const id = sel.value; const s = localStorage.getItem('akte_v3_' + id);
+        if(s) {
+            const b = JSON.parse(s); currentT = b.t; buildTable();
+            b.v.forEach((row, r) => row.forEach((v, t) => {
+                const el = document.getElementById(`v-${r}-${t}`); if(el) el.value = v;
+            }));
+        } else {
+            currentT = 4; buildTable();
+        }
+        sync();
+    }
+
+    function addT() { currentT++; buildTable(); save(); sync(); }
+    function reset() { if(confirm("Akte wirklich leeren?")) { localStorage.removeItem('akte_v3_' + sel.value); load(); } }
+
+    function exportCSV() {
+        let csv = "Parameter;" + Array.from({length: currentT}, (_,i) => "T"+(i+1)).join(";") + "\n";
+        flat.forEach((name, r) => {
+            csv += `"${name}";`;
+            for(let t=0; t<currentT; t++) csv += `${document.getElementById(`v-${r}-${t}`).value};`;
+            csv += "\n";
+        });
+        const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a"); link.href = URL.createObjectURL(blob);
+        link.download = `Klient_${sel.value}_Trend.csv`; link.click();
+    }
+
+    window.onload = load;
+</script>
+</body>
+</html>
