@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Klienten Tracker - Komplett</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; padding: 20px; max-width: 800px; margin: auto; background-color: #f0f2f5; }
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h2 { color: #333; border-bottom: 2px solid #007AFF; padding-bottom: 5px; }
+        label { display: block; margin-top: 10px; font-weight: bold; font-size: 14px; }
+        input { width: 100%; padding: 10px; margin-top: 5px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; }
+        button { width: 100%; padding: 15px; margin-top: 20px; background-color: #007AFF; color: white; border: none; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .btn-delete { background-color: #ff3b30; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f8f9fa; }
+        .result-box { text-align: center; margin-top: 15px; padding: 10px; background: #eef; border-radius: 8px; display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>1. Kurzbefragung (Nach jedem Besuch)</h2>
+        <input type="text" id="nameKurz" placeholder="Name des Klienten">
+        
+        <label>Stimmung (1-10)</label><input type="number" id="k1" min="1" max="10">
+        <label>Schlafqualität (1-10)</label><input type="number" id="k2" min="1" max="10">
+        <label>Schmerzfreiheit (1-10)</label><input type="number" id="k3" min="1" max="10">
+        <label>Energielevel (1-10)</label><input type="number" id="k4" min="1" max="10">
+        <label>Verbundenheit heute (1-10)</label><input type="number" id="k5" min="1" max="10">
+
+        <button onclick="speichernKurz()">Kurzbefragung Speichern</button>
+
+        <div id="auswertungKurz" class="result-box">
+            <h3 id="scoreKurz"></h3>
+            <h1 id="ampelKurz" style="font-size: 40px; margin: 0;"></h1>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>2. Langzeit-Evaluation (Alle 6 Monate)</h2>
+        <input type="text" id="nameLang" placeholder="Name des Klienten">
+        
+        <label>Gemeinschaftsgefühl (1-10)</label><input type="number" id="l1" min="1" max="10">
+        <label>Zahl sozialer Kontakte pro Woche (Absolute Zahl)</label><input type="number" id="l2" min="0">
+        <label>Eigeninitiative (1-10)</label><input type="number" id="l3" min="1" max="10">
+        <label>Vertrauen in andere (1-10)</label><input type="number" id="l4" min="1" max="10">
+        <label>Zukunftsausblick (1-10)</label><input type="number" id="l5" min="1" max="10">
+
+        <button onclick="speichernLang()">Langzeit-Evaluation Speichern</button>
+
+        <div id="auswertungLang" class="result-box">
+            <h3 id="scoreLang"></h3>
+            <h2 id="balkenLang" style="margin: 0; color: green;"></h2>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Verlauf: Kurzbefragungen</h2>
+        <div style="overflow-x:auto;">
+            <table id="tabelleKurz"><tr><th>Datum</th><th>Name</th><th>Score</th><th>Ampel</th></tr></table>
+        </div>
+
+        <h2 style="margin-top:30px;">Verlauf: Langzeit-Evaluationen</h2>
+        <div style="overflow-x:auto;">
+            <table id="tabelleLang"><tr><th>Datum</th><th>Name</th><th>Kontakte</th><th>Score</th><th>Wegstrecke</th></tr></table>
+        </div>
+
+        <button class="btn-delete" onclick="datenLöschen()">Alle gespeicherten Daten löschen</button>
+    </div>
+
+    <script>
+        window.onload = function() { tabellenAktualisieren(); }
+
+        function holeDatum() {
+            return new Date().toLocaleDateString('de-DE');
+        }
+
+        // --- Logik für Kurzbefragung ---
+        function speichernKurz() {
+            let name = document.getElementById("nameKurz").value;
+            let k1 = parseInt(document.getElementById("k1").value) || 0;
+            let k2 = parseInt(document.getElementById("k2").value) || 0;
+            let k3 = parseInt(document.getElementById("k3").value) || 0;
+            let k4 = parseInt(document.getElementById("k4").value) || 0;
+            let k5 = parseInt(document.getElementById("k5").value) || 0;
+
+            if(!name || k1===0 || k2===0 || k3===0 || k4===0 || k5===0) {
+                alert("Bitte Namen und alle Werte (1-10) eingeben."); return;
+            }
+
+            let score = ((k1 + k2 + k3 + k4 + k5) / 5).toFixed(1);
+            let ampel = score >= 7 ? "🟢" : (score >= 5 ? "🟡" : "🔴");
+
+            document.getElementById("auswertungKurz").style.display = "block";
+            document.getElementById("scoreKurz").innerText = "Tages-Score: " + score;
+            document.getElementById("ampelKurz").innerText = ampel;
+
+            let daten = JSON.parse(localStorage.getItem("datenKurz")) || [];
+            daten.push({ datum: holeDatum(), name: name, score: score, ampel: ampel });
+            localStorage.setItem("datenKurz", JSON.stringify(daten));
+
+            // Felder leeren
+            document.getElementById("nameKurz").value = "";
+            document.getElementById("k1").value = ""; document.getElementById("k2").value = ""; 
+            document.getElementById("k3").value = ""; document.getElementById("k4").value = ""; document.getElementById("k5").value = "";
+
+            tabellenAktualisieren();
+        }
+
+        // --- Logik für Langzeit-Evaluation ---
+        function speichernLang() {
+            let name = document.getElementById("nameLang").value;
+            let l1 = parseInt(document.getElementById("l1").value) || 0;
+            let l2 = document.getElementById("l2").value; // Absolute Zahl
+            let l3 = parseInt(document.getElementById("l3").value) || 0;
+            let l4 = parseInt(document.getElementById("l4").value) || 0;
+            let l5 = parseInt(document.getElementById("l5").value) || 0;
+
+            if(!name || l1===0 || l2==="" || l3===0 || l4===0 || l5===0) {
+                alert("Bitte Namen und alle Werte eingeben."); return;
+            }
+
+            // Durchschnitt nur aus den 1-10 Werten berechnen (l1, l3, l4, l5)
+            let score = ((l1 + l3 + l4 + l5) / 4).toFixed(1);
+            
+            // Wegstrecke (Balken) aus grünen Quadraten aufbauen, z.B. Score 8 = 8 Quadrate
+            let balken = "🟩".repeat(Math.round(score));
+
+            document.getElementById("auswertungLang").style.display = "block";
+            document.getElementById("scoreLang").innerText = "Fortschritts-Score: " + score;
+            document.getElementById("balkenLang").innerText = balken;
+
+            let daten = JSON.parse(localStorage.getItem("datenLang")) || [];
+            daten.push({ datum: holeDatum(), name: name, kontakte: l2, score: score, balken: balken });
+            localStorage.setItem("datenLang", JSON.stringify(daten));
+
+            // Felder leeren
+            document.getElementById("nameLang").value = "";
+            document.getElementById("l1").value = ""; document.getElementById("l2").value = ""; 
+            document.getElementById("l3").value = ""; document.getElementById("l4").value = ""; document.getElementById("l5").value = "";
+
+            tabellenAktualisieren();
+        }
+
+        // --- Tabellen aufbauen ---
+        function tabellenAktualisieren() {
+            // Tabelle Kurz
+            let datenK = JSON.parse(localStorage.getItem("datenKurz")) || [];
+            let htmlK = "<tr><th>Datum</th><th>Name</th><th>Score</th><th>Ampel</th></tr>";
+            datenK.forEach(e => htmlK += `<tr><td>${e.datum}</td><td>${e.name}</td><td>${e.score}</td><td>${e.ampel}</td></tr>`);
+            document.getElementById("tabelleKurz").innerHTML = htmlK;
+
+            // Tabelle Lang
+            let datenL = JSON.parse(localStorage.getItem("datenLang")) || [];
+            let htmlL = "<tr><th>Datum</th><th>Name</th><th>Kontakte/Woche</th><th>Score</th><th>Wegstrecke</th></tr>";
+            datenL.forEach(e => htmlL += `<tr><td>${e.datum}</td><td>${e.name}</td><td>${e.kontakte}</td><td>${e.score}</td><td>${e.balken}</td></tr>`);
+            document.getElementById("tabelleLang").innerHTML = htmlL;
+        }
+
+        // --- Daten löschen ---
+        function datenLöschen() {
+            if(confirm("ACHTUNG: Möchten Sie wirklich ALLE gespeicherten Daten löschen? Dies kann nicht rückgängig gemacht werden.")) {
+                localStorage.removeItem("datenKurz");
+                localStorage.removeItem("datenLang");
+                document.getElementById("auswertungKurz").style.display = "none";
+                document.getElementById("auswertungLang").style.display = "none";
+                tabellenAktualisieren();
+            }
+        }
+    </script>
+</body>
+</html>
