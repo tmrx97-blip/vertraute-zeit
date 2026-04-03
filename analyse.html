@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Klienten-Analyse-Tool</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f0f2f5; }
+        .card { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+    <h1>Exklusive Trendanalyse</h1>
+    <div class="card"><h2>Fragebogen Items</h2><canvas id="c1"></canvas></div>
+    <div class="card"><h2>Verfassung & Wahrnehmung</h2><canvas id="c2"></canvas></div>
+
+    <script>
+        const zeit = ['T1', 'T2', 'T3', 'T4'];
+        const d1 = { 'Lust': [2,2,3,4], 'Gespräche': [1,2,3,4], 'Hilfe': [1,2,2,3] };
+        const d2 = { 'Emotion': [3,4,6,7], 'Schlaf': [4,4,6,8], 'Einsamkeit (Trend)': [3,4,6,8] };
+
+        function draw(id, data, label) {
+            const ds = Object.keys(data).map(k => ({ label: k, data: data[k], borderDash: [5,5], fill: false }));
+            ds.push({ label: 'GESAMTTREND', data: zeit.map((_,i) => Object.values(data).reduce((s,d)=>s+d[i],0)/Object.keys(data).length), borderColor: 'black', borderWidth: 4, fill: false });
+            new Chart(document.getElementById(id), { type: 'line', data: { labels: zeit, datasets: ds } });
+        }
+        draw('c1', d1, 'Zustimmung');
+        draw('c2', d2, 'Skala');
+    </script>
+</body>
+</html>
