@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trend-Zusatzmodul</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f4f7f6; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 900px; margin: auto; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        input { width: 40px; text-align: center; border: 1px solid #ccc; }
+        .btn { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; width: 100%; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>📈 Zusätzliche Trendanalyse</h2>
+    <p><small>Diese Seite ist unabhängig von deiner index.html und deinem anderen Tracker.</small></p>
+    
+    <table>
+        <thead><tr><th>Parameter</th><th>T1</th><th>T2</th><th>T3</th><th>T4</th></tr></thead>
+        <tbody id="inputs">
+            <tr data-inv="no"><td>Lust auf Menschen (1-5)</td><td><input value="1"></td><td><input value="1"></td><td><input value="1"></td><td><input value="1"></td></tr>
+            <tr data-inv="no"><td>Gespräche führen (1-5)</td><td><input value="1"></td><td><input value="1"></td><td><input value="1"></td><td><input value="1"></td></tr>
+            <tr data-inv="yes"><td>Einsamkeit (1-10) *</td><td><input value="10"></td><td><input value="10"></td><td><input value="10"></td><td><input value="10"></td></tr>
+            <tr data-inv="yes"><td>Schmerz (1-10) *</td><td><input value="10"></td><td><input value="10"></td><td><input value="10"></td><td><input value="10"></td></tr>
+        </tbody>
+    </table>
+    <p><small>* Bei markierten Werten bedeutet 10 = schlecht, 1 = gut. Im Trend wird dies automatisch für dich umgedreht!</small></p>
+    <button class="btn" onclick="run()">Trend jetzt berechnen</button>
+    
+    <div style="height: 400px; margin-top: 30px;">
+        <canvas id="chart"></canvas>
+    </div>
+</div>
+
+<script>
+    let chart = null;
+    function run() {
+        const rows = document.querySelectorAll('#inputs tr');
+        const datasets = [];
+        let averages = [0,0,0,0];
+
+        rows.forEach((row, i) => {
+            const name = row.cells[0].innerText;
+            const inv = row.getAttribute('data-inv') === 'yes';
+            const inputs = row.querySelectorAll('input');
+            const data = Array.from(inputs).map((inp, t) => {
+                let val = parseFloat(inp.value) || 0;
+                let trendVal = inv ? (11 - val) : val; // Invertiert 10 zu 1, 1 zu 10
+                averages[t] += trendVal;
+                return val;
+            });
+
+            datasets.push({ label: name, data: data, borderDash: [5,5], borderColor: `hsl(${i*60},60%,70%)`, fill: false });
+        });
+
+        const finalTrend = averages.map(s => (s / rows.length).toFixed(2));
+        datasets.push({ label: 'GESAMTTREND (ERFOLG)', data: finalTrend, borderColor: 'black', borderWidth: 4, fill: false });
+
+        if(chart) chart.destroy();
+        chart = new Chart(document.getElementById('chart'), {
+            type: 'line',
+            data: { labels: ['T1','T2','T3','T4'], datasets: datasets },
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 10 } } }
+        });
+    }
+    run();
+</script>
+</body>
+</html>
