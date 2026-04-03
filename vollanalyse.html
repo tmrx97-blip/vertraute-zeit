@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vertraute Zeit | Clean Core Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #0062cc;
+            --secondary: #6c757d;
+            --success: #218838;
+            --bg: #f0f2f5;
+            --surface: #ffffff;
+            --text: #1c1e21;
+            --border: #ced4da;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 15px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 2px solid var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .status-badge {
+            font-size: 0.8rem;
+            color: var(--success);
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s;
+            margin-top: 5px;
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+
+        .toolbar {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: background 0.2s;
+            color: white;
+        }
+
+        .btn-add { background-color: #17a2b8; }
+        .btn-csv { background-color: var(--secondary); }
+        .btn-reset { background-color: #dc3545; }
+
+        .table-scroll {
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            min-width: 800px;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background: var(--primary);
+            color: white;
+            position: sticky;
+            top: 0;
+        }
+
+        td:first-child {
+            text-align: left;
+            font-weight: 600;
+            background: #f8f9fa;
+            position: sticky;
+            left: 0;
+            z-index: 2;
+            width: 250px;
+        }
+
+        .cat-header {
+            background: #e7f3ff !important;
+            color: var(--primary);
+            text-align: left !important;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+        input {
+            width: 50px;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        input:focus { border-color: var(--primary); outline: none; background: #fff9e6; }
+
+        .chart-container { height: 500px; position: relative; }
+
+        @media (max-width: 768px) {
+            .toolbar { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>📊 Vertraute Zeit – Dashboard PRO</h1>
+        <div id="save-status" class="status-badge">✔ Automatisch gespeichert</div>
+    </header>
+
+    <div class="card">
+        <div class="toolbar">
+            <button class="btn-add" onclick="addTimepoint()">➕ Zeitpunkt (T) hinzufügen</button>
+            <button class="btn-csv" onclick="exportCSV()">📥 Excel-Export (CSV)</button>
+            <button class="btn-reset" onclick="resetData()">⚠ Daten löschen</button>
+        </div>
+
+        <div class="table-scroll">
+            <table>
+                <thead>
+                    <tr id="h-row">
+                        <th>Parameter</th>
+                        </tr>
+                </thead>
+                <tbody id="b-rows"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Trendanalyse: Gesamte Entwicklung</h2>
+        <div class="chart-container">
+            <canvas id="masterChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<script>
+    // DEFINITION ALLER PARAMETER (Stufe: Chefentwickler)
+    const datasetDefinition = [
+        { group: "Soziale Resonanz (Skala 1-5)", items: ["Lust auf Menschen", "Kleine Gespräche", "Neue Kontakte", "Um Hilfe bitten", "Etwas zu geben", "Freude/Unternehmung", "Teilnahme am Leben", "Zukunftspläne"] },
+        { group: "Befinden & Verfassung", items: ["Zufriedenheit (1-10)", "Einsamkeitserleben (1-10)*", "Selbstwirksamkeit (1-5)", "Soziale Initiative", "Schlafqualität (1-10)", "Vorfreude (1-5)", "Sinnhaftigkeit", "Körperwahrnehmung (1-5)*", "Zukunftsorientierung"] },
+        { group: "Verhalten & Alltag", items: ["Teilnahme-Intensität", "Soziale Kontakte", "Alltagsaktivitäten", "Arztbesuche*", "Kognitive Aktivität", "Körperliche Aktivität", "Ernährung", "Kreativität"] },
+        { group: "Langfristige Entwicklung", items: ["Netzwerkgröße", "Lebensqualität (1-10)", "Selbstbild", "Zielerreichung", "Rückfälle*", "Hilfe-Inanspruchnahme"] },
+        { group: "Gruppen-Spezifisch", items: ["Vertraute Momente", "Gemeinschaftserleben", "Ritual-Treue", "Initiative Gruppe", "Transfer Alltag"] }
+    ];
+
+    const flatItems = datasetDefinition.flatMap(d => d.items);
+    let currentTCount = 4;
+    let chartInstance = null;
+
+    // INITIALISIERUNG
+    function init() {
+        loadData();
+        renderTable();
+        updateChart();
+    }
+
+    function renderTable() {
+        const header = document.getElementById('h-row');
+        header.innerHTML = '<th>Parameter</th>';
+        for(let t=1; t<=currentTCount; t++) {
+            header.innerHTML += `<th>T${t}</th>`;
+        }
+
+        const tbody = document.getElementById('b-rows');
+        tbody.innerHTML = '';
+        let itemIdx = 0;
+
+        datasetDefinition.forEach(cat => {
+            let catRow = tbody.insertRow();
+            catRow.innerHTML = `<td colspan="${currentTCount + 1}" class="cat-header">${cat.group}</td>`;
+            
+            cat.items.forEach(name => {
+                let row = tbody.insertRow();
+                row.insertCell(0).innerText = name;
+                for(let t=0; t<currentTCount; t++) {
+                    let cell = row.insertCell(t+1);
+                    cell.innerHTML = `<input type="number" id="cell-${itemIdx}-${t}" oninput="handleInput()">`;
+                }
+                itemIdx++;
+            });
+        });
+        restoreValues();
+    }
+
+    function handleInput() {
+        saveData();
+        updateChart();
+        showStatus();
+    }
+
+    function showStatus() {
+        const s = document.getElementById('save-status');
+        s.style.opacity = '1';
+        setTimeout(() => s.style.opacity = '0', 1500);
+    }
+
+    function addTimepoint() {
+        currentTCount++;
+        renderTable();
+        saveData();
+        updateChart();
+    }
+
+    function updateChart() {
+        const datasets = [];
+        let trendLine = Array(currentTCount).fill(0);
+
+        flatItems.forEach((name, rIdx) => {
+            let rowData = [];
+            for(let t=0; t<currentTCount; t++) {
+                let val = parseFloat(document.getElementById(`cell-${rIdx}-${t}`).value) || 0;
+                
+                // INVERTIERUNGS-LOGIK: Erkennt das Sternchen im Namen
+                let calcVal = val;
+                if(name.includes('*')) {
+                    let max = name.includes('1-10') ? 10 : 5;
+                    calcVal = (val > 0) ? (max + 1 - val) : 0;
+                }
+                
+                rowData.push(val);
+                trendLine[t] += calcVal;
+            }
+
+            datasets.push({
+                label: name,
+                data: rowData,
+                borderDash: [5, 5],
+                borderColor: `hsl(${rIdx * 15}, 60%, 80%)`,
+                hidden: true,
+                tension: 0.2
+            });
+        });
+
+        const averages = trendLine.map(v => (v / flatItems.length).toFixed(2));
+
+        const ctx = document.getElementById('masterChart').getContext('2d');
+        if(chartInstance) chartInstance.destroy();
+
+        chartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: Array.from({length: currentTCount}, (_, i) => "T" + (i+1)),
+                datasets: [
+                    ...datasets,
+                    {
+                        label: 'GESAMTTREND (ERFOLG)',
+                        data: averages,
+                        borderColor: '#000',
+                        borderWidth: 5,
+                        pointRadius: 6,
+                        fill: false,
+                        tension: 0.1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { y: { beginAtZero: true, suggestedMax: 10 } },
+                plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } }
+            }
+        });
+    }
+
+    function saveData() {
+        const values = [];
+        for(let r=0; r<flatItems.length; r++) {
+            let row = [];
+            for(let t=0; t<currentTCount; t++) {
+                row.push(document.getElementById(`cell-${r}-${t}`).value);
+            }
+            values.push(row);
+        }
+        const bundle = { t: currentTCount, v: values };
+        localStorage.setItem('v_zeit_clean_core', JSON.stringify(bundle));
+    }
+
+    function loadData() {
+        const stored = localStorage.getItem('v_zeit_clean_core');
+        if(stored) {
+            const bundle = JSON.parse(stored);
+            currentTCount = bundle.t;
+        }
+    }
+
+    function restoreValues() {
+        const stored = localStorage.getItem('v_zeit_clean_core');
+        if(stored) {
+            const bundle = JSON.parse(stored);
+            bundle.v.forEach((row, rIdx) => {
+                row.forEach((val, tIdx) => {
+                    const el = document.getElementById(`cell-${rIdx}-${tIdx}`);
+                    if(el) el.value = val;
+                });
+            });
+        }
+    }
+
+    function exportCSV() {
+        let csv = "\uFEFFParameter;";
+        for(let t=1; t<=currentTCount; t++) csv += `T${t};`;
+        csv += "\n";
+
+        flatItems.forEach((name, rIdx) => {
+            csv += `"${name}";`;
+            for(let t=0; t<currentTCount; t++) {
+                csv += `${document.getElementById(`cell-${rIdx}-${t}`).value};`;
+            }
+            csv += "\n";
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `Trendanalyse_${new Date().toISOString().split('T')[0]}.csv`;
+        link.click();
+    }
+
+    function resetData() {
+        if(confirm("ACHTUNG: Alle eingetragenen Daten werden unwiderruflich gelöscht. Fortfahren?")) {
+            localStorage.removeItem('v_zeit_clean_core');
+            location.reload();
+        }
+    }
+
+    window.onload = init;
+</script>
+</body>
+</html>
