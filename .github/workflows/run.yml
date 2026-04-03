@@ -1,0 +1,19 @@
+name: Automatisierte Analyse
+on: [push] # Startet jedes Mal, wenn du den Code änderst
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Tools installieren
+        run: pip install pandas matplotlib
+      - name: Analyse starten
+        run: python analyse.py
+      - name: Ergebnisse speichern
+        uses: STEF-AK/action-commit-push@v3
+        with:
+          message: "Diagramme automatisch aktualisiert"
