@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vertraute Zeit – Vollanalyse & Tracking</title>
+    <style>
+        :root {
+            --blau: #4A6A8F;
+            --blau-hell: #6B84AC;
+            --blau-bg: #E8EEF4;
+            --gruen: #2E8B57;
+            --gelb: #DAA520;
+            --rot: #CC3333;
+            --grau: #666;
+            --grau-hell: #F5F6F8;
+            --weiss: #FFFFFF;
+            --text: #2A2A2A;
+            --radius: 10px;
+            --schatten: 0 2px 12px rgba(74,106,143,0.10);
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: Georgia, serif;
+            color: var(--text);
+            background: var(--grau-hell);
+            line-height: 1.6;
+            padding-bottom: 4rem;
+        }
+
+        header {
+            background: var(--blau);
+            color: var(--weiss);
+            padding: 1.5rem;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        header h1 { font-family: Arial, sans-serif; font-size: 1.4rem; margin-bottom: 5px; }
+
+        .container { max-width: 900px; margin: 0 auto; padding: 1rem; }
+
+        .card {
+            background: var(--weiss);
+            border-radius: var(--radius);
+            box-shadow: var(--schatten);
+            padding: 1.5rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .nav { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+        
+        .nav-btn {
+            flex: 1;
+            min-width: 130px;
+            padding: 0.8rem;
+            border: 2px solid var(--blau);
+            background: var(--weiss);
+            color: var(--blau);
+            border-radius: var(--radius);
+            font-weight: bold;
+            cursor: pointer;
+            font-family: Arial, sans-serif;
+            transition: 0.2s;
+        }
+
+        .nav-btn.active, .nav-btn:hover {
+            background: var(--blau);
+            color: var(--weiss);
+        }
+
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; font-weight: bold; margin-bottom: 0.3rem; color: var(--blau); font-family: Arial; }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1.5px solid #CCC;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        .btn {
+            padding: 0.8rem 1.2rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        .btn-primary { background: var(--blau); color: white; }
+        .btn-success { background: var(--gruen); color: white; width: 100%; font-size: 1.1rem; }
+        .btn-danger { background: var(--rot); color: white; }
+        .btn-secondary { background: var(--blau-bg); color: var(--blau); }
+
+        .klient-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border: 1px solid #E0E0E0;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            background: white;
+        }
+
+        /* Ampel & Trends */
+        .ampel {
+            display: inline-block;
+            width: 14px; height: 14px;
+            border-radius: 50%;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        .ampel-gruen { background: var(--gruen); }
+        .ampel-gelb { background: var(--gelb); }
+        .ampel-rot { background: var(--rot); box-shadow: 0 0 6px var(--rot); }
+
+        .ampel-hint {
+            background: #FFF0F0;
+            border-left: 5px solid var(--rot);
+            padding: 1rem;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #800;
+            font-weight: bold;
+        }
+
+        .mini-bar-container {
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            height: 50px;
+            margin: 10px 0;
+            background: #F9F9F9;
+            padding: 5px;
+            border-radius: 4px;
+        }
+        .mini-bar {
+            flex: 1;
+            border-radius: 2px 2px 0 0;
+            transition: height 0.3s;
+        }
+
+        .view { display: none; }
+        .view.active { display: block; }
+
+        @media print {
+            .nav, .no-print, .btn-danger { display: none !important; }
+            body { background: white; padding: 0; }
+            .card { box-shadow: none; border: 1px solid #DDD; break-inside: avoid; }
+            header { position: static; background: white; color: black; border-bottom: 2px solid var(--blau); }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Vertraute Zeit – Vollanalyse</h1>
+    <p style="font-size: 0.85rem; opacity: 0.9;">Klienten-Tracking & Parameter-Auswertung</p>
+</header>
+
+<div class="container">
+    <div class="nav no-print">
+        <button class="nav-btn active" onclick="showView('klienten')">Klienten</button>
+        <button class="nav-btn" onclick="showView('erhebung')">Neue Erhebung</button>
+        <button class="nav-btn" onclick="showView('trend')">Vollanalyse</button>
+        <button class="nav-btn" onclick="showView('daten')">Daten-Export</button>
+    </div>
+
+    <div id="view-klienten" class="view active">
+        <div class="card">
+            <label>Neuen Klienten registrieren</label>
+            <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 0.5rem; margin-top: 0.5rem;">
+                <input type="text" id="new-nr" placeholder="Nr. (z.B. K102)">
+                <input type="text" id="new-init" placeholder="Kürzel (z.B. A.B.)">
+                <button class="btn btn-primary" onclick="addKlient()">Hinzufügen</button>
+            </div>
+        </div>
+        <div class="card">
+            <label>Aktuelle Klientenliste</label>
+            <div id="klienten-liste" style="margin-top: 1rem;"></div>
+        </div>
+    </div>
+
+    <div id="view-erhebung" class="view">
+        <div class="card">
+            <div class="form-group">
+                <label>Klient auswählen</label>
+                <select id="erh-klient"></select>
+            </div>
+            <div class="form-group">
+                <label>Datum der Erhebung</label>
+                <input type="date" id="erh-datum">
+            </div>
+        </div>
+        <div id="param-form-container"></div>
+        <div class="card no-print">
+            <button class="btn btn-success" onclick="saveErhebung()">Erhebung dauerhaft speichern</button>
+        </div>
+    </div>
+
+    <div id="view-trend" class="view">
+        <div class="card no-print">
+            <label>Analyse für Klient laden</label>
+            <select id="trend-klient" onchange="renderTrend()"></select>
+        </div>
+        <div id="trend-output"></div>
+    </div>
+
+    <div id="view-daten" class="view">
+        <div class="card">
+            <label>Bericht & Archivierung</label>
+            <p style="font-size: 0.9rem; margin-bottom: 1rem;">Wählen Sie einen Klienten in der Vollanalyse aus, um die Druckfunktion zu nutzen.</p>
+            <button class="btn btn-primary" onclick="window.print()">Aktuelle Ansicht als PDF drucken</button>
+            <button class="btn btn-secondary" onclick="exportCSV()" style="margin-top: 1rem;">Daten als CSV (Excel) exportieren</button>
+        </div>
+        <div class="card" style="margin-top: 2rem; border: 1.5px solid var(--rot);">
+            <label style="color: var(--rot);">Gefahrenbereich</label>
+            <p style="font-size: 0.8rem; margin-bottom: 1rem;">Hiermit werden alle lokal gespeicherten Daten gelöscht.</p>
+            <button class="btn btn-danger" onclick="resetAll()">Daten-Reset (Alles löschen)</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Feste Parameter-Struktur
+    const KATEGORIEN = [
+        { name: "Soziale Verbindung", params: [
+            { id: "p01", name: "Freude an Kontakt", fragen: "Hatten Sie Besuch? Wie war das Gefühl dabei?" },
+            { id: "p02", name: "Gesprächsbeginn", fragen: "Suchen Sie von sich aus das Gespräch mit anderen?" },
+            { id: "p03", name: "Bekanntenkreis", fragen: "Besteht Kontakt zu Menschen von früher?" }
+        ]},
+        { name: "Stimmung & Antrieb", params: [
+            { id: "p04", name: "Allg. Zufriedenheit", fragen: "Wie würden Sie Ihre Stimmung heute beschreiben?" },
+            { id: "p05", name: "Vorfreude", fragen: "Gibt es Ereignisse, auf die Sie sich freuen?" },
+            { id: "p06", name: "Eigeninitiative", fragen: "Können Sie heute frei entscheiden, was Sie tun?" }
+        ]},
+        { name: "Alltag & Aktivität", params: [
+            { id: "p07", name: "Selbstständigkeit", fragen: "Was haben Sie heute ohne Hilfe geschafft?" },
+            { id: "p08", name: "Struktur & Versorgung", fragen: "Essen und Trinken Sie regelmäßig über den Tag?" },
+            { id: "p09", name: "Bewegung", fragen: "Waren Sie heute oder gestern an der frischen Luft?" }
+        ]},
+        { name: "Entwicklung", params: [
+            { id: "p10", name: "Selbstbild", fragen: "Was schätzen Sie an sich selbst am meisten?" },
+            { id: "p11", name: "Zukunftswünsche", fragen: "Was möchten Sie in den nächsten Monaten erreichen?" },
+            { id: "p12", name: "Offenheit", fragen: "Wie gehen Sie mit Veränderungen in Ihrem Umfeld um?" }
+        ]}
+    ];
+
+    const ALL_PARAMS = KATEGORIEN.flatMap(k => k.params.map(p => ({...p, kat: k.name})));
+
+    // DATEN-LOGIK
+    function loadData() {
+        return JSON.parse(localStorage.getItem("vz_vollanalyse_db") || '{"klienten":[], "erhebungen":[]}');
+    }
+    function saveData(data) {
+        localStorage.setItem("vz_vollanalyse_db", JSON.stringify(data));
+    }
+
+    // NAVIGATION
+    function showView(viewId) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById('view-' + viewId).classList.add('active');
+        document.querySelectorAll('.nav-btn').forEach(b => {
+            b.classList.toggle('active', b.getAttribute('onclick').includes(viewId));
+        });
+        
+        if(viewId === 'klienten') renderKlienten();
+        if(viewId === 'erhebung') { updateSelects(); renderForm(); }
+        if(viewId === 'trend') { updateSelects(); renderTrend(); }
+        if(viewId === 'daten') updateSelects();
+    }
+
+    // KLIENTEN-STEUERUNG
+    function addKlient() {
+        const nr = document.getElementById("new-nr").value.trim();
+        const init = document.getElementById("new-init").value.trim();
+        if(!nr || !init) { alert("Bitte Nr. und Kürzel eingeben."); return; }
+        
+        let data = loadData();
+        if(data.klienten.find(k => k.nr === nr)) { alert("Diese Nr. existiert bereits."); return; }
+        
+        data.klienten.push({ nr, init });
+        saveData(data);
+        document.getElementById("new-nr").value = "";
+        document.getElementById("new-init").value = "";
+        renderKlienten();
+    }
+
+    function renderKlienten() {
+        const data = loadData();
+        const container = document.getElementById("klienten-liste");
+        container.innerHTML = data.klienten.length ? "" : "<p style='color:gray'>Noch keine Klienten angelegt.</p>";
+        data.klienten.forEach(k => {
+            const anzahl = data.erhebungen.filter(e => e.klient === k.nr).length;
+            container.innerHTML += `
+                <div class="klient-item">
+                    <span><strong>${k.nr}</strong> — ${k.init} <small style="color:var(--blau-hell)">(${anzahl} Erhebungen)</small></span>
+                    <button class="btn btn-danger" style="padding:4px 10px; font-size:0.8rem;" onclick="deleteKlient('${k.nr}')">Löschen</button>
+                </div>`;
+        });
+    }
+
+    function deleteKlient(nr) {
+        if(!confirm("Möchten Sie Klient " + nr + " und alle zugehörigen Daten wirklich löschen?")) return;
+        let data = loadData();
+        data.klienten = data.klienten.filter(k => k.nr !== nr);
+        data.erhebungen = data.erhebungen.filter(e => e.klient !== nr);
+        saveData(data);
+        renderKlienten();
+    }
+
+    // FORMULAR-ERSTELLUNG
+    function updateSelects() {
+        const data = loadData();
+        const options = '<option value="">-- Bitte wählen --</option>' + 
+            data.klienten.map(k => `<option value="${k.nr}">${k.nr} (${k.init})</option>`).join("");
+        ['erh-klient', 'trend-klient'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.innerHTML = options;
+        });
+    }
+
+    function renderForm() {
+        const container = document.getElementById("param-form-container");
+        document.getElementById("erh-datum").value = new Date().toISOString().split('T')[0];
+        let html = "";
+        KATEGORIEN.forEach(kat => {
+            html += `<h3 style="margin: 1.5rem 0 0.5rem; color: var(--blau); font-family: Arial;">${kat.name}</h3>`;
+            kat.params.forEach(p => {
+                html += `
+                <div class="card">
+                    <label>${p.name}</label>
+                    <p style="font-size: 0.85rem; color: #555; margin-bottom: 0.8rem; font-style: italic;">Fragehilfe: ${p.fragen}</p>
+                    <select id="val-${p.id}">
+                        <option value="">-- Wert auswählen --</option>
+                        <option value="1">1 - Trifft gar nicht zu</option>
+                        <option value="2">2 - Selten / Kaum</option>
+                        <option value="3">3 - Gelegentlich / Mittel</option>
+                        <option value="4">4 - Häufig / Gut</option>
+                        <option value="5">5 - Vollständig / Optimal</option>
+                    </select>
+                    <textarea id="note-${p.id}" placeholder="Besondere Notizen oder Zitate..." style="margin-top:0.8rem; height: 60px;"></textarea>
+                </div>`;
+            });
+        });
+        container.innerHTML = html;
+    }
+
+    function saveErhebung() {
+        const klient = document.getElementById("erh-klient").value;
+        const datum = document.getElementById("erh-datum").value;
+        if(!klient || !datum) { alert("Bitte wählen Sie einen Klienten und ein Datum."); return; }
+
+        let werte = {};
+        let notizen = {};
+        let unvollstaendig = false;
+
+        ALL_PARAMS.forEach(p => {
+            const v = document.getElementById("val-" + p.id).value;
+            if(!v) unvollstaendig = true;
+            werte[p.id] = v;
+            notizen[p.id] = document.getElementById("note-" + p.id).value.trim();
+        });
+
+        if(unvollstaendig && !confirm("Einige Parameter wurden nicht bewertet. Trotzdem speichern?")) return;
+
+        let data = loadData();
+        data.erhebungen.push({ klient, datum, werte, notizen });
+        saveData(data);
+        alert("Erhebung wurde erfolgreich gespeichert.");
+        showView('klienten');
+    }
+
+    // VOLLANALYSE & TRENDS
+    function renderTrend() {
+        const nr = document.getElementById("trend-klient").value;
+        const container = document.getElementById("trend-output");
+        if(!nr) { container.innerHTML = ""; return; }
+
+        const data = loadData();
+        const klientObj = data.klienten.find(k => k.nr === nr);
+        const erhs = data.erhebungen.filter(e => e.klient === nr).sort((a,b) => a.datum.localeCompare(b.datum));
+
+        if(erhs.length === 0) { 
+            container.innerHTML = "<div class='card'>Keine Daten für diesen Klienten vorhanden.</div>"; 
+            return; 
+        }
+
+        let html = `
+            <div class="card">
+                <h2 style="color:var(--blau)">Bericht für ${nr} (${klientObj ? klientObj.init : '?'})</h2>
+                <p>Zeitraum: ${erhs[0].datum} bis ${erhs[erhs.length-1].datum} | Erhebungen: ${erhs.length}</p>
+            </div>`;
+        
+        KATEGORIEN.forEach(kat => {
+            html += `<h3 style="margin: 2rem 0 1rem; border-bottom: 3px solid var(--blau-bg); padding-bottom: 5px;">${kat.name}</h3>`;
+            kat.params.forEach(p => {
+                const werteSerie = erhs.map(e => parseInt(e.werte[p.id]) || 0);
+                const aktuell = werteSerie[werteSerie.length - 1];
+                const davor = werteSerie.length > 1 ? werteSerie[werteSerie.length - 2] : null;
+                
+                // Logik für Ampel
+                let ampel = "ampel-gelb";
+                if(aktuell >= 4) ampel = "ampel-gruen";
+                if(aktuell <= 2 && davor !== null && davor <= 2) ampel = "ampel-rot";
+
+                // Visualisierung Balken
+                let bars = "";
+                werteSerie.forEach(w => {
+                    const h = (w * 20) + "%";
+                    const color = w >= 4 ? "var(--gruen)" : (w <= 2 ? "var(--rot)" : "var(--gelb)");
+                    bars += `<div class="mini-bar" style="height:${h}; background:${color}"></div>`;
+                });
+
+                html += `
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <strong><span class="ampel ${ampel}"></span> ${p.name}</strong>
+                        <span style="font-weight:bold; color:var(--blau)">${aktuell || '-'}/5</span>
+                    </div>
+                    <div class="mini-bar-container">${bars}</div>
+                    ${ampel === 'ampel-rot' ? '<div class="ampel-hint">Warnung: Stabile Verschlechterung/Niedrigwert. Prüfung durch Fachpersonal empfohlen.</div>' : ''}
+                    <div style="font-size: 0.8rem; color: #666; margin-top: 10px;">
+                        Verlauf: ${erhs.map(e => e.werte[p.id] || '?').join(' → ')}
+                    </div>
+                </div>`;
+            });
+        });
+        container.innerHTML = html;
+    }
+
+    // EXPORT & RESET
+    function exportCSV() {
+        const data = loadData();
+        if(!data.erhebungen.length) return alert("Keine Daten zum Exportieren.");
+        
+        let csv = "\uFEFFDatum;Klient;Kategorie;Parameter;Wert;Notiz\n";
+        data.erhebungen.forEach(e => {
+            KATEGORIEN.forEach(kat => {
+                kat.params.forEach(p => {
+                    csv += `${e.datum};${e.klient};${kat.name};${p.name};${e.werte[p.id] || ''};"${(e.notizen[p.id] || '').replace(/"/g, '""')}"\n`;
+                });
+            });
+        });
+
+        const blob = new Blob([csv], {type: 'text/csv;charset=utf-8'});
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `Vollanalyse_Export_${new Date().toISOString().split('T')[0]}.csv`;
+        link.click();
+    }
+
+    function resetAll() {
+        if(!confirm("ACHTUNG: Dies löscht wirklich alle Klienten und alle Erhebungen unwiderruflich! Fortfahren?")) return;
+        localStorage.removeItem("vz_vollanalyse_db");
+        location.reload();
+    }
+
+    // Start-Anzeige
+    renderKlienten();
+</script>
+
+</body>
+</html>
