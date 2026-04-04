@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vertraute Zeit - Klienten-Tracking</title>
+    <style>
+        /* Grundlegendes Layout & Reset */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        :root {
+            --blau: #4A6A8F; --blau2: #6B84AC; --blaubg: #E8EEF4;
+            --gruen: #2E8B57; --gelb: #DAA520; --rot: #CC3333;
+            --grau: #666; --hell: #F5F6F8; --weiss: #FFF; --text: #2A2A2A;
+            --radius: 10px; --schatten: 0 2px 12px rgba(74, 106, 143, 0.10);
+        }
+        
+        html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+        body { font-family: Georgia, "Times New Roman", serif; color: var(--text); background: var(--hell); min-height: 100vh; padding-bottom: 2rem; }
+        h1, h2, h3, h4, button, label, select, .nav-btn, .tag, th { font-family: Arial, Helvetica, sans-serif; }
+        
+        /* Header */
+        header { background: var(--blau); color: var(--weiss); padding: 1.2rem 1.5rem; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+        header h1 { font-size: 1.3rem; font-weight: 700; letter-spacing: 0.02em; }
+        header p { font-size: 0.8rem; opacity: 0.8; margin-top: 0.2rem; }
+        
+        /* Container & Cards */
+        .container { max-width: 900px; margin: 0 auto; padding: 1rem; }
+        .card { background: var(--weiss); border-radius: var(--radius); box-shadow: var(--schatten); padding: 1.5rem; margin-bottom: 1rem; }
+        .card h2 { color: var(--blau); font-size: 1.1rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--blaubg); }
+        .card h3 { color: var(--blau2); font-size: 0.95rem; margin: 1rem 0 0.5rem; }
+        
+        /* Navigation */
+        .navigation { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+        .nav-btn { flex: 1; min-width: 120px; padding: 0.7rem 0.5rem; border: 2px solid var(--blau); background: var(--weiss); color: var(--blau); border-radius: var(--radius); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; text-align: center; }
+        .nav-btn.active, .nav-btn:hover { background: var(--blau); color: var(--weiss); }
+        
+        /* Formulare */
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--blau); margin-bottom: 0.3rem; }
+        input[type="text"], input[type="date"], select, textarea { width: 100%; padding: 0.7rem; border: 1.5px solid #CCC; border-radius: 6px; font-size: 1rem; font-family: Georgia, serif; background: var(--weiss); color: var(--text); -webkit-appearance: none; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--blau); box-shadow: 0 0 0 3px rgba(74,106,143,0.15); }
+        textarea { resize: vertical; min-height: 60px; }
+        select { cursor: pointer; }
+        
+        /* Buttons */
+        .btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.7rem 1.2rem; border: none; border-radius: 6px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .btn-primary { background: var(--blau); color: var(--weiss); } .btn-primary:hover { background: #3A5A7F; }
+        .btn-secondary { background: var(--blaubg); color: var(--blau); } .btn-secondary:hover { background: #D0DCE8; }
+        .btn-danger { background: var(--rot); color: var(--weiss); } .btn-danger:hover { background: #AA2222; }
+        .btn-success { background: var(--gruen); color: var(--weiss); width: 100%; justify-content: center; font-size: 1.1rem; padding: 1rem; } .btn-success:hover { background: #1E6B3F; }
+        .btn-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem; }
+        
+        /* Listen & Items */
+        .client-item { display: flex; align-items: center; justify-content: space-between; padding: 0.8rem 1rem; border: 1.5px solid #E0E0E0; border-radius: 8px; margin-bottom: 0.5rem; cursor: pointer; transition: all 0.15s; }
+        .client-item:hover { border-color: var(--blau); background: var(--blaubg); }
+        .client-name { font-weight: 600; font-size: 1rem; }
+        .client-count { font-family: Arial, sans-serif; font-size: 0.75rem; color: var(--blau2); }
+        
+        /* Parameter Boxen */
+        .param-box { border: 1.5px solid #E8E8E8; border-radius: 8px; padding: 1rem; margin-bottom: 0.8rem; background: var(--hell); }
+        .param-box h4 { color: var(--blau); font-size: 0.9rem; margin-bottom: 0.3rem; }
+        .param-fragen { font-size: 0.8rem; color: var(--grau); margin-bottom: 0.6rem; line-height: 1.4; }
+        .param-row { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.5rem; }
+        .param-row label { margin: 0; min-width: 60px; font-size: 0.85rem; }
+        .param-row select { width: auto; min-width: 140px; }
+        
+        /* Indikatoren & Tags */
+        .ampel { display: inline-block; width: 14px; height: 14px; border-radius: 50%; margin-right: 0.4rem; vertical-align: middle; }
+        .ampel-gruen { background: var(--gruen); } .ampel-gelb { background: var(--gelb); } .ampel-rot { background: var(--rot); box-shadow: 0 0 6px rgba(204, 51, 51, 0.4); }
+        .alert-hint { font-size: 0.75rem; color: var(--rot); margin-top: 0.3rem; padding: 0.3rem 0.5rem; background: #FFF0F0; border-radius: 4px; border-left: 3px solid var(--rot); }
+        .no-data { text-align: center; color: var(--grau); font-size: 0.85rem; padding: 2rem; font-style: italic; }
+        .kat-header { background: var(--blau); color: var(--weiss); padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.9rem; font-weight: 600; margin: 1.2rem 0 0.6rem; }
+        
+        /* Views */
+        .view { display: none; }
+        .view.active { display: block; }
+        
+        .tag { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600; }
+        .tag-t1 { background: #E3F0E8; color: #2E6B45; }
+        .tag-t2 { background: #FFF3DC; color: #8B6914; }
+        .tag-t3 { background: #E8EEF4; color: #4A6A8F; }
+        .tag-t4 { background: #F3E8F4; color: #6B3A8F; }
+        
+        @media(min-width: 768px) { .container { padding: 1.5rem; } header h1 { font-size: 1.5rem; } .nav-btn { font-size: 0.9rem; } }
+        @media print { header { position: static; } .navigation, .btn-row, .no-print { display: none !important; } .card { box-shadow: none; border: 1px solid #CCC; break-inside: avoid; } body { background: white; } }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Vertraute Zeit - Klienten-Tracking</h1>
+    <p>12 Parameter - Skala 1-5 - Alle 6 Monate</p>
+</header>
+
+<div class="container">
+    <div class="navigation no-print">
+        <button class="nav-btn active" onclick="switchView('klienten')">Klienten</button>
+        <button class="nav-btn" onclick="switchView('erhebung')">Neue Erhebung</button>
+        <button class="nav-btn" onclick="switchView('trend')">Trendanalyse</button>
+        <button class="nav-btn" onclick="switchView('export')">Export</button>
+    </div>
+
+    <div id="view-klienten" class="view active">
+        <div class="card">
+            <h2>Klienten verwalten</h2>
+            <div class="form-group">
+                <label for="input-klient-nr">Klienten-Nummer (z.B. K001)</label>
+                <input type="text" id="input-klient-nr" placeholder="K001">
+            </div>
+            <div class="form-group">
+                <label for="input-klient-init">Anfangsbuchstaben Vor-/Nachname (z.B. B.K.)</label>
+                <input type="text" id="input-klient-init" placeholder="B.K.">
+            </div>
+            <button class="btn btn-primary" onclick="addClient()">Klient hinzufügen</button>
+        </div>
+        <div class="card">
+            <h2>Registrierte Klienten</h2>
+            <div id="client-list-container"></div>
+            <p id="no-clients-msg" class="no-data">Noch keine Klienten angelegt.</p>
+        </div>
+    </div>
+
+    <div id="view-erhebung" class="view">
+        <div class="card">
+            <h2>Neue Erhebung erfassen</h2>
+            <div class="form-group">
+                <label for="select-klient-erhebung">Klient</label>
+                <select id="select-klient-erhebung"><option value="">Bitte wählen...</option></select>
+            </div>
+            <div class="form-group">
+                <label for="input-datum">Datum der Erhebung</label>
+                <input type="date" id="input-datum">
+            </div>
+        </div>
+        <div id="parameter-form-container"></div>
+        <div class="card no-print">
+            <button class="btn btn-success" onclick="saveErhebung()">Erhebung speichern</button>
+        </div>
+    </div>
+
+    <div id="view-trend" class="view">
+        <div class="card">
+            <h2>Trendanalyse</h2>
+            <div class="form-group">
+                <label for="select-klient-trend">Klient</label>
+                <select id="select-klient-trend" onchange="renderTrend()"><option value="">Bitte wählen...</option></select>
+            </div>
+        </div>
+        <div id="trend-container"></div>
+    </div>
+
+    <div id="view-export" class="view">
+        <div class="card">
+            <h2>Daten exportieren</h2>
+            <p style="margin-bottom:1rem;font-size:0.9rem;">CSV-Backup aller Erhebungen oder PDF-Gesamtbericht für einen Klienten.</p>
+            <div class="btn-row">
+                <button class="btn btn-secondary" onclick="exportCSV()">CSV-Backup herunterladen</button>
+            </div>
+            <div class="form-group" style="margin-top:1.5rem;">
+                <label for="select-klient-pdf">PDF-Bericht für Klient</label>
+                <select id="select-klient-pdf"><option value="">Bitte wählen...</option></select>
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-primary" onclick="exportPDF()">PDF-Bericht erstellen</button>
+            </div>
+        </div>
+        <div class="card">
+            <h2>Daten verwalten</h2>
+            <p style="margin-bottom:1rem;font-size:0.9rem;color:var(--rot);">Achtung: Löschen entfernt ALLE Daten unwiderruflich.</p>
+            <button class="btn btn-danger" onclick="deleteAllData()">Alle Daten löschen</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// --- KONFIGURATION DER PARAMETER ---
+const KATEGORIEN = [
+    {
+        name: "Soziale Verbindung", tag: "tag-t1", params: [
+            { id: "p01", name: "Freude an Kontakt mit anderen", fragen: "1. Hatten Sie in letzter Zeit Besuch? Wie war das für Sie?\n2. Wenn morgen jemand vor der Tür stände und Sie zum Kaffee einladen würde – würden Sie mitgehen?" },
+            { id: "p02", name: "Gespräche von sich aus beginnen", fragen: "3. Worüber haben Sie sich zuletzt mit jemandem unterhalten – außer mit mir?\n4. Wenn ich heute nicht gekommen wäre – hätten Sie jemanden angerufen?" },
+            { id: "p03", name: "Kontakt zu früheren Bekannten", fragen: "5. An wen denken Sie manchmal, den Sie lange nicht gesehen haben?\n6. Was müsste passieren, damit so ein alter Kontakt wieder lebendig wird?" }
+        ]
+    },
+    {
+        name: "Stimmung und Antrieb", tag: "tag-t2", params: [
+            { id: "p04", name: "Allgemeine Zufriedenheit", fragen: "7. Wenn Sie Ihren Tag heute beschreiben müssten – in einem einzigen Wort. Welches wäre das?\n8. Wenn ich Sie frage, wie es Ihnen geht – was sagen Sie Ihrer Tochter? Und was würden Sie MIR sagen?" },
+            { id: "p05", name: "Vorfreude", fragen: "9. Worauf freuen Sie sich diese Woche?\n10. Was würden Sie gern nächste Woche erleben, wenn Sie frei wählen könnten?" },
+            { id: "p06", name: "Eigeninitiative (WOLLEN)", fragen: "11. Haben Sie in den letzten Wochen etwas gemacht, wofür Sie sich bewusst entschieden haben?\n12. Wenn Ihnen langweilig ist – was tun Sie dann?" }
+        ]
+    },
+    {
+        name: "Alltag und Aktivität", tag: "tag-t3", params: [
+            { id: "p07", name: "Selbständigkeit (KÖNNEN)", fragen: "13. Was haben Sie heute schon alles geschafft, bevor ich kam?\n14. Wenn Post kommt, die Sie nicht verstehen – was machen Sie damit?" },
+            { id: "p08", name: "Regelmäßigkeit (Essen, Trinken, Struktur)", fragen: "15. Was haben Sie heute Mittag gegessen?\n16. Wann stehen Sie morgens auf? Ist das immer ungefähr gleich oder unterschiedlich?" },
+            { id: "p09", name: "Gesundheitsbewusstsein", fragen: "17. Waren Sie in letzter Zeit draußen? Einfach so, eine Runde um den Block?\n18. Wenn es Ihnen mal nicht gut geht – wen rufen Sie an?" }
+        ]
+    },
+    {
+        name: "Entwicklung", tag: "tag-t4", params: [
+            { id: "p10", name: "Selbstvertrauen / Selbstbild", fragen: "19. Worüber können Sie mehr als die meisten anderen Menschen?\n20. Was würden Sie einem jüngeren Menschen raten, der gerade eine schwere Zeit hat?" },
+            { id: "p11", name: "Eigene Ziele formulieren", fragen: "21. Gibt es etwas, das Sie unbedingt noch erleben möchten?\n22. Wenn wir uns in sechs Monaten wieder so unterhalten – was sollte dann anders sein?" },
+            { id: "p12", name: "Bereitschaft, etwas zu verändern", fragen: "23. Haben Sie in letzter Zeit etwas zum ersten Mal gemacht?\n24. Wenn sich etwas in Ihrem Leben verändern würde – hätten Sie davor eher Angst oder eher Hoffnung?" }
+        ]
+    }
+];
+
+// Flache Liste aller Parameter für einfachen Zugriff erstellen
+const ALLE_PARAMETER = [];
+KATEGORIEN.forEach(kat => {
+    kat.params.forEach(p => {
+        ALLE_PARAMETER.push({ id: p.id, name: p.name, fragen: p.fragen, kat: kat.name, tag: kat.tag });
+    });
+});
+
+// --- DATENVERWALTUNG (LocalStorage) ---
+function loadData() {
+    try {
+        return JSON.parse(localStorage.getItem("vz_tracking") || '{"klienten":[],"erhebungen":[]}');
+    } catch (e) {
+        return { klienten: [], erhebungen: [] };
+    }
+}
+
+function saveData(data) {
+    localStorage.setItem("vz_tracking", JSON.stringify(data));
+}
+
+function escapeHTML(str) {
+    if (!str) return "";
+    const div = document.createElement("div");
+    div.appendChild(document.createTextNode(str));
+    return div.innerHTML;
+}
+
+// --- NAVIGATION ---
+function switchView(viewId) {
+    document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+    document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+    
+    document.getElementById("view-" + viewId).classList.add("active");
+    
+    const btnMap = { 'klienten': 0, 'erhebung': 1, 'trend': 2, 'export': 3 };
+    const btns = document.querySelectorAll(".nav-btn");
+    if (btns[btnMap[viewId]]) btns[btnMap[viewId]].classList.add("active");
+
+    if (viewId === "klienten") renderClientList();
+    if (viewId === "erhebung") { populateSelectDropdowns(); renderParameterForm(); }
+    if (viewId === "trend") { populateSelectDropdowns(); renderTrend(); }
+    if (viewId === "export") { populateSelectDropdowns(); }
+}
+
+// --- KLIENTEN VERWALTEN ---
+function addClient() {
+    const nr = document.getElementById("input-klient-nr").value.trim();
+    const init = document.getElementById("input-klient-init").value.trim();
+    
+    if (!nr || !init) {
+        alert("Bitte Nummer und Anfangsbuchstaben eingeben.");
+        return;
+    }
+    
+    const data = loadData();
+    if (data.klienten.some(k => k.nr === nr)) {
+        alert("Diese Nummer existiert bereits.");
+        return;
+    }
+    
+    data.klienten.push({ nr: nr, init: init });
+    saveData(data);
+    
+    document.getElementById("input-klient-nr").value = "";
+    document.getElementById("input-klient-init").value = "";
+    renderClientList();
+}
+
+function deleteClient(nr) {
+    if (!confirm("Klient " + nr + " und ALLE zugehörigen Erhebungen löschen?")) return;
+    
+    const data = loadData();
+    data.klienten = data.klienten.filter(k => k.nr !== nr);
+    data.erhebungen = data.erhebungen.filter(e => e.klient !== nr);
+    saveData(data);
+    renderClientList();
+}
+
+function renderClientList() {
+    const data = loadData();
+    const container = document.getElementById("client-list-container");
+    const msg = document.getElementById("no-clients-msg");
+    
+    if (data.klienten.length === 0) {
+        container.innerHTML = "";
+        msg.style.display = "block";
+        return;
+    }
+    
+    msg.style.display = "none";
+    let html = "";
+    
+    data.klienten.forEach(klient => {
+        const count = data.erhebungen.filter(e => e.klient === klient.nr).length;
+        html += `
+            <div class="client-item">
+                <div>
+                    <span class="client-name">${klient.nr} - ${escapeHTML(klient.init)}</span> 
+                    <span class="client-count">${count} Erhebung${count !== 1 ? "en" : ""}</span>
+                </div>
+                <button class="btn btn-danger" style="padding:0.4rem 0.8rem;font-size:0.75rem;" onclick="event.stopPropagation(); deleteClient('${klient.nr}')">x</button>
+            </div>
+        `;
+    });
+    container.innerHTML = html;
+}
+
+// --- ERHEBUNGEN ---
+function populateSelectDropdowns() {
+    const data = loadData();
+    let options = '<option value="">Bitte wählen...</option>';
+    data.klienten.forEach(k => {
+        options += `<option value="${k.nr}">${k.nr} - ${escapeHTML(k.init)}</option>`;
+    });
+    
+    ["select-klient-erhebung", "select-klient-trend", "select-klient-pdf"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = options;
+    });
+}
+
+function renderParameterForm() {
+    const container = document.getElementById("parameter-form-container");
+    document.getElementById("input-datum").value = new Date().toISOString().split("T")[0];
+    
+    let html = "";
+    KATEGORIEN.forEach(kat => {
+        html += `<div class="kat-header">${kat.name}</div>`;
+        kat.params.forEach(p => {
+            html += `
+                <div class="card param-box">
+                    <h4>${p.name} <span class="tag ${kat.tag}">${kat.name}</span></h4>
+                    <div class="param-fragen">${escapeHTML(p.fragen).replace(/\n/g, "<br>")}</div>
+                    <div class="param-row">
+                        <label>Wert:</label>
+                        <select id="val-${p.id}">
+                            <option value="">--</option>
+                            <option value="1">1 - trifft gar nicht zu</option>
+                            <option value="2">2 - selten</option>
+                            <option value="3">3 - manchmal</option>
+                            <option value="4">4 - oft</option>
+                            <option value="5">5 - gehört fest zum Alltag</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-top:0.5rem;margin-bottom:0">
+                        <label>Notiz (Freitext vom Papierbogen):</label>
+                        <textarea id="note-${p.id}" rows="2" placeholder="Beobachtungen, Zitate, Anmerkungen..."></textarea>
+                    </div>
+                </div>
+            `;
+        });
+    });
+    container.innerHTML = html;
+}
+
+function saveErhebung() {
+    const klient = document.getElementById("select-klient-erhebung").value;
+    const datum = document.getElementById("input-datum").value;
+    
+    if (!klient) { alert("Bitte Klient wählen."); return; }
+    if (!datum) { alert("Bitte Datum eingeben."); return; }
+    
+    const werte = {};
+    const notizen = {};
+    let allFilled = true;
+    
+    ALLE_PARAMETER.forEach(p => {
+        const val = document.getElementById("val-" + p.id).value;
+        if (!val) allFilled = false;
+        werte[p.id] = val ? parseInt(val) : null;
+        notizen[p.id] = document.getElementById("note-" + p.id).value.trim();
+    });
+    
+    if (!allFilled && !confirm("Nicht alle Parameter bewertet. Trotzdem speichern?")) return;
+    
+    const data = loadData();
+    data.erhebungen.push({
+        klient: klient,
+        datum: datum,
+        werte: werte,
+        notizen: notizen,
+        timestamp: Date.now()
+    });
+    
+    saveData(data);
+    alert("Erhebung erfolgreich gespeichert.");
+    renderParameterForm();
+    document.getElementById("select-klient-erhebung").value = "";
+}
+
+// --- TRENDANALYSE ---
+function renderTrend() {
+    const klient = document.getElementById("select-klient-trend").value;
+    const container = document.getElementById("trend-container");
+    
+    if (!klient) {
+        container.innerHTML = '<div class="card"><p class="no-data">Bitte Klient wählen.</p></div>';
+        return;
+    }
+    
+    const data = loadData();
+    const erhebungen = data.erhebungen
+        .filter(e => e.klient === klient)
+        .sort((a, b) => a.datum.localeCompare(b.datum));
+        
+    if (erhebungen.length < 2) {
+        container.innerHTML = `<div class="card"><p class="no-data">Mindestens 2 Erhebungen nötig für Trendanzeige.<br>Aktuell: ${erhebungen.length} Erhebung(en).</p></div>`;
+        return;
+    }
+    
+    const klientData = data.klienten.find(k => k.nr === klient);
+    let html = `
+        <div class="card">
+            <h2>Trend: ${klient} - ${escapeHTML(klientData ? klientData.init : "")}</h2>
+            <p style="font-size:0.85rem;color:var(--grau);margin-bottom:1rem;">${erhebungen.length} Erhebungen - ${erhebungen[0].datum} bis ${erhebungen[erhebungen.length - 1].datum}</p>
+        </div>
+    `;
+    
+    KATEGORIEN.forEach(kat => {
+        html += `<div class="kat-header">${kat.name}</div>`;
+        kat.params.forEach(p => {
+            const werte = [];
+            const daten = [];
+            erhebungen.forEach(e => {
+                werte.push(e.werte[p.id]);
+                daten.push(e.datum);
+            });
+            
+            const last = werte[werte.length - 1];
+            const prev = werte.length >= 2 ? werte[werte.length - 2] : null;
+            
+            let ampelClass = "ampel-gelb";
+            let warningText = "";
+            
+            if (last !== null && last >= 4) ampelClass = "ampel-gruen";
+            else if (last !== null && last <= 2 && prev !== null && prev <= 2) {
+                ampelClass = "ampel-rot";
+                warningText = "Dieser Parameter liegt seit zwei Erhebungen bei 1-2. Bitte prüfen, ob weiterführende Unterstützung sinnvoll ist (z.B. fachärztliche Beratung, Selbsthilfe, AGATHE).";
+            }
+            
+            let pfeil = "";
+            if (werte.length >= 2 && last !== null && prev !== null) {
+                if (last > prev) pfeil = " ↑";
+                else if (last < prev) pfeil = " ↓";
+                else pfeil = " →";
+            }
+            
+            let letzteNotiz = "";
+            for (let k = erhebungen.length - 1; k >= 0; k--) {
+                if (erhebungen[k].notizen && erhebungen[k].notizen[p.id]) {
+                    letzteNotiz = erhebungen[k].notizen[p.id];
+                    break;
+                }
+            }
+            
+            html += `
+                <div class="card param-box">
+                    <h4><span class="ampel ${ampelClass}"></span>${p.name}${pfeil}</h4>
+                    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin:0.5rem 0;">
+            `;
+            
+            werte.forEach((w, index) => {
+                html += `<span class="tag tag-t3" style="font-size:0.8rem;">${daten[index]}: <b>${w !== null ? w : "-"}</b></span>`;
+            });
+            
+            html += `</div><div style="display:flex;align-items:end;gap:4px;height:60px;margin:0.5rem 0;">`;
+            
+            werte.forEach(w => {
+                const height = w !== null ? (w / 5 * 100) : 0;
+                const color = w === null ? "#DDD" : w >= 4 ? "var(--gruen)" : w <= 2 ? "var(--rot)" : "var(--gelb)";
+                html += `<div style="flex:1;background:${color};height:${height}%;border-radius:3px 3px 0 0;min-width:16px;" title="${w}"></div>`;
+            });
+            
+            html += `</div>`;
+            
+            if (warningText) {
+                html += `<div class="alert-hint">${warningText}</div>`;
+            }
+            if (letzteNotiz) {
+                html += `<div style="font-size:0.8rem;color:var(--grau);margin-top:0.5rem;padding:0.4rem;background:#F8F8F8;border-radius:4px;border-left:3px solid var(--blau2);"><b>Letzte Notiz:</b> ${escapeHTML(letzteNotiz)}</div>`;
+            }
+            html += `</div>`;
+        });
+    });
+    container.innerHTML = html;
+}
+
+// --- EXPORT & RESET ---
+function exportCSV() {
+    const data = loadData();
+    if (data.erhebungen.length === 0) { alert("Keine Daten vorhanden."); return; }
+    
+    const header = ["Klient", "Initialen", "Datum"];
+    ALLE_PARAMETER.forEach(p => {
+        header.push(p.name + " (Wert)");
+        header.push(p.name + " (Notiz)");
+    });
+    
+    const rows = [header.join(";")];
+    
+    data.erhebungen.forEach(e => {
+        const klient = data.klienten.find(k => k.nr === e.klient);
+        const row = [e.klient, klient ? klient.init : "", e.datum];
+        
+        ALLE_PARAMETER.forEach(p => {
+            row.push(e.werte[p.id] !== null && e.werte[p.id] !== undefined ? e.werte[p.id] : "");
+            const notiz = e.notizen && e.notizen[p.id] ? e.notizen[p.id] : "";
+            row.push('"' + notiz.replace(/"/g, '""') + '"');
+        });
+        rows.push(row.join(";"));
+    });
+    
+    const csv = "\uFEFF" + rows.join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "VertrauteZeit_Backup_" + new Date().toISOString().split("T")[0] + ".csv";
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function exportPDF() {
+    const klient = document.getElementById("select-klient-pdf").value;
+    if (!klient) { alert("Bitte Klient wählen."); return; }
+    
+    const data = loadData();
+    const klientData = data.klienten.find(k => k.nr === klient);
+    const erhebungen = data.erhebungen
+        .filter(e => e.klient === klient)
+        .sort((a, b) => a.datum.localeCompare(b.datum));
+        
+    if (erhebungen.length === 0) { alert("Keine Erhebungen für diesen Klienten vorhanden."); return; }
+    
+    let html = `
+        <!DOCTYPE html>
+        <html lang="de">
+        <head>
+            <meta charset="UTF-8">
+            <title>Gesamtbericht ${klient}</title>
+            <style>
+                body { font-family: Georgia, serif; color: #2A2A2A; margin: 2cm; font-size: 11pt; line-height: 1.5; }
+                h1 { font-family: Arial, sans-serif; color: #4A6A8F; font-size: 18pt; border-bottom: 2px solid #4A6A8F; padding-bottom: 6px; }
+                h2 { font-family: Arial, sans-serif; color: #4A6A8F; font-size: 13pt; margin-top: 1.5em; }
+                h3 { font-family: Arial, sans-serif; color: #6B84AC; font-size: 11pt; margin-top: 1em; }
+                .header-line { font-family: Arial, sans-serif; font-size: 9pt; color: #4A6A8F; border-bottom: 1px solid #4A6A8F; padding-bottom: 4px; margin-bottom: 1.5cm; }
+                .meta-text { font-size: 10pt; color: #666; margin-bottom: 1em; }
+                table { width: 100%; border-collapse: collapse; margin: 0.8em 0; font-size: 10pt; }
+                th { background: #4A6A8F; color: white; padding: 6px 8px; text-align: left; font-family: Arial, sans-serif; }
+                td { padding: 5px 8px; border-bottom: 1px solid #DDD; }
+                .ampel { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 4px; }
+                .ampel-gruen { background: #2E8B57; } .ampel-gelb { background: #DAA520; } .ampel-rot { background: #CC3333; }
+                .notiz { font-size: 9.5pt; color: #555; padding: 4px 8px; background: #F5F6F8; border-left: 3px solid #6B84AC; margin: 4px 0 8px 0; }
+                .warnung { font-size: 9pt; color: #CC3333; padding: 4px 8px; background: #FFF0F0; border-left: 3px solid #CC3333; margin: 4px 0; }
+                .footer { font-size: 8pt; color: #999; margin-top: 2cm; border-top: 1px solid #CCC; padding-top: 4px; }
+                @media print { body { margin: 1.5cm; } @page { size: A4; margin: 1.5cm; } }
+            </style>
+        </head>
+        <body>
+            <div class="header-line">Vertraute Zeit | Dipl.-Med. Thomas Marx | Klettenweg 11, 99097 Erfurt</div>
+            <h1>Gesamtbericht Klienten-Tracking</h1>
+            <div class="meta-text">
+                Klient: <b>${klient} - ${escapeHTML(klientData ? klientData.init : "")}</b><br>
+                Zeitraum: ${erhebungen[0].datum} bis ${erhebungen[erhebungen.length - 1].datum}<br>
+                Anzahl Erhebungen: ${erhebungen.length}<br>
+                Erstellt: ${new Date().toLocaleDateString("de-DE")}
+            </div>
+            
+            <h2>Übersicht aller Parameter</h2>
+            <table>
+                <tr>
+                    <th>Parameter</th>
+                    ${erhebungen.map(e => `<th>${e.datum}</th>`).join('')}
+                    <th>Trend</th>
+                </tr>
+    `;
+    
+    ALLE_PARAMETER.forEach(p => {
+        const werte = erhebungen.map(e => e.werte[p.id]);
+        const last = werte[werte.length - 1];
+        const prev = werte.length >= 2 ? werte[werte.length - 2] : null;
+        let pfeil = "";
+        if (last !== null && prev !== null) pfeil = last > prev ? "↑" : last < prev ? "↓" : "→";
+        
+        html += `
+            <tr>
+                <td><b>${p.name}</b></td>
+                ${werte.map(w => `<td>${w !== null ? w : "-"}</td>`).join('')}
+                <td>${pfeil}</td>
+            </tr>
+        `;
+    });
+    
+    html += `</table><h2>Detailansicht mit Notizen</h2>`;
+    
+    KATEGORIEN.forEach(kat => {
+        html += `<h2>${kat.name}</h2>`;
+        kat.params.forEach(p => {
+            const werte = erhebungen.map(e => e.werte[p.id]);
+            const last = werte[werte.length - 1];
+            const prev = werte.length >= 2 ? werte[werte.length - 2] : null;
+            
+            let ampelClass = "ampel-gelb";
+            if (last !== null && last >= 4) ampelClass = "ampel-gruen";
+            else if (last !== null && last <= 2 && prev !== null && prev <= 2) ampelClass = "ampel-rot";
+            
+            html += `<h3><span class="ampel ${ampelClass}"></span>${p.name}</h3>`;
+            html += `<table><tr>${erhebungen.map(e => `<th>${e.datum}</th>`).join('')}</tr>`;
+            html += `<tr>${erhebungen.map(e => `<td><b>${e.werte[p.id] !== null ? e.werte[p.id] : "-"}</b></td>`).join('')}</tr></table>`;
+            
+            if (ampelClass === "ampel-rot") {
+                html += `<div class="warnung">Dieser Parameter liegt seit zwei Erhebungen bei 1-2. Prüfen, ob weiterführende Unterstützung sinnvoll ist.</div>`;
+            }
+            
+            erhebungen.forEach(e => {
+                if (e.notizen && e.notizen[p.id]) {
+                    html += `<div class="notiz"><b>${e.datum}:</b> ${escapeHTML(e.notizen[p.id])}</div>`;
+                }
+            });
+        });
+    });
+    
+    html += `
+            <div class="footer">Vertraute Zeit Thomas Marx - Klienten-Tracking - Gesamtbericht - VERTRAULICH<br>Erstellt am ${new Date().toLocaleDateString("de-DE")}</div>
+        </body>
+        </html>
+    `;
+    
+    const win = window.open("", "_blank");
+    win.document.write(html);
+    win.document.close();
+    setTimeout(() => win.print(), 500);
+}
+
+function deleteAllData() {
+    if (!confirm("ALLE Daten löschen? Das kann nicht rückgängig gemacht werden!")) return;
+    if (!confirm("Wirklich ALLES löschen? Letzte Warnung!")) return;
+    
+    localStorage.removeItem("vz_tracking");
+    location.reload();
+}
+
+// Initialisierung beim Start
+renderClientList();
+renderParameterForm();
+</script>
+
+</body>
+</html>
