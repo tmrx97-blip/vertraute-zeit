@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vertraute Zeit - UCLA Einsamkeitsmessung</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--b:#4A6A8F;--b2:#6B84AC;--bg:#E8EEF4;--gn:#2E8B57;--gn2:#5FAD56;--ge:#DAA520;--or:#E07020;--rt:#CC3333;--gr:#666;--he:#F5F6F8;--w:#FFF;--tx:#2A2A2A;--r:10px}
+html{font-size:16px;-webkit-text-size-adjust:100%}
+body{font-family:Georgia,serif;color:var(--tx);background:var(--he);min-height:100vh;padding-bottom:2rem}
+h1,h2,h3,button,label,select,th,td{font-family:Arial,Helvetica,sans-serif}
+header{background:var(--b);color:var(--w);padding:1.2rem;text-align:center;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.15)}
+header h1{font-size:1.3rem;font-weight:700}
+header p{font-size:0.8rem;opacity:0.8;margin-top:0.2rem}
+.ct{max-width:900px;margin:0 auto;padding:1rem}
+.cd{background:var(--w);border-radius:var(--r);box-shadow:0 2px 12px rgba(74,106,143,0.1);padding:1.5rem;margin-bottom:1rem}
+.cd h2{color:var(--b);font-size:1.05rem;margin-bottom:1rem;padding-bottom:0.5rem;border-bottom:2px solid var(--bg)}
+.nv{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem}
+.nb{flex:1;min-width:100px;padding:0.7rem 0.5rem;border:2px solid var(--b);background:var(--w);color:var(--b);border-radius:var(--r);font-size:0.85rem;font-weight:600;cursor:pointer;text-align:center}
+.nb.ac{background:var(--b);color:var(--w)}
+.fg{margin-bottom:1rem}
+.fg label{display:block;font-size:0.85rem;font-weight:600;color:var(--b);margin-bottom:0.3rem}
+input,select,textarea{width:100%;padding:0.6rem;border:1.5px solid #CCC;border-radius:6px;font-size:1rem;font-family:Georgia,serif;-webkit-appearance:none}
+input:focus,select:focus{outline:none;border-color:var(--b);box-shadow:0 0 0 3px rgba(74,106,143,0.15)}
+.bt{display:inline-flex;align-items:center;padding:0.7rem 1.2rem;border:none;border-radius:6px;font-size:0.9rem;font-weight:600;font-family:Arial,sans-serif;cursor:pointer}
+.bp{background:var(--b);color:var(--w)}.bs{background:var(--bg);color:var(--b)}.bd{background:var(--rt);color:var(--w)}.bg{background:var(--gn);color:var(--w)}
+.vw{display:none}.vw.ac{display:block}
+.ki{display:flex;align-items:center;justify-content:space-between;padding:0.7rem 1rem;border:1.5px solid #E0E0E0;border-radius:8px;margin-bottom:0.5rem}
+.ki:hover{border-color:var(--b);background:var(--bg)}
+.nd{text-align:center;color:var(--gr);font-size:0.85rem;padding:2rem;font-style:italic}
+canvas{width:100%;max-width:800px;display:block;margin:0 auto}
+.amp{display:inline-flex;flex-direction:column;align-items:center;padding:12px;border-radius:8px;background:var(--he);min-width:120px;text-align:center}
+.amp-dot{width:20px;height:20px;border-radius:50%;margin-bottom:6px}
+.amp-val{font-size:1.2rem;font-weight:700}
+.amp-lab{font-size:0.7rem;color:var(--gr);margin-top:2px}
+.warn{font-size:0.8rem;color:var(--rt);padding:8px 12px;background:#FFF0F0;border-left:3px solid var(--rt);border-radius:4px;margin-top:12px}
+table{width:100%;border-collapse:collapse;font-size:0.85rem}
+th{background:var(--b);color:var(--w);padding:6px 8px;text-align:center}
+td{padding:5px 8px;border-bottom:1px solid #EEE;text-align:center}
+@media(min-width:768px){header h1{font-size:1.5rem}}
+</style>
+</head>
+<body>
+<header>
+<h1>Vertraute Zeit - UCLA Einsamkeitsmessung</h1>
+<p>20 Items | Doering/Bortz 1993 | Skala 0-4 | Indexwert 0.00-4.00</p>
+</header>
+<div class="ct">
+<div class="nv">
+<button class="nb ac" id="b0" onclick="sv(0)">Klienten</button>
+<button class="nb" id="b1" onclick="sv(1)">Erhebung</button>
+<button class="nb" id="b2" onclick="sv(2)">Verlauf</button>
+<button class="nb" id="b3" onclick="sv(3)">Export</button>
+</div>
+<div id="v0" class="vw ac">
+<div class="cd">
+<h2>Klienten verwalten</h2>
+<div class="fg"><label>Klienten-Nummer (z.B. K001)</label><input type="text" id="knr" placeholder="K001"></div>
+<div class="fg"><label>Initialen (z.B. B.K.)</label><input type="text" id="kin" placeholder="B.K."></div>
+<button class="bt bp" onclick="aK()">Hinzufuegen</button>
+</div>
+<div class="cd"><h2>Registrierte Klienten</h2><div id="kl"></div></div>
+</div>
+<div id="v1" class="vw">
+<div class="cd">
+<h2>UCLA-LS-20 Erhebung</h2>
+<div class="fg"><label>Klient</label><select id="ek"></select></div>
+<div class="fg"><label>Datum</label><input type="date" id="edt"></div>
+</div>
+<div class="cd" id="items"></div>
+<div class="cd"><button class="bt bg" onclick="sE()" style="width:100%;justify-content:center;font-size:1.1rem;padding:1rem;">Erhebung speichern</button></div>
+</div>
+<div id="v2" class="vw">
+<div class="cd">
+<h2>Verlaufsdiagramm</h2>
+<div class="fg"><label>Klient</label><select id="vk" onchange="rV()"></select></div>
+</div>
+<div id="vc"></div>
+</div>
+<div id="v3" class="vw">
+<div class="cd">
+<h2>Daten exportieren</h2>
+<button class="bt bs" onclick="xC()">CSV-Backup</button>
+<div class="fg" style="margin-top:1rem"><label>PDF-Bericht</label><select id="pk"></select></div>
+<button class="bt bp" onclick="xP()">PDF erstellen</button>
+</div>
+<div class="cd"><h2>Daten loeschen</h2><button class="bt bd" onclick="rA()">Alle Daten loeschen</button></div>
+</div>
+</div>
+<script>
+var POS=[
+"Ich fuehle mich wohl mit den Menschen um mich herum.",
+"Ich habe genug Gesellschaft.",
+"Ich habe einen Freundeskreis.",
+"Ich habe viel gemeinsam mit den Menschen um mich herum.",
+"Ich bin ein geselliger Mensch.",
+"Ich habe Menschen, die mir nahe stehen.",
+"Ich kann mit anderen zusammen sein, wenn ich das will.",
+"Es gibt Menschen, die mich wirklich verstehen.",
+"Ich habe Menschen, mit denen ich sprechen kann.",
+"Ich habe Menschen, an die ich mich wenden kann."
+];
+var NEG=[
+"Ich habe niemanden, an den ich mich wenden kann.",
+"Ich fuehle mich allein.",
+"Ich fuehle mich niemandem nah.",
+"Die Leute um mich herum haben ganz andere Interessen und Ideen als ich.",
+"Ich fuehle mich ausgeschlossen.",
+"Meine Freundschaften sind oberflaechlich.",
+"Niemand kennt mich wirklich.",
+"Ich fuehle mich von den anderen isoliert.",
+"Ich bin zu viel allein.",
+"Es faellt mir schwer, neue Kontakte zu knuepfen."
+];
+var ITEMS=[];
+var i;
+for(i=0;i<POS.length;i++){ITEMS.push({txt:POS[i],pos:true,idx:i});}
+for(i=0;i<NEG.length;i++){ITEMS.push({txt:NEG[i],pos:false,idx:i+10});}
+var OPTS=["0 - stimmt gar nicht","1 - stimmt wenig","2 - teils-teils","3 - stimmt ziemlich","4 - stimmt voellig"];
+var SUB_G=[11,12,14,17,18];
+var SUB_E=[10,13,15,16,19];
+var SUB_S=[0,1,2,3,4,5,6,7,8,9];
+function ld(){try{return JSON.parse(localStorage.getItem("vz_ucla")||'{"k":[],"e":[]}');}catch(x){return{k:[],e:[]};}}
+function sd(d){localStorage.setItem("vz_ucla",JSON.stringify(d));}
+function esc(s){if(!s)return"";var d=document.createElement("div");d.appendChild(document.createTextNode(s));return d.innerHTML;}
+function sv(n){var k;for(k=0;k<4;k++){document.getElementById("v"+k).className=k===n?"vw ac":"vw";document.getElementById("b"+k).className=k===n?"nb ac":"nb";}if(n===0)rK();if(n===1){pS();rI();}if(n===2){pS();rV();}if(n===3)pS();}
+function pS(){var d=ld();var o='<option value="">Bitte waehlen...</option>';var k;for(k=0;k<d.k.length;k++){o+='<option value="'+d.k[k].nr+'">'+d.k[k].nr+" - "+esc(d.k[k].init)+"</option>";}var ids=["ek","vk","pk"];for(k=0;k<ids.length;k++){var el=document.getElementById(ids[k]);if(el)el.innerHTML=o;}}
+function aK(){var nr=document.getElementById("knr").value.trim();var ini=document.getElementById("kin").value.trim();if(!nr||!ini){alert("Nummer und Initialen eingeben.");return;}var d=ld();var k;for(k=0;k<d.k.length;k++){if(d.k[k].nr===nr){alert("Nummer existiert.");return;}}d.k.push({nr:nr,init:ini});sd(d);document.getElementById("knr").value="";document.getElementById("kin").value="";rK();}
+function dK(nr){if(!confirm("Klient "+nr+" und alle Erhebungen loeschen?"))return;var d=ld();d.k=d.k.filter(function(x){return x.nr!==nr;});d.e=d.e.filter(function(x){return x.kl!==nr;});sd(d);rK();}
+function rK(){var d=ld();var el=document.getElementById("kl");if(d.k.length===0){el.innerHTML='<p class="nd">Noch keine Klienten.</p>';return;}var h="";var k,c;for(k=0;k<d.k.length;k++){c=0;var m;for(m=0;m<d.e.length;m++){if(d.e[m].kl===d.k[k].nr)c++;}h+='<div class="ki"><div><b>'+d.k[k].nr+" - "+esc(d.k[k].init)+"</b> <span style=\"font-size:0.75rem;color:var(--b2)\">"+c+" Erhebung"+(c!==1?"en":"")+'</span></div><button class="bt bd" style="padding:4px 10px;font-size:0.75rem" onclick="dK(\''+d.k[k].nr+"')\">x</button></div>";}el.innerHTML=h;}
+function rI(){var c=document.getElementById("items");document.getElementById("edt").value=new Date().toISOString().split("T")[0];var h="<h2>20 Items - bitte bewerten</h2>";var k;for(k=0;k<ITEMS.length;k++){h+='<div style="padding:8px 0;border-bottom:1px solid #EEE"><div style="font-size:0.9rem;margin-bottom:4px"><b>'+(k+1)+".</b> "+esc(ITEMS[k].txt);if(ITEMS[k].pos)h+=' <span style="font-size:0.7rem;color:var(--gn)">(+)</span>';else h+=' <span style="font-size:0.7rem;color:var(--rt)">(-)</span>';h+="</div>";h+='<select id="it'+k+'" style="max-width:300px"><option value="">--</option>';var j;for(j=0;j<OPTS.length;j++){h+='<option value="'+j+'">'+OPTS[j]+"</option>";}h+="</select></div>";}c.innerHTML=h;}
+function score(raw){var vals=[];var k;for(k=0;k<20;k++){if(raw[k]===null){vals.push(null);continue;}if(k<10){vals.push(4-raw[k]);}else{vals.push(raw[k]);}}var sum=0;var cnt=0;for(k=0;k<20;k++){if(vals[k]!==null){sum+=vals[k];cnt++;}}var gesamt=cnt>0?sum/cnt:0;var sg=0,cg=0,se=0,ce=0,ss=0,cs=0;for(k=0;k<SUB_G.length;k++){var v=vals[SUB_G[k]];if(v!==null){sg+=v;cg++;}}for(k=0;k<SUB_E.length;k++){var v2=vals[SUB_E[k]];if(v2!==null){se+=v2;ce++;}}for(k=0;k<SUB_S.length;k++){var v3=vals[SUB_S[k]];if(v3!==null){ss+=v3;cs++;}}return{gesamt:gesamt,gefuehle:cg>0?sg/cg:0,emotional:ce>0?se/ce:0,sozial:cs>0?ss/cs:0};}
+function sE(){var kl=document.getElementById("ek").value;var dt=document.getElementById("edt").value;if(!kl){alert("Klient waehlen.");return;}if(!dt){alert("Datum eingeben.");return;}var raw=[];var allOk=true;var k;for(k=0;k<20;k++){var v=document.getElementById("it"+k).value;if(v===""){allOk=false;raw.push(null);}else{raw.push(parseInt(v));}}if(!allOk){if(!confirm("Nicht alle Items bewertet. Trotzdem speichern?"))return;}var sc=score(raw);var d=ld();d.e.push({kl:kl,dt:dt,raw:raw,sc:sc});sd(d);alert("Gespeichert. Indexwert: "+sc.gesamt.toFixed(2));rI();document.getElementById("ek").value="";}
+function ampF(v){if(v<=1.0)return"#2E8B57";if(v<=1.69)return"#5FAD56";if(v<=2.5)return"#DAA520";if(v<=3.5)return"#E07020";return"#CC3333";}
+function ampT(v){if(v<=1.0)return"Gering";if(v<=1.69)return"Unterdurchschn.";if(v<=2.5)return"Moderat";if(v<=3.5)return"Hoch";return"Sehr hoch";}
+function rV(){var kl=document.getElementById("vk").value;var c=document.getElementById("vc");if(!kl){c.innerHTML='<div class="cd"><p class="nd">Bitte Klient waehlen.</p></div>';return;}var d=ld();var erh=d.e.filter(function(x){return x.kl===kl;}).sort(function(a,b){return a.dt.localeCompare(b.dt);});if(erh.length<2){c.innerHTML='<div class="cd"><p class="nd">Mindestens 2 Erhebungen noetig. Aktuell: '+erh.length+".</p></div>";return;}var ki=null;var k;for(k=0;k<d.k.length;k++){if(d.k[k].nr===kl){ki=d.k[k];break;}}var h='<div class="cd"><h2>Verlauf: '+kl+" - "+esc(ki?ki.init:"")+"</h2>";h+='<canvas id="chart" height="300"></canvas>';h+='<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px">';h+='<span style="font-size:0.7rem"><span style="display:inline-block;width:12px;height:3px;background:#4A6A8F;vertical-align:middle;margin-right:4px"></span>Gesamt</span>';h+='<span style="font-size:0.7rem"><span style="display:inline-block;width:12px;height:2px;background:#CC3333;vertical-align:middle;margin-right:4px"></span>Gefuehle</span>';h+='<span style="font-size:0.7rem"><span style="display:inline-block;width:12px;height:2px;background:#DAA520;vertical-align:middle;margin-right:4px"></span>Emotional</span>';h+='<span style="font-size:0.7rem"><span style="display:inline-block;width:12px;height:2px;background:#2E8B57;vertical-align:middle;margin-right:4px"></span>Sozial</span>';h+="</div></div>";var last=erh[erh.length-1].sc;var prev=erh.length>=2?erh[erh.length-2].sc:null;h+='<div class="cd"><h2>Ampelbewertung (letzte Erhebung: '+erh[erh.length-1].dt+")</h2>";h+='<div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">';var amps=[{l:"Gesamtindex",v:last.gesamt},{l:"Einsamkeitsgefuehle",v:last.gefuehle},{l:"Emot. Isolation",v:last.emotional},{l:"Soz. Isolation",v:last.sozial}];for(k=0;k<amps.length;k++){h+='<div class="amp"><div class="amp-dot" style="background:'+ampF(amps[k].v)+'"></div>';h+='<div class="amp-val" style="color:'+ampF(amps[k].v)+'">'+amps[k].v.toFixed(2)+"</div>";h+='<div class="amp-lab">'+amps[k].l+"</div>";h+='<div style="font-size:0.65rem;color:'+ampF(amps[k].v)+'">'+ampT(amps[k].v)+"</div></div>";}h+="</div>";if(last.gesamt>2.5&&prev&&prev.gesamt>2.5){h+='<div class="warn">Indexwert liegt seit zwei Erhebungen ueber 2.50. Bitte pruefen, ob weiterfuehrende Unterstuetzung sinnvoll ist.</div>';}h+="</div>";h+='<div class="cd"><h2>Wertetabelle</h2><table><tr><th>Datum</th><th>Gesamt</th><th>Gefuehle</th><th>Emotional</th><th>Sozial</th></tr>';for(k=0;k<erh.length;k++){var s=erh[k].sc;h+="<tr><td>"+erh[k].dt+"</td>";h+='<td style="font-weight:700;color:'+ampF(s.gesamt)+'">'+s.gesamt.toFixed(2)+"</td>";h+="<td>"+s.gefuehle.toFixed(2)+"</td><td>"+s.emotional.toFixed(2)+"</td><td>"+s.sozial.toFixed(2)+"</td></tr>";}h+="</table></div>";c.innerHTML=h;drawChart(erh);}
+function drawChart(erh){var cv=document.getElementById("chart");if(!cv)return;var ctx=cv.getContext("2d");var W=cv.offsetWidth;var H=300;cv.width=W*2;cv.height=H*2;ctx.scale(2,2);var PL=45,PR=15,PT=15,PB=40;var cw=W-PL-PR,ch=H-PT-PB;function yy(v){return PT+ch-(v/4.0)*ch;}function xx(i){return PL+(erh.length>1?i*(cw/(erh.length-1)):cw/2);}var zonen=[{mn:0,mx:1.0,c:"rgba(46,139,87,0.08)"},{mn:1.0,mx:1.69,c:"rgba(95,173,86,0.06)"},{mn:1.69,mx:2.5,c:"rgba(218,165,32,0.08)"},{mn:2.5,mx:3.5,c:"rgba(224,112,32,0.08)"},{mn:3.5,mx:4.0,c:"rgba(204,51,51,0.10)"}];var z;for(z=0;z<zonen.length;z++){ctx.fillStyle=zonen[z].c;ctx.fillRect(PL,yy(zonen[z].mx),cw,yy(zonen[z].mn)-yy(zonen[z].mx));}ctx.strokeStyle="#E0E0E0";ctx.lineWidth=0.5;var gv=[0,0.5,1.0,1.5,2.0,2.5,3.0,3.5,4.0];var g;for(g=0;g<gv.length;g++){ctx.beginPath();ctx.moveTo(PL,yy(gv[g]));ctx.lineTo(PL+cw,yy(gv[g]));ctx.stroke();ctx.fillStyle="#999";ctx.font="9px Arial";ctx.textAlign="right";ctx.fillText(gv[g].toFixed(1),PL-4,yy(gv[g])+3);}ctx.setLineDash([4,3]);ctx.strokeStyle="#AAA";ctx.lineWidth=0.8;ctx.beginPath();ctx.moveTo(PL,yy(1.69));ctx.lineTo(PL+cw,yy(1.69));ctx.stroke();ctx.setLineDash([]);ctx.fillStyle="#AAA";ctx.font="7px Arial";ctx.textAlign="right";ctx.fillText("Ref.1993",PL-4,yy(1.69)-4);ctx.strokeStyle="#999";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(PL,PT);ctx.lineTo(PL,H-PB);ctx.lineTo(PL+cw,H-PB);ctx.stroke();var k;ctx.fillStyle="#555";ctx.font="10px Arial";ctx.textAlign="center";for(k=0;k<erh.length;k++){ctx.fillText("T"+k,xx(k),H-PB+14);ctx.fillStyle="#999";ctx.font="8px Arial";ctx.fillText(erh[k].dt,xx(k),H-PB+24);ctx.fillStyle="#555";ctx.font="10px Arial";}var linien=[{key:"gesamt",col:"#4A6A8F",w:3},{key:"gefuehle",col:"#CC3333",w:1.5},{key:"emotional",col:"#DAA520",w:1.5},{key:"sozial",col:"#2E8B57",w:1.5}];var l,m;for(l=0;l<linien.length;l++){ctx.strokeStyle=linien[l].col;ctx.lineWidth=linien[l].w;ctx.lineJoin="round";ctx.beginPath();for(m=0;m<erh.length;m++){var val=erh[m].sc[linien[l].key];if(m===0)ctx.moveTo(xx(m),yy(val));else ctx.lineTo(xx(m),yy(val));}ctx.stroke();for(m=0;m<erh.length;m++){var val2=erh[m].sc[linien[l].key];ctx.beginPath();ctx.arc(xx(m),yy(val2),linien[l].w>2?4:3,0,Math.PI*2);ctx.fillStyle="#FFF";ctx.fill();ctx.strokeStyle=linien[l].col;ctx.lineWidth=1.5;ctx.stroke();ctx.fillStyle=linien[l].col;ctx.font=(linien[l].w>2?"10":"8")+"px Arial";ctx.textAlign="center";ctx.fillText(val2.toFixed(2),xx(m),yy(val2)-(linien[l].w>2?9:7));}}}
+function xC(){var d=ld();if(d.e.length===0){alert("Keine Daten.");return;}var hdr=["Klient","Initialen","Datum","Gesamtindex","Einsamkeitsgefuehle","Emot.Isolation","Soz.Isolation"];var k;for(k=0;k<20;k++){hdr.push("Item"+(k+1));}var rows=[hdr.join(";")];var m;for(m=0;m<d.e.length;m++){var e=d.e[m];var ki=null;for(k=0;k<d.k.length;k++){if(d.k[k].nr===e.kl){ki=d.k[k];break;}}var row=[e.kl,ki?ki.init:"",e.dt,e.sc.gesamt.toFixed(2),e.sc.gefuehle.toFixed(2),e.sc.emotional.toFixed(2),e.sc.sozial.toFixed(2)];for(k=0;k<20;k++){row.push(e.raw[k]!==null?e.raw[k]:"");}rows.push(row.join(";"));}var csv="\uFEFF"+rows.join("\n");var blob=new Blob([csv],{type:"text/csv;charset=utf-8;"});var url=URL.createObjectURL(blob);var a=document.createElement("a");a.href=url;a.download="UCLA_Backup_"+new Date().toISOString().split("T")[0]+".csv";a.click();URL.revokeObjectURL(url);}
+function xP(){var kl=document.getElementById("pk").value;if(!kl){alert("Klient waehlen.");return;}var d=ld();var ki=null;var k;for(k=0;k<d.k.length;k++){if(d.k[k].nr===kl){ki=d.k[k];break;}}var erh=d.e.filter(function(x){return x.kl===kl;}).sort(function(a,b){return a.dt.localeCompare(b.dt);});if(erh.length===0){alert("Keine Erhebungen.");return;}var h='<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8"><title>UCLA Bericht '+kl+"</title><style>body{font-family:Georgia,serif;margin:2cm;font-size:11pt;line-height:1.5}h1{font-family:Arial;color:#4A6A8F;font-size:18pt;border-bottom:2px solid #4A6A8F;padding-bottom:6px}h2{font-family:Arial;color:#4A6A8F;font-size:13pt;margin-top:1.5em}table{width:100%;border-collapse:collapse;font-size:10pt;margin:0.8em 0}th{background:#4A6A8F;color:white;padding:6px 8px;font-family:Arial}td{padding:5px 8px;border-bottom:1px solid #DDD;text-align:center}.hd{font-family:Arial;font-size:9pt;color:#4A6A8F;border-bottom:1px solid #4A6A8F;padding-bottom:4px;margin-bottom:1.5cm}.ft{font-size:8pt;color:#999;margin-top:2cm;border-top:1px solid #CCC;padding-top:4px}@media print{body{margin:1.5cm}@page{size:A4}}</style></head><body>";h+='<div class="hd">Vertraute Zeit | Dipl.-Med. Thomas Marx | Klettenweg 11, 99097 Erfurt</div>';h+="<h1>UCLA Loneliness Scale - Gesamtbericht</h1>";h+="<p><b>Klient:</b> "+kl+" - "+esc(ki?ki.init:"")+"<br><b>Instrument:</b> UCLA-LS-20, Doering/Bortz 1993, 5-stufige Skala<br><b>Erhebungen:</b> "+erh.length+" ("+erh[0].dt+" bis "+erh[erh.length-1].dt+")<br><b>Erstellt:</b> "+new Date().toLocaleDateString("de-DE")+"</p>";h+="<h2>Verlauf Indexwerte</h2><table><tr><th>Datum</th><th>Gesamtindex</th><th>Einsamkeitsgef.</th><th>Emot. Isolation</th><th>Soz. Isolation</th><th>Belastung</th></tr>";var m;for(m=0;m<erh.length;m++){var s=erh[m].sc;h+="<tr><td>"+erh[m].dt+"</td><td><b>"+s.gesamt.toFixed(2)+"</b></td><td>"+s.gefuehle.toFixed(2)+"</td><td>"+s.emotional.toFixed(2)+"</td><td>"+s.sozial.toFixed(2)+"</td><td>"+ampT(s.gesamt)+"</td></tr>";}h+="</table>";if(erh.length>=2){var first=erh[0].sc.gesamt;var last=erh[erh.length-1].sc.gesamt;var diff=last-first;h+="<h2>Zusammenfassung</h2><p>Ausgangsindex (T0): <b>"+first.toFixed(2)+"</b> ("+ampT(first)+")<br>Aktueller Index (T"+(erh.length-1)+"): <b>"+last.toFixed(2)+"</b> ("+ampT(last)+")<br>Veraenderung: <b>"+(diff>0?"+":"")+diff.toFixed(2)+"</b></p>";}h+='<div class="ft">Vertraute Zeit Thomas Marx | UCLA Loneliness Scale | Doering/Bortz 1993 | VERTRAULICH</div></body></html>';var win=window.open("","_blank");win.document.write(h);win.document.close();setTimeout(function(){win.print();},500);}
+function rA(){if(!confirm("ALLE UCLA-Daten loeschen?"))return;if(!confirm("Letzte Warnung! Wirklich alles loeschen?"))return;localStorage.removeItem("vz_ucla");location.reload();}
+rK();rI();
+</script>
+</body>
+</html>
