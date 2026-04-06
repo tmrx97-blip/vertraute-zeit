@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QualiCheck – Verlaufsinstrument Einsamkeit</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #d1d5db;
+      --primary: #1d4ed8;
+      --good: #16a34a;
+      --warn: #eab308;
+      --bad: #dc2626;
+      --shadow: 0 8px 24px rgba(0,0,0,0.08);
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+    }
+
+    .container {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    h1, h2, h3 {
+      margin: 0 0 10px;
+    }
+
+    p {
+      margin: 0 0 12px;
+    }
+
+    .header {
+      margin-bottom: 20px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      margin-bottom: 18px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .grid-2 {
+      grid-template-columns: 1.2fr 1fr;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      align-items: end;
+    }
+
+    .field label {
+      display: block;
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .field input, .field select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      font-size: 15px;
+      background: #fff;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 11px 16px;
+      font-size: 15px;
+      cursor: pointer;
+      background: var(--primary);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    button.secondary {
+      background: #374151;
+    }
+
+    button.light {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .items-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .item {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      background: #fff;
+    }
+
+    .item-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .item-meta {
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .item-text {
+      font-size: 17px;
+      margin-bottom: 12px;
+    }
+
+    .scale {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+    }
+
+    .scale label {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px;
+      text-align: center;
+      font-size: 13px;
+      cursor: pointer;
+      user-select: none;
+      display: block;
+    }
+
+    .scale input {
+      display: none;
+    }
+
+    .scale input:checked + span {
+      display: block;
+      background: #dbeafe;
+      border-radius: 8px;
+      padding: 8px 4px;
+      color: #1e3a8a;
+      font-weight: 700;
+    }
+
+    .cluster-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .cluster-box {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      background: #fff;
+    }
+
+    .score {
+      font-size: 28px;
+      font-weight: 800;
+      margin: 4px 0 8px;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .trend {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-weight: 700;
+      font-size: 14px;
+      margin-top: 8px;
+    }
+
+    .trend.good {
+      background: rgba(22,163,74,0.12);
+      color: var(--good);
+    }
+
+    .trend.warn {
+      background: rgba(234,179,8,0.18);
+      color: #92400e;
+    }
+
+    .trend.bad {
+      background: rgba(220,38,38,0.12);
+      color: var(--bad);
+    }
+
+    .traffic {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .light-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #d1d5db;
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+
+    .light-dot.active.red {
+      background: var(--bad);
+    }
+
+    .light-dot.active.yellow {
+      background: var(--warn);
+    }
+
+    .light-dot.active.green {
+      background: var(--good);
+    }
+
+    .canvas-wrap {
+      width: 100%;
+      overflow-x: auto;
+      padding-top: 10px;
+    }
+
+    canvas {
+      width: 100%;
+      max-width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    .history-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+
+    .history-table th,
+    .history-table td {
+      border-bottom: 1px solid var(--border);
+      padding: 10px 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .history-table th {
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .small {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    @media (max-width: 900px) {
+      .grid-2,
+      .controls,
+      .cluster-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .item-top {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>QualiCheck – Verlaufsinstrument Einsamkeit</h1>
+      <p class="subtitle">
+        12 Items, 3 Cluster, zufällig gemischte Anzeige, geclusterte Auswertung mit Trend, Kurve und Ampelfarbe.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>Erfassung</h2>
+      <div class="controls">
+        <div class="field">
+          <label for="clientId">Klient-ID</label>
+          <input id="clientId" type="text" placeholder="z. B. K-001" />
+        </div>
+        <div class="field">
+          <label for="clientName">Name</label>
+          <input id="clientName" type="text" placeholder="optional" />
+        </div>
+        <div class="field">
+          <label for="measurementLabel">Messzeitpunkt</label>
+          <input id="measurementLabel" type="text" placeholder="z. B. Start, 6 Monate, 12 Monate" />
+        </div>
+        <div class="field">
+          <label for="measurementDate">Datum</label>
+          <input id="measurementDate" type="date" />
+        </div>
+        <div class="field">
+          <label>&nbsp;</label>
+          <button id="shuffleBtn" type="button" class="secondary">Reihenfolge neu mischen</button>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button id="saveBtn" type="button">Messung speichern</button>
+        <button id="loadBtn" type="button" class="secondary">Verlauf laden</button>
+        <button id="exportBtn" type="button" class="light">JSON exportieren</button>
+        <button id="resetBtn" type="button" class="light">Antworten zurücksetzen</button>
+      </div>
+    </div>
+
+    <div class="grid grid-2">
+      <div class="card">
+        <h2>Fragebogen</h2>
+        <p class="small">Skala: 1 = trifft gar nicht zu, 5 = trifft voll zu</p>
+        <div id="itemsList" class="items-list"></div>
+      </div>
+
+      <div>
+        <div class="card">
+          <h2>Aktuelle Auswertung</h2>
+          <div id="clusterResults" class="cluster-grid"></div>
+        </div>
+
+        <div class="card">
+          <h2>Verlauf als Kurve</h2>
+          <div class="canvas-wrap">
+            <canvas id="trendCanvas" width="900" height="360"></canvas>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Messhistorie</h2>
+          <div id="historyWrap"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const CLUSTERS = {
+      opening: {
+        label: "Soziale Öffnung / Kontaktbereitschaft",
+        short: "Öffnung"
+      },
+      bond: {
+        label: "Beziehungsaufbau / Verbundenheit",
+        short: "Verbundenheit"
+      },
+      participation: {
+        label: "Aktive Teilhabe / Rückkehr ins Leben",
+        short: "Teilhabe"
+      }
+    };
+
+    const ITEMS = [
+      {
+        id: 1,
+        cluster: "opening",
+        text: "Ich spüre, dass ich wieder mehr Lust habe, andere Menschen zu treffen."
+      },
+      {
+        id: 2,
+        cluster: "opening",
+        text: "Es fällt mir leichter, kleine Gespräche zu führen – z. B. mit Nachbarn oder im Laden."
+      },
+      {
+        id: 3,
+        cluster: "bond",
+        text: "Ich habe in den letzten Wochen mindestens eine Person kennengelernt, mit der ich mich wohlfühle."
+      },
+      {
+        id: 4,
+        cluster: "bond",
+        text: "Ich traue mich, andere um Hilfe oder Unterstützung zu bitten, wenn ich sie brauche."
+      },
+      {
+        id: 5,
+        cluster: "bond",
+        text: "Ich habe das Gefühl, dass ich etwas zu geben habe – z. B. durch Zuhören, Erzählen oder Helfen."
+      },
+      {
+        id: 6,
+        cluster: "participation",
+        text: "Ich unternehme öfter etwas, das mir Freude macht – allein oder mit anderen."
+      },
+      {
+        id: 7,
+        cluster: "participation",
+        text: "Ich merke, dass ich mich weniger zurückziehe und mehr am Leben teilnehme."
+      },
+      {
+        id: 8,
+        cluster: "opening",
+        text: "Ich kann mir vorstellen, in Zukunft regelmäßig an Aktivitäten mit anderen teilzunehmen."
+      },
+      {
+        id: 9,
+        cluster: "participation",
+        text: "Ich verlasse meine Wohnung häufiger mit einem guten Gefühl."
+      },
+      {
+        id: 10,
+        cluster: "participation",
+        text: "Ich nehme wieder eher Gelegenheiten wahr, bei denen ich anderen begegnen kann."
+      },
+      {
+        id: 11,
+        cluster: "bond",
+        text: "Ich habe das Gefühl, dass mich mindestens ein Mensch wirklich wahrnimmt."
+      },
+      {
+        id: 12,
+        cluster: "opening",
+        text: "Kontakte mit anderen wirken auf mich wieder eher möglich als belastend."
+      }
+    ];
+
+    const SCALE_LABELS = {
+      1: "1<br>gar nicht",
+      2: "2",
+      3: "3",
+      4: "4",
+      5: "5<br>voll"
+    };
+
+    let randomizedItems = [];
+    let currentAnswers = {};
+    let loadedHistory = [];
+
+    const itemsList = document.getElementById("itemsList");
+    const clusterResults = document.getElementById("clusterResults");
+    const historyWrap = document.getElementById("historyWrap");
+    const trendCanvas = document.getElementById("trendCanvas");
+    const ctx = trendCanvas.getContext("2d");
+
+    const clientIdEl = document.getElementById("clientId");
+    const clientNameEl = document.getElementById("clientName");
+    const measurementLabelEl = document.getElementById("measurementLabel");
+    const measurementDateEl = document.getElementById("measurementDate");
+
+    function todayISO() {
+      return new Date().toISOString().slice(0, 10);
+    }
+
+    function shuffle(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function init() {
+      measurementDateEl.value = todayISO();
+      randomizedItems = shuffle(ITEMS);
+      renderItems();
+      renderCurrentResults();
+      renderHistory([]);
+      drawTrendChart([]);
+    }
+
+    function renderItems() {
+      itemsList.innerHTML = "";
+      randomizedItems.forEach(item => {
+        const box = document.createElement("div");
+        box.className = "item";
+
+        const top = document.createElement("div");
+        top.className = "item-top";
+
+        const left = document.createElement("div");
+        left.className = "item-text";
+        left.textContent = item.text;
+
+        const right = document.createElement("div");
+        right.className = "item-meta";
+        right.textContent = `${CLUSTERS[item.cluster].short} · Item ${item.id}`;
+
+        top.appendChild(left);
+        top.appendChild(right);
+
+        const scale = document.createElement("div");
+        scale.className = "scale";
+
+        for (let value = 1; value <= 5; value++) {
+          const label = document.createElement("label");
+          const input = document.createElement("input");
+          input.type = "radio";
+          input.name = `item_${item.id}`;
+          input.value = String(value);
+          input.checked = currentAnswers[item.id] === value;
+          input.addEventListener("change", () => {
+            currentAnswers[item.id] = value;
+            renderCurrentResults();
+          });
+
+          const span = document.createElement("span");
+          span.innerHTML = SCALE_LABELS[value];
+
+          label.appendChild(input);
+          label.appendChild(span);
+          scale.appendChild(label);
+        }
+
+        box.appendChild(top);
+        box.appendChild(scale);
+        itemsList.appendChild(box);
+      });
+    }
+
+    function calculateClusterScores(answers) {
+      const result = {
+        opening: [],
+        bond: [],
+        participation: []
+      };
+
+      ITEMS.forEach(item => {
+        const value = answers[item.id];
+        if (typeof value === "number") {
+          result[item.cluster].push(value);
+        }
+      });
+
+      return Object.fromEntries(
+        Object.keys(result).map(clusterKey => {
+          const values = result[clusterKey];
+          const sum = values.reduce((a, b) => a + b, 0);
+          const mean = values.length ? sum / values.length : 0;
+          return [clusterKey, {
+            values,
+            sum,
+            mean,
+            countAnswered: values.length,
+            totalItems: ITEMS.filter(i => i.cluster === clusterKey).length
+          }];
+        })
+      );
+    }
+
+    function calculateTotalScore(clusterScores) {
+      const allMeans = Object.values(clusterScores)
+        .map(c => c.mean)
+        .filter(v => v > 0);
+      if (!allMeans.length) return 0;
+      return allMeans.reduce((a, b) => a + b, 0) / allMeans.length;
+    }
+
+    function getTrendInfo(current, previous) {
+      if (previous == null) {
+        return {
+          delta: 0,
+          label: "keine Vorwert-Vergleichsbasis",
+          colorClass: "warn",
+          light: "yellow"
+        };
+      }
+
+      const delta = +(current - previous).toFixed(2);
+
+      if (delta > 0.09) {
+        return {
+          delta,
+          label: `Verbesserung (+${delta})`,
+          colorClass: "good",
+          light: "green"
+        };
+      }
+
+      if (delta < -0.09) {
+        return {
+          delta,
+          label: `Verschlechterung (${delta})`,
+          colorClass: "bad",
+          light: "red"
+        };
+      }
+
+      return {
+        delta,
+        label: `Konstant (${delta >= 0 ? "+" : ""}${delta})`,
+        colorClass: "warn",
+        light: "yellow"
+      };
+    }
+
+    function renderTraffic(light) {
+      return `
+        <div class="traffic">
+          <div class="light-dot ${light === "red" ? "active red" : ""}"></div>
+          <div class="light-dot ${light === "yellow" ? "active yellow" : ""}"></div>
+          <div class="light-dot ${light === "green" ? "active green" : ""}"></div>
+        </div>
+      `;
+    }
+
+    function renderCurrentResults() {
+      const scores = calculateClusterScores(currentAnswers);
+      const allAnswered = Object.keys(currentAnswers).length;
+      const total = calculateTotalScore(scores);
+
+      clusterResults.innerHTML = "";
+
+      Object.keys(CLUSTERS).forEach(clusterKey => {
+        const c = scores[clusterKey];
+        const percent = c.mean ? ((c.mean - 1) / 4) * 100 : 0;
+
+        const box = document.createElement("div");
+        box.className = "cluster-box";
+        box.innerHTML = `
+          <h3>${CLUSTERS[clusterKey].label}</h3>
+          <div class="score">${c.mean ? c.mean.toFixed(2) : "–"}</div>
+          <div class="muted">
+            beantwortet: ${c.countAnswered}/${c.totalItems}<br>
+            Rohsumme: ${c.sum}
+          </div>
+          <div style="margin-top:10px;height:10px;background:#e5e7eb;border-radius:999px;overflow:hidden;">
+            <div style="width:${percent}%;height:100%;background:#2563eb;"></div>
+          </div>
+        `;
+        clusterResults.appendChild(box);
+      });
+
+      const totalBox = document.createElement("div");
+      totalBox.className = "cluster-box";
+      totalBox.style.gridColumn = "1 / -1";
+      totalBox.innerHTML = `
+        <h3>Gesamtübersicht</h3>
+        <div class="score">${total ? total.toFixed(2) : "–"}</div>
+        <div class="muted">Beantwortete Items gesamt: ${allAnswered}/${ITEMS.length}</div>
+      `;
+      clusterResults.appendChild(totalBox);
+    }
+
+    function validateForm() {
+      if (!clientIdEl.value.trim()) {
+        alert("Bitte eine Klient-ID eingeben.");
+        return false;
+      }
+      if (!measurementLabelEl.value.trim()) {
+        alert("Bitte einen Messzeitpunkt angeben, z. B. Start oder 6 Monate.");
+        return false;
+      }
+      if (!measurementDateEl.value) {
+        alert("Bitte ein Datum wählen.");
+        return false;
+      }
+      if (Object.keys(currentAnswers).length !== ITEMS.length) {
+        alert("Bitte alle 12 Items beantworten.");
+        return false;
+      }
+      return true;
+    }
+
+    function getStorageKey(clientId) {
+      return `qualicheck_${clientId}`;
+    }
+
+    function buildMeasurementObject() {
+      const clusterScores = calculateClusterScores(currentAnswers);
+      return {
+        clientId: clientIdEl.value.trim(),
+        clientName: clientNameEl.value.trim(),
+        measurementLabel: measurementLabelEl.value.trim(),
+        measurementDate: measurementDateEl.value,
+        createdAt: new Date().toISOString(),
+        answers: { ...currentAnswers },
+        clusterScores: {
+          opening: +clusterScores.opening.mean.toFixed(2),
+          bond: +clusterScores.bond.mean.toFixed(2),
+          participation: +clusterScores.participation.mean.toFixed(2)
+        },
+        totalScore: +calculateTotalScore(clusterScores).toFixed(2)
+      };
+    }
+
+    function saveMeasurement() {
+      if (!validateForm()) return;
+
+      const measurement = buildMeasurementObject();
+      const key = getStorageKey(measurement.clientId);
+      const existing = JSON.parse(localStorage.getItem(key) || "[]");
+
+      existing.push(measurement);
+      existing.sort((a, b) => new Date(a.measurementDate) - new Date(b.measurementDate));
+      localStorage.setItem(key, JSON.stringify(existing));
+
+      alert("Messung gespeichert.");
+      loadedHistory = existing;
+      renderHistory(existing);
+      drawTrendChart(existing);
+    }
+
+    function loadHistory() {
+      const clientId = clientIdEl.value.trim();
+      if (!clientId) {
+        alert("Bitte zuerst eine Klient-ID eingeben.");
+        return;
+      }
+
+      const key = getStorageKey(clientId);
+      const existing = JSON.parse(localStorage.getItem(key) || "[]");
+      loadedHistory = existing;
+      renderHistory(existing);
+      drawTrendChart(existing);
+
+      if (!existing.length) {
+        alert("Für diese Klient-ID wurden noch keine Messungen gefunden.");
+      }
+    }
+
+    function exportJson() {
+      const clientId = clientIdEl.value.trim();
+      if (!clientId) {
+        alert("Bitte zuerst eine Klient-ID eingeben.");
+        return;
+      }
+
+      const key = getStorageKey(clientId);
+      const existing = JSON.parse(localStorage.getItem(key) || "[]");
+
+      if (!existing.length) {
+        alert("Keine Daten zum Export vorhanden.");
+        return;
+      }
+
+      const blob = new Blob([JSON.stringify(existing, null, 2)], {
+        type: "application/json"
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `qualicheck_${clientId}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function resetAnswers() {
+      currentAnswers = {};
+      randomizedItems = shuffle(ITEMS);
+      renderItems();
+      renderCurrentResults();
+    }
+
+    function renderHistory(history) {
+      if (!history.length) {
+        historyWrap.innerHTML = `<p class="muted">Noch keine Messungen geladen.</p>`;
+        return;
+      }
+
+      let html = `
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>Datum</th>
+              <th>Messzeitpunkt</th>
+              <th>Öffnung</th>
+              <th>Verbundenheit</th>
+              <th>Teilhabe</th>
+              <th>Gesamt</th>
+              <th>Trend</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      history.forEach((entry, index) => {
+        const prev = index > 0 ? history[index - 1] : null;
+        const trend = getTrendInfo(
+          entry.totalScore,
+          prev ? prev.totalScore : null
+        );
+
+        html += `
+          <tr>
+            <td>${entry.measurementDate}</td>
+            <td>${entry.measurementLabel}</td>
+            <td>${entry.clusterScores.opening.toFixed(2)}</td>
+            <td>${entry.clusterScores.bond.toFixed(2)}</td>
+            <td>${entry.clusterScores.participation.toFixed(2)}</td>
+            <td><strong>${entry.totalScore.toFixed(2)}</strong></td>
+            <td>
+              <span class="trend ${trend.colorClass}">${trend.label}</span>
+              ${renderTraffic(trend.light)}
+            </td>
+          </tr>
+        `;
+      });
+
+      html += `</tbody></table>`;
+      historyWrap.innerHTML = html;
+    }
+
+    function drawTrendChart(history) {
+      const canvas = trendCanvas;
+      const ctx = canvas.getContext("2d");
+      const width = canvas.width;
+      const height = canvas.height;
+
+      ctx.clearRect(0, 0, width, height);
+
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, width, height);
+
+      const margin = { top: 30, right: 30, bottom: 60, left: 50 };
+      const chartW = width - margin.left - margin.right;
+      const chartH = height - margin.top - margin.bottom;
+
+      ctx.strokeStyle = "#d1d5db";
+      ctx.lineWidth = 1;
+
+      for (let i = 0; i <= 4; i++) {
+        const y = margin.top + (chartH / 4) * i;
+        ctx.beginPath();
+        ctx.moveTo(margin.left, y);
+        ctx.lineTo(margin.left + chartW, y);
+        ctx.stroke();
+
+        const value = (5 - i).toFixed(0);
+        ctx.fillStyle = "#6b7280";
+        ctx.font = "12px Arial";
+        ctx.fillText(value, 20, y + 4);
+      }
+
+      ctx.strokeStyle = "#9ca3af";
+      ctx.beginPath();
+      ctx.moveTo(margin.left, margin.top);
+      ctx.lineTo(margin.left, margin.top + chartH);
+      ctx.lineTo(margin.left + chartW, margin.top + chartH);
+      ctx.stroke();
+
+      if (!history.length) {
+        ctx.fillStyle = "#6b7280";
+        ctx.font = "16px Arial";
+        ctx.fillText("Noch keine Verlaufsdaten vorhanden.", margin.left + 20, margin.top + 40);
+        return;
+      }
+
+      const series = [
+        { key: "opening", color: "#2563eb", label: "Öffnung" },
+        { key: "bond", color: "#7c3aed", label: "Verbundenheit" },
+        { key: "participation", color: "#059669", label: "Teilhabe" },
+        { key: "totalScore", color: "#111827", label: "Gesamt" }
+      ];
+
+      const getX = (index) => {
+        if (history.length === 1) return margin.left + chartW / 2;
+        return margin.left + (chartW / (history.length - 1)) * index;
+      };
+
+      const getY = (value) => {
+        const min = 1;
+        const max = 5;
+        return margin.top + chartH - ((value - min) / (max - min)) * chartH;
+      };
+
+      history.forEach((entry, index) => {
+        const x = getX(index);
+        ctx.fillStyle = "#6b7280";
+        ctx.font = "12px Arial";
+        ctx.save();
+        ctx.translate(x, margin.top + chartH + 18);
+        ctx.rotate(-0.35);
+        ctx.fillText(entry.measurementLabel, 0, 0);
+        ctx.restore();
+      });
+
+      series.forEach(s => {
+        ctx.beginPath();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = s.color;
+
+        history.forEach((entry, index) => {
+          const value = s.key === "totalScore" ? entry.totalScore : entry.clusterScores[s.key];
+          const x = getX(index);
+          const y = getY(value);
+
+          if (index === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+
+        ctx.stroke();
+
+        history.forEach((entry, index) => {
+          const value = s.key === "totalScore" ? entry.totalScore : entry.clusterScores[s.key];
+          const x = getX(index);
+          const y = getY(value);
+
+          ctx.beginPath();
+          ctx.fillStyle = s.color;
+          ctx.arc(x, y, 4, 0, Math.PI * 2);
+          ctx.fill();
+        });
+      });
+
+      let legendX = margin.left;
+      const legendY = 18;
+
+      series.forEach(s => {
+        ctx.fillStyle = s.color;
+        ctx.fillRect(legendX, legendY - 9, 14, 14);
+        ctx.fillStyle = "#111827";
+        ctx.font = "13px Arial";
+        ctx.fillText(s.label, legendX + 20, legendY + 2);
+        legendX += 130;
+      });
+    }
+
+    document.getElementById("shuffleBtn").addEventListener("click", () => {
+      randomizedItems = shuffle(ITEMS);
+      renderItems();
+    });
+
+    document.getElementById("saveBtn").addEventListener("click", saveMeasurement);
+    document.getElementById("loadBtn").addEventListener("click", loadHistory);
+    document.getElementById("exportBtn").addEventListener("click", exportJson);
+    document.getElementById("resetBtn").addEventListener("click", resetAnswers);
+
+    init();
+  </script>
+</body>
+</html>
