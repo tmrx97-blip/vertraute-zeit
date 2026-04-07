@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Protokoll gesundheitlicher Beobachtungen</title>
+  <style>
+    :root{
+      --blue:#2f4f86;
+      --blue-strong:#2449d8;
+      --blue-light:#eef2f8;
+      --line:#cfd7e6;
+      --text:#1f2430;
+      --muted:#6b7280;
+      --bg:#f4f6fa;
+      --card:#ffffff;
+      --danger:#b42318;
+      --success:#1d7a46;
+      --warning:#b54708;
+      --shadow:0 8px 24px rgba(16,24,40,.08);
+    }
+
+    *{box-sizing:border-box}
+
+    html,body{
+      margin:0;
+      padding:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family: Georgia, "Times New Roman", serif;
+      -webkit-text-size-adjust:100%;
+    }
+
+    body{
+      padding:20px;
+    }
+
+    .app{
+      max-width:1180px;
+      margin:0 auto;
+    }
+
+    .toolbar{
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:space-between;
+      gap:12px;
+      align-items:center;
+      margin-bottom:18px;
+    }
+
+    .toolbar-left,
+    .toolbar-right{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+    }
+
+    .btn{
+      appearance:none;
+      border:none;
+      border-radius:12px;
+      padding:14px 18px;
+      font-size:16px;
+      line-height:1.1;
+      font-family:inherit;
+      cursor:pointer;
+      min-height:48px;
+      box-shadow:var(--shadow);
+      background:#fff;
+      color:var(--text);
+      border:1px solid var(--line);
+    }
+
+    .btn-primary{
+      background:var(--blue-strong);
+      color:#fff;
+      border-color:var(--blue-strong);
+    }
+
+    .btn-danger{
+      color:var(--danger);
+      border-color:#efc5c0;
+      background:#fff;
+    }
+
+    .btn:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+    }
+
+    .status{
+      min-height:22px;
+      font-size:15px;
+      color:var(--muted);
+      margin-bottom:14px;
+      padding-left:4px;
+    }
+
+    .sheet,
+    .search-panel,
+    .records{
+      background:#fff;
+      border:1px solid #e6eaf2;
+      border-radius:20px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+
+    .sheet-top{
+      padding:30px 34px 22px;
+    }
+
+    .sheet-title{
+      color:var(--blue);
+      font-size:34px;
+      line-height:1.15;
+      margin:0 0 10px;
+      font-weight:700;
+      border-bottom:2px solid #97acd4;
+      padding-bottom:8px;
+    }
+
+    .sheet-subtitle{
+      margin:0;
+      color:#737b8b;
+      font-style:italic;
+      font-size:18px;
+    }
+
+    .sheet-rule{
+      border:none;
+      border-top:1px solid var(--line);
+      margin:0 34px;
+    }
+
+    .sheet-body{
+      padding:24px 34px 34px;
+    }
+
+    .intro{
+      margin:0 0 18px;
+      font-size:18px;
+      line-height:1.45;
+      color:#111827;
+    }
+
+    .panel{
+      background:#eef2f8;
+      padding:16px 14px 20px;
+      min-height:720px;
+    }
+
+    .row{
+      margin-bottom:18px;
+    }
+
+    .row:last-child{
+      margin-bottom:0;
+    }
+
+    .field{
+      display:grid;
+      gap:7px;
+    }
+
+    .field label{
+      color:#111827;
+      font-size:16px;
+      font-weight:700;
+      letter-spacing:.01em;
+    }
+
+    .required::after{
+      content:" *";
+      color:var(--danger);
+    }
+
+    input[type="text"],
+    input[type="date"],
+    input[type="time"],
+    textarea,
+    select{
+      width:100%;
+      border:1.5px solid var(--line);
+      border-radius:10px;
+      background:#fff;
+      color:var(--text);
+      padding:12px 14px;
+      font-size:17px;
+      font-family:inherit;
+      outline:none;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus{
+      border-color:#6b8cff;
+      box-shadow:0 0 0 4px rgba(36,73,216,.08);
+    }
+
+    textarea{
+      resize:vertical;
+      min-height:88px;
+    }
+
+    .invalid{
+      border-color:var(--danger) !important;
+      box-shadow:0 0 0 4px rgba(180,35,24,.08) !important;
+    }
+
+    .observation-layout{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:0;
+    }
+
+    .grid-date-time{
+      display:grid;
+      grid-template-columns:1fr 220px;
+      gap:14px;
+    }
+
+    .grid-two{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+    }
+
+    .h-observation{ min-height:170px; }
+    .h-situation{ min-height:140px; }
+    .h-steps{ min-height:120px; }
+    .h-free{ min-height:120px; }
+
+    .meta-note{
+      font-size:14px;
+      color:var(--muted);
+      margin-top:4px;
+    }
+
+    .freefield{
+      margin-top:22px;
+    }
+
+    .freefield h2{
+      margin:0 0 10px;
+      color:#111827;
+      font-size:24px;
+      font-weight:700;
+    }
+
+    .search-panel{
+      margin-top:18px;
+      padding:18px 20px;
+    }
+
+    .search-panel h3{
+      margin:0 0 14px;
+      font-size:22px;
+      color:var(--blue);
+    }
+
+    .search-grid{
+      display:grid;
+      grid-template-columns:1.1fr .85fr .85fr .9fr;
+      gap:12px;
+      align-items:end;
+      margin-bottom:12px;
+    }
+
+    .search-grid-2{
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr auto;
+      gap:12px;
+      align-items:end;
+    }
+
+    .quickfilters{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin:12px 0 10px;
+    }
+
+    .quick-btn{
+      appearance:none;
+      border:1px solid var(--line);
+      background:#fff;
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:10px;
+      cursor:pointer;
+      font-family:inherit;
+      font-size:15px;
+    }
+
+    .quick-btn.active{
+      background:#eef3ff;
+      color:#1d43cc;
+      border-color:#cfd9ff;
+    }
+
+    .search-info{
+      margin-top:12px;
+      color:var(--muted);
+      font-size:15px;
+      line-height:1.45;
+    }
+
+    .records{
+      margin-top:18px;
+    }
+
+    .records-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      padding:18px 20px;
+      border-bottom:1px solid #edf1f7;
+      background:#fafbfd;
+    }
+
+    .records-head h3{
+      margin:0;
+      font-size:22px;
+      color:var(--blue);
+    }
+
+    .records-count{
+      color:var(--muted);
+      font-size:15px;
+    }
+
+    .badge{
+      display:inline-block;
+      padding:5px 10px;
+      border-radius:999px;
+      background:#eef3ff;
+      color:#2449d8;
+      font-size:14px;
+      font-weight:700;
+    }
+
+    .records-list{
+      padding:8px 14px 16px;
+    }
+
+    .record{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      gap:14px;
+      align-items:center;
+      border:1px solid #e8edf5;
+      border-radius:14px;
+      padding:14px;
+      margin-top:12px;
+      background:#fff;
+    }
+
+    .record-title{
+      font-size:18px;
+      color:var(--text);
+      font-weight:700;
+      margin:0 0 6px;
+      word-break:break-word;
+    }
+
+    .record-meta{
+      color:var(--muted);
+      font-size:15px;
+      line-height:1.5;
+      word-break:break-word;
+    }
+
+    .record-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .small-btn{
+      appearance:none;
+      border:none;
+      border-radius:10px;
+      padding:10px 12px;
+      font-size:14px;
+      font-family:inherit;
+      cursor:pointer;
+      min-height:40px;
+    }
+
+    .small-edit{
+      background:#eef3ff;
+      color:#1d43cc;
+    }
+
+    .small-delete{
+      background:#fff2f1;
+      color:var(--danger);
+    }
+
+    .small-print{
+      background:#eef7f1;
+      color:#1d7a46;
+    }
+
+    .empty{
+      padding:24px 8px 10px;
+      color:var(--muted);
+      font-size:16px;
+    }
+
+    .hidden{
+      display:none !important;
+    }
+
+    @media (max-width: 980px){
+      .toolbar{
+        align-items:stretch;
+      }
+
+      .toolbar-left,
+      .toolbar-right{
+        width:100%;
+      }
+
+      .grid-date-time,
+      .grid-two,
+      .search-grid,
+      .search-grid-2{
+        grid-template-columns:1fr;
+      }
+
+      .record{
+        grid-template-columns:1fr;
+      }
+
+      .record-actions{
+        justify-content:flex-start;
+      }
+
+      .btn{
+        flex:1 1 auto;
+      }
+
+      .sheet-top,
+      .sheet-body{
+        padding-left:18px;
+        padding-right:18px;
+      }
+
+      .sheet-rule{
+        margin-left:18px;
+        margin-right:18px;
+      }
+
+      .sheet-title{
+        font-size:28px;
+      }
+    }
+
+    @media print{
+      @page{
+        size:A4;
+        margin:12mm;
+      }
+
+      body{
+        background:#fff;
+        padding:0;
+      }
+
+      .toolbar,
+      .search-panel,
+      .records,
+      .status{
+        display:none !important;
+      }
+
+      .sheet{
+        border:none;
+        box-shadow:none;
+        border-radius:0;
+      }
+
+      .sheet-top{
+        padding:0 0 16px 0;
+      }
+
+      .sheet-title{
+        font-size:28px;
+      }
+
+      .sheet-rule{
+        margin:0;
+      }
+
+      .sheet-body{
+        padding:18px 0 0 0;
+      }
+
+      input[type="text"],
+      input[type="date"],
+      input[type="time"],
+      textarea,
+      select{
+        border:1px solid #cfd7e6;
+        border-radius:0;
+        padding:8px 6px;
+        box-shadow:none !important;
+        background:#fff;
+        font-size:15px;
+      }
+
+      .panel{
+        background:#eef2f8 !important;
+      }
+
+      .freefield h2{
+        font-size:20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <button class="btn btn-primary" id="saveBtn" type="button">Speichern</button>
+        <button class="btn" id="resetBtn" type="button">Zurücksetzen</button>
+        <button class="btn" id="printBtn" type="button">Drucken / PDF</button>
+      </div>
+      <div class="toolbar-right">
+        <button class="btn" id="exportJsonBtn" type="button">Export JSON</button>
+        <button class="btn" id="importJsonBtn" type="button">Import JSON</button>
+        <button class="btn" id="exportCsvBtn" type="button">Export CSV</button>
+        <input type="file" id="jsonFileInput" accept=".json,application/json" class="hidden" />
+      </div>
+    </div>
+
+    <div class="status" id="status"></div>
+
+    <section class="sheet" id="mainSheet">
+      <div class="sheet-top">
+        <h1 class="sheet-title">Protokoll gesundheitlicher Beobachtungen</h1>
+        <p class="sheet-subtitle">Vertraute Zeit – Thomas Marx</p>
+      </div>
+
+      <hr class="sheet-rule" />
+
+      <div class="sheet-body">
+        <p class="intro">Nur für sachliche Beobachtungen im Alltag. Keine Diagnosen, keine Therapieanweisungen.</p>
+
+        <form id="observationForm">
+          <input type="hidden" id="entryId" />
+          <input type="hidden" id="dokumentiertAm" />
+
+          <div class="observation-layout">
+            <div class="panel">
+              <div class="row field">
+                <label for="nameKuerzel" class="required">Name / Kürzel</label>
+                <input type="text" id="nameKuerzel" />
+              </div>
+
+              <div class="row grid-date-time">
+                <div class="field">
+                  <label for="datum" class="required">Datum</label>
+                  <input type="date" id="datum" />
+                </div>
+                <div class="field">
+                  <label for="uhrzeit">Uhrzeit</label>
+                  <input type="time" id="uhrzeit" />
+                </div>
+              </div>
+
+              <div class="row grid-two">
+                <div class="field">
+                  <label for="artBeobachtung">Art der Beobachtung</label>
+                  <select id="artBeobachtung">
+                    <option value="">Bitte auswählen</option>
+                    <option>Allgemeinzustand</option>
+                    <option>Mobilität</option>
+                    <option>Stimmung / Verhalten</option>
+                    <option>Ernährung / Trinken</option>
+                    <option>Orientierung</option>
+                    <option>Medikamente / Umgang damit</option>
+                    <option>Umfeld / Sicherheit</option>
+                    <option>Sonstiges</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="dokumentiertVon" class="required">Dokumentiert von</label>
+                  <input type="text" id="dokumentiertVon" />
+                </div>
+              </div>
+
+              <div class="row field">
+                <label for="beobachtung" class="required">Beobachtung</label>
+                <textarea id="beobachtung" class="h-observation"></textarea>
+              </div>
+
+              <div class="row field">
+                <label for="anlassSituation">Anlass / Situation</label>
+                <textarea id="anlassSituation" class="h-situation"></textarea>
+              </div>
+
+              <div class="row grid-two">
+                <div class="field">
+                  <label for="schritteVeranlasst">Welche Schritte wurden veranlasst?</label>
+                  <textarea id="schritteVeranlasst" class="h-steps"></textarea>
+                </div>
+                <div class="field">
+                  <label for="werInformiert">Wer wurde informiert?</label>
+                  <input type="text" id="werInformiert" placeholder="z. B. Angehörige, Pflegedienst, Praxis" />
+                </div>
+              </div>
+
+              <div class="row field">
+                <label for="dokumentiertAmAnzeige">Dokumentiert am</label>
+                <input type="text" id="dokumentiertAmAnzeige" readonly />
+                <div class="meta-note">Wird beim ersten Speichern automatisch gesetzt und bei Aktualisierung mitgeführt.</div>
+              </div>
+            </div>
+
+            <div class="freefield">
+              <h2>Freifeld</h2>
+              <div class="field">
+                <textarea id="freifeld" class="h-free"></textarea>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section class="search-panel">
+      <h3>Suche / Filter</h3>
+
+      <div class="search-grid">
+        <div class="field">
+          <label for="searchKuerzel">Kürzel</label>
+          <input type="text" id="searchKuerzel" placeholder="Exakte Suche, ohne Groß-/Kleinschreibung" />
+        </div>
+
+        <div class="field">
+          <label for="searchDateFrom">Datum von</label>
+          <input type="date" id="searchDateFrom" />
+        </div>
+
+        <div class="field">
+          <label for="searchDateTo">Datum bis</label>
+          <input type="date" id="searchDateTo" />
+        </div>
+
+        <div class="field">
+          <label for="searchDokumentiertVon">Dokumentiert von</label>
+          <input type="text" id="searchDokumentiertVon" placeholder="exakt, ohne Groß-/Kleinschreibung" />
+        </div>
+      </div>
+
+      <div class="search-grid-2">
+        <div class="field">
+          <label for="searchVolltext">Volltextsuche</label>
+          <input type="text" id="searchVolltext" placeholder="sucht in Beobachtung, Anlass, Schritte, Freifeld, informiert" />
+        </div>
+
+        <div class="field">
+          <label for="searchArtBeobachtung">Art der Beobachtung</label>
+          <select id="searchArtBeobachtung">
+            <option value="">alle</option>
+            <option>Allgemeinzustand</option>
+            <option>Mobilität</option>
+            <option>Stimmung / Verhalten</option>
+            <option>Ernährung / Trinken</option>
+            <option>Orientierung</option>
+            <option>Medikamente / Umgang damit</option>
+            <option>Umfeld / Sicherheit</option>
+            <option>Sonstiges</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="onlyWithSteps">Zusatzfilter</label>
+          <select id="onlyWithSteps">
+            <option value="">alle</option>
+            <option value="yes">nur mit veranlassten Schritten</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>&nbsp;</label>
+          <button class="btn" id="searchResetBtn" type="button">Filter zurücksetzen</button>
+        </div>
+      </div>
+
+      <div class="quickfilters">
+        <button class="quick-btn" type="button" data-range="today">Heute</button>
+        <button class="quick-btn" type="button" data-range="7days">Letzte 7 Tage</button>
+        <button class="quick-btn" type="button" data-range="month">Dieser Monat</button>
+        <button class="quick-btn" type="button" data-range="lastmonth">Letzter Monat</button>
+      </div>
+
+      <div class="search-info" id="searchInfo">Kein Filter aktiv. Es werden alle Einträge angezeigt.</div>
+    </section>
+
+    <section class="records">
+      <div class="records-head">
+        <div>
+          <h3>Gespeicherte Einträge</h3>
+          <div class="records-count" id="recordsCount">0 Einträge</div>
+        </div>
+        <div class="badge" id="resultBadge">0 Treffer</div>
+      </div>
+      <div class="records-list" id="recordsList"></div>
+    </section>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "gesundheitliche_beobachtungen_v2";
+
+    const form = document.getElementById("observationForm");
+    const statusEl = document.getElementById("status");
+    const saveBtn = document.getElementById("saveBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const printBtn = document.getElementById("printBtn");
+    const exportJsonBtn = document.getElementById("exportJsonBtn");
+    const importJsonBtn = document.getElementById("importJsonBtn");
+    const exportCsvBtn = document.getElementById("exportCsvBtn");
+    const jsonFileInput = document.getElementById("jsonFileInput");
+
+    const recordsList = document.getElementById("recordsList");
+    const recordsCount = document.getElementById("recordsCount");
+    const resultBadge = document.getElementById("resultBadge");
+    const searchInfo = document.getElementById("searchInfo");
+
+    const searchKuerzel = document.getElementById("searchKuerzel");
+    const searchDateFrom = document.getElementById("searchDateFrom");
+    const searchDateTo = document.getElementById("searchDateTo");
+    const searchDokumentiertVon = document.getElementById("searchDokumentiertVon");
+    const searchVolltext = document.getElementById("searchVolltext");
+    const searchArtBeobachtung = document.getElementById("searchArtBeobachtung");
+    const onlyWithSteps = document.getElementById("onlyWithSteps");
+    const searchResetBtn = document.getElementById("searchResetBtn");
+    const quickFilterButtons = document.querySelectorAll(".quick-btn");
+
+    let isDirty = false;
+
+    const fields = {
+      entryId: document.getElementById("entryId"),
+      nameKuerzel: document.getElementById("nameKuerzel"),
+      datum: document.getElementById("datum"),
+      uhrzeit: document.getElementById("uhrzeit"),
+      artBeobachtung: document.getElementById("artBeobachtung"),
+      beobachtung: document.getElementById("beobachtung"),
+      anlassSituation: document.getElementById("anlassSituation"),
+      schritteVeranlasst: document.getElementById("schritteVeranlasst"),
+      werInformiert: document.getElementById("werInformiert"),
+      dokumentiertVon: document.getElementById("dokumentiertVon"),
+      dokumentiertAm: document.getElementById("dokumentiertAm"),
+      dokumentiertAmAnzeige: document.getElementById("dokumentiertAmAnzeige"),
+      freifeld: document.getElementById("freifeld")
+    };
+
+    const requiredFieldIds = ["nameKuerzel", "datum", "beobachtung", "dokumentiertVon"];
+
+    function todayForInput() {
+      const now = new Date();
+      return toDateInputValue(now);
+    }
+
+    function toDateInputValue(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, "0");
+      const d = String(date.getDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    }
+
+    function formatDateDisplay(value) {
+      if (!value) return "ohne Datum";
+      const [y, m, d] = value.split("-");
+      if (!y || !m || !d) return value;
+      return `${d}.${m}.${y}`;
+    }
+
+    function formatTimestampDisplay(isoString) {
+      if (!isoString) return "";
+      const date = new Date(isoString);
+      if (Number.isNaN(date.getTime())) return isoString;
+      const d = String(date.getDate()).padStart(2, "0");
+      const m = String(date.getMonth() + 1).padStart(2, "0");
+      const y = date.getFullYear();
+      const hh = String(date.getHours()).padStart(2, "0");
+      const mm = String(date.getMinutes()).padStart(2, "0");
+      return `${d}.${m}.${y}, ${hh}:${mm}`;
+    }
+
+    function uid() {
+      return "id_" + Date.now() + "_" + Math.random().toString(36).slice(2, 9);
+    }
+
+    function normalizeText(value) {
+      return String(value || "").trim().toLowerCase();
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function readEntries() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function writeEntries(entries) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+    }
+
+    function sortEntries(entries) {
+      return [...entries].sort((a, b) => {
+        const dateA = a.datum || "";
+        const dateB = b.datum || "";
+        if (dateA !== dateB) return dateB.localeCompare(dateA);
+
+        const timeA = a.uhrzeit || "";
+        const timeB = b.uhrzeit || "";
+        if (timeA !== timeB) return timeB.localeCompare(timeA);
+
+        return (b.updatedAt || "").localeCompare(a.updatedAt || "");
+      });
+    }
+
+    function setStatus(message, type = "neutral") {
+      statusEl.textContent = message;
+      if (type === "error") {
+        statusEl.style.color = "var(--danger)";
+      } else if (type === "ok") {
+        statusEl.style.color = "var(--success)";
+      } else if (type === "warn") {
+        statusEl.style.color = "var(--warning)";
+      } else {
+        statusEl.style.color = "var(--muted)";
+      }
+    }
+
+    function clearValidation() {
+      requiredFieldIds.forEach(id => fields[id].classList.remove("invalid"));
+    }
+
+    function validateForm() {
+      clearValidation();
+      let valid = true;
+
+      requiredFieldIds.forEach(id => {
+        if (!String(fields[id].value || "").trim()) {
+          fields[id].classList.add("invalid");
+          valid = false;
+        }
+      });
+
+      if (!valid) {
+        setStatus("Bitte die Pflichtfelder Name/Kürzel, Datum, Beobachtung und Dokumentiert von ausfüllen.", "error");
+      }
+
+      return valid;
+    }
+
+    function clearForm() {
+      form.reset();
+      fields.entryId.value = "";
+      fields.datum.value = todayForInput();
+      fields.dokumentiertAm.value = "";
+      fields.dokumentiertAmAnzeige.value = "";
+      clearValidation();
+      isDirty = false;
+    }
+
+    function fillForm(entry) {
+      fields.entryId.value = entry.id || "";
+      fields.nameKuerzel.value = entry.nameKuerzel || "";
+      fields.datum.value = entry.datum || todayForInput();
+      fields.uhrzeit.value = entry.uhrzeit || "";
+      fields.artBeobachtung.value = entry.artBeobachtung || "";
+      fields.beobachtung.value = entry.beobachtung || "";
+      fields.anlassSituation.value = entry.anlassSituation || "";
+      fields.schritteVeranlasst.value = entry.schritteVeranlasst || "";
+      fields.werInformiert.value = entry.werInformiert || "";
+      fields.dokumentiertVon.value = entry.dokumentiertVon || "";
+      fields.dokumentiertAm.value = entry.dokumentiertAm || "";
+      fields.dokumentiertAmAnzeige.value = formatTimestampDisplay(entry.dokumentiertAm || "");
+      fields.freifeld.value = entry.freifeld || "";
+      clearValidation();
+      isDirty = false;
+      setStatus("Eintrag zum Bearbeiten geladen.", "ok");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function getFormData() {
+      const existingTimestamp = fields.dokumentiertAm.value || new Date().toISOString();
+
+      return {
+        id: fields.entryId.value || uid(),
+        nameKuerzel: fields.nameKuerzel.value.trim(),
+        datum: fields.datum.value,
+        uhrzeit: fields.uhrzeit.value,
+        artBeobachtung: fields.artBeobachtung.value,
+        beobachtung: fields.beobachtung.value.trim(),
+        anlassSituation: fields.anlassSituation.value.trim(),
+        schritteVeranlasst: fields.schritteVeranlasst.value.trim(),
+        werInformiert: fields.werInformiert.value.trim(),
+        dokumentiertVon: fields.dokumentiertVon.value.trim(),
+        dokumentiertAm: existingTimestamp,
+        freifeld: fields.freifeld.value.trim(),
+        updatedAt: new Date().toISOString()
+      };
+    }
+
+    function saveEntry() {
+      if (!validateForm()) return;
+
+      const data = getFormData();
+      const entries = readEntries();
+      const index = entries.findIndex(entry => entry.id === data.id);
+
+      if (index >= 0) {
+        entries[index] = data;
+        setStatus("Eintrag aktualisiert und im Browser gespeichert.", "ok");
+      } else {
+        entries.push(data);
+        setStatus("Eintrag gespeichert und im Browser gesichert.", "ok");
+      }
+
+      writeEntries(entries);
+      fields.entryId.value = data.id;
+      fields.dokumentiertAm.value = data.dokumentiertAm;
+      fields.dokumentiertAmAnzeige.value = formatTimestampDisplay(data.dokumentiertAm);
+      isDirty = false;
+      renderEntries();
+    }
+
+    function deleteEntry(id) {
+      const entries = readEntries().filter(entry => entry.id !== id);
+      writeEntries(entries);
+
+      if (fields.entryId.value === id) {
+        clearForm();
+      }
+
+      renderEntries();
+      setStatus("Eintrag gelöscht.", "ok");
+    }
+
+    function getActiveFilters() {
+      return {
+        kuerzel: normalizeText(searchKuerzel.value),
+        from: searchDateFrom.value,
+        to: searchDateTo.value,
+        dokumentiertVon: normalizeText(searchDokumentiertVon.value),
+        volltext: normalizeText(searchVolltext.value),
+        artBeobachtung: normalizeText(searchArtBeobachtung.value),
+        onlyWithSteps: onlyWithSteps.value === "yes"
+      };
+    }
+
+    function entryMatchesFilters(entry, filters) {
+      let kuerzelOk = true;
+      let fromOk = true;
+      let toOk = true;
+      let dokumentiertVonOk = true;
+      let volltextOk = true;
+      let artOk = true;
+      let stepsOk = true;
+
+      if (filters.kuerzel) {
+        kuerzelOk = normalizeText(entry.nameKuerzel) === filters.kuerzel;
+      }
+
+      if (filters.from) {
+        fromOk = !!entry.datum && entry.datum >= filters.from;
+      }
+
+      if (filters.to) {
+        toOk = !!entry.datum && entry.datum <= filters.to;
+      }
+
+      if (filters.dokumentiertVon) {
+        dokumentiertVonOk = normalizeText(entry.dokumentiertVon) === filters.dokumentiertVon;
+      }
+
+      if (filters.artBeobachtung) {
+        artOk = normalizeText(entry.artBeobachtung) === filters.artBeobachtung;
+      }
+
+      if (filters.onlyWithSteps) {
+        stepsOk = !!normalizeText(entry.schritteVeranlasst);
+      }
+
+      if (filters.volltext) {
+        const haystack = [
+          entry.beobachtung,
+          entry.anlassSituation,
+          entry.schritteVeranlasst,
+          entry.freifeld,
+          entry.werInformiert
+        ].map(normalizeText).join(" ");
+        volltextOk = haystack.includes(filters.volltext);
+      }
+
+      return kuerzelOk && fromOk && toOk && dokumentiertVonOk && volltextOk && artOk && stepsOk;
+    }
+
+    function getFilteredEntries() {
+      const allEntries = sortEntries(readEntries());
+      const filters = getActiveFilters();
+      return allEntries.filter(entry => entryMatchesFilters(entry, filters));
+    }
+
+    function updateSearchInfo(total, filtered) {
+      const filters = getActiveFilters();
+      const parts = [];
+
+      if (filters.kuerzel) parts.push(`Kürzel exakt: ${searchKuerzel.value.trim()}`);
+      if (filters.from) parts.push(`von ${formatDateDisplay(filters.from)}`);
+      if (filters.to) parts.push(`bis ${formatDateDisplay(filters.to)}`);
+      if (filters.dokumentiertVon) parts.push(`Dokumentiert von exakt: ${searchDokumentiertVon.value.trim()}`);
+      if (filters.volltext) parts.push(`Volltext: ${searchVolltext.value.trim()}`);
+      if (filters.artBeobachtung) parts.push(`Art: ${searchArtBeobachtung.value}`);
+      if (filters.onlyWithSteps) parts.push(`nur mit veranlassten Schritten`);
+
+      if (!parts.length) {
+        searchInfo.textContent = "Kein Filter aktiv. Es werden alle Einträge angezeigt.";
+        return;
+      }
+
+      searchInfo.textContent = `Aktiver Filter: ${parts.join(" | ")}. Angezeigt werden ${filtered} von ${total} Einträgen.`;
+    }
+
+    function renderEntries() {
+      const allEntries = sortEntries(readEntries());
+      const filteredEntries = getFilteredEntries();
+
+      recordsCount.textContent = `${allEntries.length} ${allEntries.length === 1 ? "Eintrag gesamt" : "Einträge gesamt"}`;
+      resultBadge.textContent = `${filteredEntries.length} Treffer`;
+      updateSearchInfo(allEntries.length, filteredEntries.length);
+
+      if (!filteredEntries.length) {
+        recordsList.innerHTML = `<div class="empty">Keine Einträge passend zum aktuellen Filter gefunden.</div>`;
+        return;
+      }
+
+      recordsList.innerHTML = filteredEntries.map(entry => {
+        const title = `${escapeHtml(entry.nameKuerzel || "Ohne Kürzel")} – gesundheitliche Beobachtung`;
+        const metaParts = [
+          formatDateDisplay(entry.datum),
+          entry.uhrzeit ? `Uhrzeit: ${entry.uhrzeit}` : "",
+          entry.artBeobachtung ? `Art: ${escapeHtml(entry.artBeobachtung)}` : "",
+          entry.dokumentiertVon ? `Dokumentiert von: ${escapeHtml(entry.dokumentiertVon)}` : "",
+          entry.werInformiert ? `Informiert: ${escapeHtml(entry.werInformiert)}` : "",
+          entry.schritteVeranlasst ? `Schritte vorhanden` : ""
+        ].filter(Boolean);
+
+        return `
+          <div class="record">
+            <div>
+              <div class="record-title">${title}</div>
+              <div class="record-meta">${metaParts.join(" | ")}</div>
+            </div>
+            <div class="record-actions">
+              <button class="small-btn small-edit" type="button" onclick="editEntry('${entry.id}')">Bearbeiten</button>
+              <button class="small-btn small-print" type="button" onclick="printSingleEntry('${entry.id}')">Einzeldruck</button>
+              <button class="small-btn small-delete" type="button" onclick="confirmDelete('${entry.id}')">Löschen</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function resetSearch() {
+      searchKuerzel.value = "";
+      searchDateFrom.value = "";
+      searchDateTo.value = "";
+      searchDokumentiertVon.value = "";
+      searchVolltext.value = "";
+      searchArtBeobachtung.value = "";
+      onlyWithSteps.value = "";
+      quickFilterButtons.forEach(btn => btn.classList.remove("active"));
+      renderEntries();
+      setStatus("Filter zurückgesetzt.", "ok");
+    }
+
+    function markDirty() {
+      isDirty = true;
+    }
+
+    function setQuickRange(type) {
+      quickFilterButtons.forEach(btn => btn.classList.remove("active"));
+      const activeBtn = document.querySelector(`.quick-btn[data-range="${type}"]`);
+      if (activeBtn) activeBtn.classList.add("active");
+
+      const now = new Date();
+      let fromDate = null;
+      let toDate = null;
+
+      if (type === "today") {
+        fromDate = new Date(now);
+        toDate = new Date(now);
+      }
+
+      if (type === "7days") {
+        toDate = new Date(now);
+        fromDate = new Date(now);
+        fromDate.setDate(fromDate.getDate() - 6);
+      }
+
+      if (type === "month") {
+        fromDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        toDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+      }
+
+      if (type === "lastmonth") {
+        fromDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        toDate = new Date(now.getFullYear(), now.getMonth(), 0);
+      }
+
+      searchDateFrom.value = fromDate ? toDateInputValue(fromDate) : "";
+      searchDateTo.value = toDate ? toDateInputValue(toDate) : "";
+      renderEntries();
+    }
+
+    function downloadFile(filename, content, mimeType) {
+      const blob = new Blob([content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function exportJson() {
+      const entries = sortEntries(readEntries());
+      const content = JSON.stringify(entries, null, 2);
+      const stamp = new Date().toISOString().slice(0, 10);
+      downloadFile(`beobachtungen_export_${stamp}.json`, content, "application/json");
+      setStatus("JSON-Export erstellt.", "ok");
+    }
+
+    function importJsonFile(file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (!Array.isArray(parsed)) {
+            throw new Error("JSON enthält keine Liste von Einträgen.");
+          }
+
+          const sanitized = parsed.map(item => ({
+            id: item.id || uid(),
+            nameKuerzel: item.nameKuerzel || "",
+            datum: item.datum || "",
+            uhrzeit: item.uhrzeit || "",
+            artBeobachtung: item.artBeobachtung || "",
+            beobachtung: item.beobachtung || "",
+            anlassSituation: item.anlassSituation || "",
+            schritteVeranlasst: item.schritteVeranlasst || "",
+            werInformiert: item.werInformiert || "",
+            dokumentiertVon: item.dokumentiertVon || "",
+            dokumentiertAm: item.dokumentiertAm || new Date().toISOString(),
+            freifeld: item.freifeld || "",
+            updatedAt: item.updatedAt || new Date().toISOString()
+          }));
+
+          writeEntries(sanitized);
+          renderEntries();
+          setStatus("JSON erfolgreich importiert. Vorhandene Einträge wurden ersetzt.", "ok");
+        } catch (err) {
+          setStatus("Import fehlgeschlagen. Datei ist kein gültiger JSON-Export.", "error");
+        } finally {
+          jsonFileInput.value = "";
+        }
+      };
+      reader.readAsText(file, "UTF-8");
+    }
+
+    function toCsvValue(value) {
+      const str = String(value ?? "");
+      return `"${str.replace(/"/g, '""')}"`;
+    }
+
+    function exportCsv() {
+      const entries = sortEntries(readEntries());
+      const header = [
+        "id",
+        "nameKuerzel",
+        "datum",
+        "uhrzeit",
+        "artBeobachtung",
+        "beobachtung",
+        "anlassSituation",
+        "schritteVeranlasst",
+        "werInformiert",
+        "dokumentiertVon",
+        "dokumentiertAm",
+        "freifeld",
+        "updatedAt"
+      ];
+
+      const rows = entries.map(entry => [
+        entry.id,
+        entry.nameKuerzel,
+        entry.datum,
+        entry.uhrzeit,
+        entry.artBeobachtung,
+        entry.beobachtung,
+        entry.anlassSituation,
+        entry.schritteVeranlasst,
+        entry.werInformiert,
+        entry.dokumentiertVon,
+        entry.dokumentiertAm,
+        entry.freifeld,
+        entry.updatedAt
+      ]);
+
+      const csv = [header, ...rows]
+        .map(row => row.map(toCsvValue).join(";"))
+        .join("\n");
+
+      const stamp = new Date().toISOString().slice(0, 10);
+      downloadFile(`beobachtungen_export_${stamp}.csv`, csv, "text/csv;charset=utf-8");
+      setStatus("CSV-Export erstellt.", "ok");
+    }
+
+    function printSingleEntryByData(entry) {
+      const printWindow = window.open("", "_blank");
+      if (!printWindow) {
+        setStatus("Einzeldruck wurde vom Browser blockiert.", "error");
+        return;
+      }
+
+      const html = `
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Einzeldruck Beobachtung</title>
+<style>
+  body{
+    font-family: Georgia, "Times New Roman", serif;
+    color:#1f2430;
+    margin:12mm;
+  }
+  h1{
+    color:#2f4f86;
+    font-size:28px;
+    border-bottom:2px solid #97acd4;
+    padding-bottom:8px;
+    margin:0 0 10px;
+  }
+  .sub{
+    color:#737b8b;
+    font-style:italic;
+    margin-bottom:18px;
+  }
+  .intro{
+    margin:0 0 16px;
+    font-size:17px;
+  }
+  .box{
+    background:#eef2f8;
+    padding:14px;
+  }
+  .field{
+    margin-bottom:14px;
+  }
+  .label{
+    font-weight:700;
+    margin-bottom:4px;
+  }
+  .value{
+    white-space:pre-wrap;
+    min-height:20px;
+  }
+  .grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+  }
+</style>
+</head>
+<body>
+  <h1>Protokoll gesundheitlicher Beobachtungen</h1>
+  <div class="sub">Vertraute Zeit – Thomas Marx</div>
+  <div class="intro">Nur für sachliche Beobachtungen im Alltag. Keine Diagnosen, keine Therapieanweisungen.</div>
+
+  <div class="box">
+    <div class="field"><div class="label">Name / Kürzel</div><div class="value">${escapeHtml(entry.nameKuerzel || "")}</div></div>
+    <div class="grid">
+      <div class="field"><div class="label">Datum</div><div class="value">${escapeHtml(formatDateDisplay(entry.datum || ""))}</div></div>
+      <div class="field"><div class="label">Uhrzeit</div><div class="value">${escapeHtml(entry.uhrzeit || "")}</div></div>
+    </div>
+    <div class="grid">
+      <div class="field"><div class="label">Art der Beobachtung</div><div class="value">${escapeHtml(entry.artBeobachtung || "")}</div></div>
+      <div class="field"><div class="label">Dokumentiert von</div><div class="value">${escapeHtml(entry.dokumentiertVon || "")}</div></div>
+    </div>
+    <div class="field"><div class="label">Beobachtung</div><div class="value">${escapeHtml(entry.beobachtung || "")}</div></div>
+    <div class="field"><div class="label">Anlass / Situation</div><div class="value">${escapeHtml(entry.anlassSituation || "")}</div></div>
+    <div class="grid">
+      <div class="field"><div class="label">Welche Schritte wurden veranlasst?</div><div class="value">${escapeHtml(entry.schritteVeranlasst || "")}</div></div>
+      <div class="field"><div class="label">Wer wurde informiert?</div><div class="value">${escapeHtml(entry.werInformiert || "")}</div></div>
+    </div>
+    <div class="field"><div class="label">Dokumentiert am</div><div class="value">${escapeHtml(formatTimestampDisplay(entry.dokumentiertAm || ""))}</div></div>
+  </div>
+
+  <h2 style="margin:22px 0 10px; font-size:24px;">Freifeld</h2>
+  <div class="field"><div class="value">${escapeHtml(entry.freifeld || "")}</div></div>
+
+  <script>
+    window.onload = function() {
+      window.print();
+      setTimeout(() => window.close(), 200);
+    };
+  <\/script>
+</body>
+</html>
+      `;
+
+      printWindow.document.open();
+      printWindow.document.write(html);
+      printWindow.document.close();
+    }
+
+    function printSingleEntry(id) {
+      const entry = readEntries().find(item => item.id === id);
+      if (!entry) {
+        setStatus("Eintrag für Einzeldruck nicht gefunden.", "error");
+        return;
+      }
+      printSingleEntryByData(entry);
+    }
+
+    function confirmDelete(id) {
+      const ok = window.confirm("Diesen Eintrag wirklich löschen?");
+      if (!ok) return;
+      deleteEntry(id);
+    }
+
+    Object.values(fields).forEach(el => {
+      if (!el || el.readOnly) return;
+      el.addEventListener("input", () => { isDirty = true; });
+      el.addEventListener("change", () => { isDirty = true; });
+    });
+
+    [searchKuerzel, searchDateFrom, searchDateTo, searchDokumentiertVon, searchVolltext, searchArtBeobachtung, onlyWithSteps]
+      .forEach(el => {
+        const eventName = el.tagName === "INPUT" && el.type === "text" ? "input" : "change";
+        el.addEventListener(eventName, renderEntries);
+        if (eventName !== "input") el.addEventListener("input", renderEntries);
+      });
+
+    quickFilterButtons.forEach(btn => {
+      btn.addEventListener("click", () => setQuickRange(btn.dataset.range));
+    });
+
+    searchResetBtn.addEventListener("click", resetSearch);
+    saveBtn.addEventListener("click", saveEntry);
+    resetBtn.addEventListener("click", () => {
+      clearForm();
+      setStatus("Formular zurückgesetzt. Neuer Eintrag kann erfasst werden.", "ok");
+    });
+    printBtn.addEventListener("click", () => window.print());
+    exportJsonBtn.addEventListener("click", exportJson);
+    importJsonBtn.addEventListener("click", () => jsonFileInput.click());
+    exportCsvBtn.addEventListener("click", exportCsv);
+
+    jsonFileInput.addEventListener("change", (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      importJsonFile(file);
+    });
+
+    window.editEntry = function(id) {
+      const entry = readEntries().find(item => item.id === id);
+      if (!entry) {
+        setStatus("Eintrag konnte nicht geladen werden.", "error");
+        return;
+      }
+      fillForm(entry);
+    };
+
+    window.confirmDelete = confirmDelete;
+    window.printSingleEntry = printSingleEntry;
+
+    window.addEventListener("beforeunload", function (e) {
+      if (!isDirty) return;
+      e.preventDefault();
+      e.returnValue = "";
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+      clearForm();
+      renderEntries();
+      setStatus("Bereit.");
+    });
+  </script>
+</body>
+</html>
