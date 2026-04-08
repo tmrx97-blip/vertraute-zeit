@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aufnahmebogen – Vertraute Zeit</title>
+  <style>
+    :root{
+      --blue:#2f4f86;
+      --blue-strong:#2449d8;
+      --line:#cfd7e6;
+      --text:#1f2430;
+      --muted:#6b7280;
+      --bg:#f4f6fa;
+      --card:#ffffff;
+      --danger:#b42318;
+      --success:#1d7a46;
+      --warning:#b54708;
+      --shadow:0 8px 24px rgba(16,24,40,.08);
+    }
+
+    *{box-sizing:border-box}
+
+    html,body{
+      margin:0;
+      padding:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family: Georgia, "Times New Roman", serif;
+      -webkit-text-size-adjust:100%;
+    }
+
+    body{
+      padding:20px;
+    }
+
+    .app{
+      max-width:1240px;
+      margin:0 auto;
+    }
+
+    .toolbar{
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:space-between;
+      gap:12px;
+      align-items:center;
+      margin-bottom:18px;
+    }
+
+    .toolbar-left,
+    .toolbar-right{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+    }
+
+    .btn{
+      appearance:none;
+      border:none;
+      border-radius:12px;
+      padding:14px 18px;
+      font-size:17px;
+      line-height:1;
+      font-family:inherit;
+      cursor:pointer;
+      min-height:48px;
+      box-shadow:var(--shadow);
+      transition:transform .04s ease, opacity .2s ease;
+    }
+
+    .btn:active{
+      transform:translateY(1px);
+    }
+
+    .btn-primary{
+      background:var(--blue-strong);
+      color:#fff;
+    }
+
+    .btn-secondary,
+    .btn-print{
+      background:#fff;
+      color:var(--text);
+      border:1px solid var(--line);
+    }
+
+    .status{
+      font-size:15px;
+      color:var(--muted);
+      min-height:22px;
+      margin-bottom:14px;
+      padding-left:4px;
+    }
+
+    .sheet,
+    .records{
+      background:var(--card);
+      border-radius:20px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      border:1px solid #e6eaf2;
+    }
+
+    .sheet-header{
+      background:var(--blue-strong);
+      color:#fff;
+      padding:28px 28px 24px;
+    }
+
+    .sheet-header h1{
+      margin:0;
+      font-size:30px;
+      line-height:1.1;
+      font-weight:700;
+    }
+
+    .sheet-header p{
+      margin:8px 0 0;
+      font-size:17px;
+      opacity:.95;
+    }
+
+    .form-wrap{
+      padding:26px;
+    }
+
+    .section-title{
+      margin:0 0 16px;
+      color:var(--blue);
+      font-size:24px;
+      line-height:1.2;
+      font-weight:700;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:18px 24px;
+      align-items:start;
+    }
+
+    .field{
+      display:grid;
+      gap:7px;
+    }
+
+    .field.full{
+      grid-column:1 / -1;
+    }
+
+    .field label{
+      color:var(--blue);
+      font-size:16px;
+      font-weight:700;
+      letter-spacing:.01em;
+    }
+
+    .required::after{
+      content:" *";
+      color:var(--danger);
+    }
+
+    input[type="text"],
+    input[type="date"],
+    input[type="tel"],
+    textarea{
+      width:100%;
+      border:1.5px solid var(--line);
+      border-radius:12px;
+      background:#fff;
+      color:var(--text);
+      padding:14px 15px;
+      font-size:18px;
+      font-family:inherit;
+      outline:none;
+    }
+
+    input:focus,
+    textarea:focus{
+      border-color:#6b8cff;
+      box-shadow:0 0 0 4px rgba(36,73,216,.09);
+    }
+
+    textarea{
+      resize:vertical;
+      min-height:100px;
+    }
+
+    .invalid{
+      border-color:var(--danger) !important;
+      box-shadow:0 0 0 4px rgba(180,35,24,.08) !important;
+    }
+
+    .info-box{
+      border:1px solid #e6eaf2;
+      background:#fafbfd;
+      border-radius:14px;
+      padding:14px 16px;
+      font-size:15px;
+      color:var(--muted);
+      line-height:1.45;
+    }
+
+    .records{
+      margin-top:18px;
+    }
+
+    .records-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      padding:18px 20px;
+      border-bottom:1px solid #edf1f7;
+      background:#fafbfd;
+    }
+
+    .records-head h3{
+      margin:0;
+      font-size:22px;
+      color:var(--blue);
+    }
+
+    .records-count{
+      color:var(--muted);
+      font-size:15px;
+    }
+
+    .records-list{
+      padding:8px 14px 16px;
+    }
+
+    .record{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      gap:14px;
+      align-items:center;
+      border:1px solid #e8edf5;
+      border-radius:14px;
+      padding:14px;
+      margin-top:12px;
+      background:#fff;
+    }
+
+    .record-main{
+      min-width:0;
+    }
+
+    .record-title{
+      font-size:18px;
+      color:var(--text);
+      font-weight:700;
+      margin:0 0 6px;
+      word-break:break-word;
+    }
+
+    .record-meta{
+      color:var(--muted);
+      font-size:15px;
+      line-height:1.5;
+      word-break:break-word;
+    }
+
+    .record-meta a{
+      color:#1d43cc;
+      text-decoration:none;
+    }
+
+    .record-meta a:hover{
+      text-decoration:underline;
+    }
+
+    .record-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .small-btn{
+      appearance:none;
+      border:none;
+      border-radius:10px;
+      padding:10px 12px;
+      font-size:15px;
+      font-family:inherit;
+      cursor:pointer;
+      min-height:40px;
+    }
+
+    .small-edit{
+      background:#eef3ff;
+      color:#1d43cc;
+    }
+
+    .small-delete{
+      background:#fff2f1;
+      color:var(--danger);
+    }
+
+    .empty{
+      padding:24px 8px 10px;
+      color:var(--muted);
+      font-size:16px;
+    }
+
+    .hidden{
+      display:none !important;
+    }
+
+    @media (max-width: 980px){
+      .grid{
+        grid-template-columns:1fr;
+      }
+
+      .toolbar{
+        align-items:stretch;
+      }
+
+      .toolbar-left,
+      .toolbar-right{
+        width:100%;
+      }
+
+      .btn{
+        flex:1 1 auto;
+      }
+
+      .record{
+        grid-template-columns:1fr;
+      }
+
+      .record-actions{
+        justify-content:flex-start;
+      }
+    }
+
+    @media print{
+      @page{
+        size:A4;
+        margin:12mm;
+      }
+
+      body{
+        background:#fff;
+        padding:0;
+      }
+
+      .toolbar,
+      .records,
+      .status{
+        display:none !important;
+      }
+
+      .sheet{
+        border:none;
+        box-shadow:none;
+        border-radius:0;
+      }
+
+      .sheet-header{
+        background:#fff !important;
+        color:var(--blue) !important;
+        padding:0 0 10px 0;
+        border-bottom:2px solid #97acd4;
+      }
+
+      .sheet-header h1{
+        font-size:28px;
+      }
+
+      .sheet-header p{
+        color:#5f6675 !important;
+        font-style:italic;
+      }
+
+      .form-wrap{
+        padding:16px 0 0 0;
+      }
+
+      input[type="text"],
+      input[type="date"],
+      input[type="tel"],
+      textarea{
+        border:1px solid #cfd7e6;
+        border-radius:0;
+        padding:8px 6px;
+        box-shadow:none !important;
+        background:#fff;
+        font-size:15px;
+      }
+
+      .field label{
+        font-size:15px;
+      }
+
+      .info-box{
+        border:1px solid #cfd7e6;
+        background:#fff;
+        padding:10px 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <button class="btn btn-primary" id="saveBtn" type="button">Speichern</button>
+        <button class="btn btn-secondary" id="resetBtn" type="button">Zurücksetzen</button>
+        <button class="btn btn-print" id="printBtn" type="button">Drucken / PDF</button>
+      </div>
+      <div class="toolbar-right">
+        <button class="btn btn-secondary" id="exportJsonBtn" type="button">Export JSON</button>
+        <button class="btn btn-secondary" id="importJsonBtn" type="button">Import JSON</button>
+        <button class="btn btn-secondary" id="exportCsvBtn" type="button">Export CSV</button>
+        <input type="file" id="jsonFileInput" accept=".json,application/json" class="hidden" />
+      </div>
+    </div>
+
+    <div class="status" id="status"></div>
+
+    <section class="sheet">
+      <div class="sheet-header">
+        <h1>Aufnahmebogen</h1>
+        <p>Vertraute Zeit – Thomas Marx</p>
+      </div>
+
+      <div class="form-wrap">
+        <form id="aufnahmeForm">
+          <input type="hidden" id="entryId" />
+
+          <h2 class="section-title">Grunddaten</h2>
+
+          <div class="grid">
+            <div class="field">
+              <label for="name" class="required">Name</label>
+              <input type="text" id="name" list="clientSuggestions" autocomplete="off" placeholder="Name eingeben oder auswählen" />
+              <datalist id="clientSuggestions"></datalist>
+            </div>
+
+            <div class="field">
+              <label for="kuerzel" class="required">Kürzel</label>
+              <input type="text" id="kuerzel" maxlength="2" placeholder="z. B. TM" />
+            </div>
+
+            <div class="field">
+              <label for="geburtsdatum" class="required">Geburtsdatum</label>
+              <input type="date" id="geburtsdatum" />
+            </div>
+
+            <div class="field">
+              <label for="alterAnzeige">Alter</label>
+              <input type="text" id="alterAnzeige" readonly />
+            </div>
+
+            <div class="field full">
+              <label for="anschrift">Anschrift</label>
+              <textarea id="anschrift"></textarea>
+            </div>
+
+            <div class="field">
+              <label for="telefon">Telefon</label>
+              <input type="tel" id="telefon" placeholder="z. B. 0361 123456 oder 0171 1234567" />
+            </div>
+
+            <div class="field">
+              <label for="hausarztPraxis">Hausarzt / Praxis (optional)</label>
+              <input type="text" id="hausarztPraxis" />
+            </div>
+
+            <div class="field">
+              <label for="kontaktpersonName">Kontaktperson / Angehörige – Name</label>
+              <input type="text" id="kontaktpersonName" />
+            </div>
+
+            <div class="field">
+              <label for="kontaktpersonTelefon">Kontaktperson / Angehörige – Telefon</label>
+              <input type="tel" id="kontaktpersonTelefon" />
+            </div>
+
+            <div class="field full">
+              <label for="wichtigeHinweise">Wichtige Hinweise</label>
+              <textarea id="wichtigeHinweise"></textarea>
+            </div>
+
+            <div class="field full">
+              <div class="info-box">
+                Der Alterswert wird automatisch aus dem Geburtsdatum berechnet und nur informativ angezeigt.
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section class="records">
+      <div class="records-head">
+        <div>
+          <h3>Gespeicherte Aufnahmebögen</h3>
+          <div class="records-count" id="recordsCount">0 Einträge</div>
+        </div>
+      </div>
+      <div class="records-list" id="recordsList"></div>
+    </section>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "aufnahmebogen_eintraege_v1";
+
+    const form = document.getElementById("aufnahmeForm");
+    const statusEl = document.getElementById("status");
+    const recordsList = document.getElementById("recordsList");
+    const recordsCount = document.getElementById("recordsCount");
+    const clientSuggestions = document.getElementById("clientSuggestions");
+
+    const saveBtn = document.getElementById("saveBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const printBtn = document.getElementById("printBtn");
+    const exportJsonBtn = document.getElementById("exportJsonBtn");
+    const importJsonBtn = document.getElementById("importJsonBtn");
+    const exportCsvBtn = document.getElementById("exportCsvBtn");
+    const jsonFileInput = document.getElementById("jsonFileInput");
+
+    let isDirty = false;
+
+    const fields = {
+      entryId: document.getElementById("entryId"),
+      name: document.getElementById("name"),
+      kuerzel: document.getElementById("kuerzel"),
+      geburtsdatum: document.getElementById("geburtsdatum"),
+      alterAnzeige: document.getElementById("alterAnzeige"),
+      anschrift: document.getElementById("anschrift"),
+      telefon: document.getElementById("telefon"),
+      kontaktpersonName: document.getElementById("kontaktpersonName"),
+      kontaktpersonTelefon: document.getElementById("kontaktpersonTelefon"),
+      hausarztPraxis: document.getElementById("hausarztPraxis"),
+      wichtigeHinweise: document.getElementById("wichtigeHinweise")
+    };
+
+    const requiredFieldIds = ["name", "kuerzel", "geburtsdatum"];
+
+    function uid() {
+      return "id_" + Date.now() + "_" + Math.random().toString(36).slice(2, 9);
+    }
+
+    function normalizeText(value) {
+      return String(value || "").trim().toLowerCase();
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function normalizePhoneForTel(value) {
+      return String(value || "").replace(/[^\d+]/g, "");
+    }
+
+    function calculateAge(dateString) {
+      if (!dateString) return "";
+      const birthDate = new Date(dateString);
+      if (Number.isNaN(birthDate.getTime())) return "";
+
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      const dayDiff = today.getDate() - birthDate.getDate();
+
+      if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+        age--;
+      }
+
+      if (age < 0 || age > 130) return "";
+      return `${age} Jahre`;
+    }
+
+    function updateAgeDisplay() {
+      fields.alterAnzeige.value = calculateAge(fields.geburtsdatum.value);
+    }
+
+    function readEntries() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function writeEntries(entries) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+    }
+
+    function sortEntries(entries) {
+      return [...entries].sort((a, b) => {
+        const nameCompare = (a.name || "").localeCompare((b.name || ""), "de");
+        if (nameCompare !== 0) return nameCompare;
+        return (b.updatedAt || "").localeCompare(a.updatedAt || "");
+      });
+    }
+
+    function setStatus(message, type = "neutral") {
+      statusEl.textContent = message;
+      if (type === "error") {
+        statusEl.style.color = "var(--danger)";
+      } else if (type === "ok") {
+        statusEl.style.color = "var(--success)";
+      } else if (type === "warn") {
+        statusEl.style.color = "var(--warning)";
+      } else {
+        statusEl.style.color = "var(--muted)";
+      }
+    }
+
+    function clearValidation() {
+      requiredFieldIds.forEach(id => fields[id].classList.remove("invalid"));
+    }
+
+    function validateForm() {
+      clearValidation();
+      let valid = true;
+
+      requiredFieldIds.forEach(id => {
+        if (!String(fields[id].value || "").trim()) {
+          fields[id].classList.add("invalid");
+          valid = false;
+        }
+      });
+
+      const kuerzel = String(fields.kuerzel.value || "").trim().toUpperCase();
+      if (kuerzel && kuerzel.length > 2) {
+        fields.kuerzel.classList.add("invalid");
+        valid = false;
+      }
+
+      if (!valid) {
+        setStatus("Bitte die Pflichtfelder Name, Kürzel und Geburtsdatum ausfüllen. Kürzel maximal 2 Zeichen.", "error");
+      }
+
+      return valid;
+    }
+
+    function getFormData() {
+      return {
+        id: fields.entryId.value || uid(),
+        name: fields.name.value.trim(),
+        kuerzel: fields.kuerzel.value.trim().toUpperCase(),
+        geburtsdatum: fields.geburtsdatum.value,
+        anschrift: fields.anschrift.value.trim(),
+        telefon: fields.telefon.value.trim(),
+        kontaktpersonName: fields.kontaktpersonName.value.trim(),
+        kontaktpersonTelefon: fields.kontaktpersonTelefon.value.trim(),
+        hausarztPraxis: fields.hausarztPraxis.value.trim(),
+        wichtigeHinweise: fields.wichtigeHinweise.value.trim(),
+        updatedAt: new Date().toISOString()
+      };
+    }
+
+    function fillForm(entry) {
+      fields.entryId.value = entry.id || "";
+      fields.name.value = entry.name || "";
+      fields.kuerzel.value = entry.kuerzel || "";
+      fields.geburtsdatum.value = entry.geburtsdatum || "";
+      fields.anschrift.value = entry.anschrift || "";
+      fields.telefon.value = entry.telefon || "";
+      fields.kontaktpersonName.value = entry.kontaktpersonName || "";
+      fields.kontaktpersonTelefon.value = entry.kontaktpersonTelefon || "";
+      fields.hausarztPraxis.value = entry.hausarztPraxis || "";
+      fields.wichtigeHinweise.value = entry.wichtigeHinweise || "";
+
+      updateAgeDisplay();
+      clearValidation();
+      isDirty = false;
+      setStatus("Eintrag zum Bearbeiten geladen.", "ok");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function clearForm() {
+      form.reset();
+      fields.entryId.value = "";
+      fields.alterAnzeige.value = "";
+      clearValidation();
+      isDirty = false;
+    }
+
+    function saveEntry() {
+      if (!validateForm()) return;
+
+      const data = getFormData();
+      const entries = readEntries();
+      const index = entries.findIndex(entry => entry.id === data.id);
+
+      if (index >= 0) {
+        entries[index] = data;
+        setStatus("Eintrag aktualisiert und im Browser gespeichert.", "ok");
+      } else {
+        entries.push(data);
+        fields.entryId.value = data.id;
+        setStatus("Eintrag gespeichert und im Browser gesichert.", "ok");
+      }
+
+      writeEntries(entries);
+      renderClientSuggestions();
+      renderEntries();
+      isDirty = false;
+    }
+
+    function deleteEntry(id) {
+      const entries = readEntries().filter(entry => entry.id !== id);
+      writeEntries(entries);
+
+      if (fields.entryId.value === id) {
+        clearForm();
+      }
+
+      renderClientSuggestions();
+      renderEntries();
+      setStatus("Eintrag gelöscht.", "ok");
+    }
+
+    function renderClientSuggestions() {
+      const entries = readEntries();
+      const unique = new Map();
+
+      entries.forEach(entry => {
+        const original = String(entry.name || "").trim();
+        const normalized = normalizeText(original);
+        if (!normalized) return;
+        if (!unique.has(normalized)) {
+          unique.set(normalized, original);
+        }
+      });
+
+      const names = [...unique.values()].sort((a, b) => a.localeCompare(b, "de"));
+      clientSuggestions.innerHTML = names
+        .map(name => `<option value="${escapeHtml(name)}"></option>`)
+        .join("");
+    }
+
+    function renderEntries() {
+      const entries = sortEntries(readEntries());
+      recordsCount.textContent = `${entries.length} ${entries.length === 1 ? "Eintrag" : "Einträge"}`;
+
+      if (!entries.length) {
+        recordsList.innerHTML = `<div class="empty">Noch keine gespeicherten Aufnahmebögen vorhanden.</div>`;
+        return;
+      }
+
+      recordsList.innerHTML = entries.map(entry => {
+        const age = calculateAge(entry.geburtsdatum);
+        const phoneLink = entry.telefon
+          ? `<a href="tel:${escapeHtml(normalizePhoneForTel(entry.telefon))}">${escapeHtml(entry.telefon)}</a>`
+          : "keine Telefonnummer";
+
+        const kontaktText = [
+          entry.kontaktpersonName ? `Kontaktperson: ${escapeHtml(entry.kontaktpersonName)}` : "",
+          entry.kontaktpersonTelefon
+            ? `Kontaktperson Tel.: <a href="tel:${escapeHtml(normalizePhoneForTel(entry.kontaktpersonTelefon))}">${escapeHtml(entry.kontaktpersonTelefon)}</a>`
+            : ""
+        ].filter(Boolean).join(" | ");
+
+        const metaParts = [
+          `Kürzel: ${escapeHtml(entry.kuerzel || "")}`,
+          entry.geburtsdatum ? `Geburtsdatum: ${escapeHtml(entry.geburtsdatum)}` : "",
+          age ? `Alter: ${escapeHtml(age)}` : "",
+          `Telefon: ${phoneLink}`,
+          kontaktText,
+          entry.hausarztPraxis ? `Hausarzt/Praxis: ${escapeHtml(entry.hausarztPraxis)}` : ""
+        ].filter(Boolean);
+
+        return `
+          <div class="record">
+            <div class="record-main">
+              <div class="record-title">${escapeHtml(entry.name || "Ohne Namen")}</div>
+              <div class="record-meta">${metaParts.join(" | ")}</div>
+            </div>
+            <div class="record-actions">
+              <button class="small-btn small-edit" type="button" onclick="editEntry('${entry.id}')">Bearbeiten</button>
+              <button class="small-btn small-delete" type="button" onclick="confirmDelete('${entry.id}')">Löschen</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function downloadFile(filename, content, mimeType) {
+      const blob = new Blob([content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function exportJson() {
+      const entries = sortEntries(readEntries());
+      const content = JSON.stringify(entries, null, 2);
+      const stamp = new Date().toISOString().slice(0, 10);
+      downloadFile(`aufnahmebogen_export_${stamp}.json`, content, "application/json");
+      setStatus("JSON-Export erstellt.", "ok");
+    }
+
+    function importJsonFile(file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (!Array.isArray(parsed)) {
+            throw new Error("Ungültiges Format");
+          }
+
+          const sanitized = parsed.map(item => ({
+            id: item.id || uid(),
+            name: String(item.name || "").trim(),
+            kuerzel: String(item.kuerzel || "").trim().toUpperCase().slice(0, 2),
+            geburtsdatum: String(item.geburtsdatum || ""),
+            anschrift: String(item.anschrift || "").trim(),
+            telefon: String(item.telefon || "").trim(),
+            kontaktpersonName: String(item.kontaktpersonName || "").trim(),
+            kontaktpersonTelefon: String(item.kontaktpersonTelefon || "").trim(),
+            hausarztPraxis: String(item.hausarztPraxis || "").trim(),
+            wichtigeHinweise: String(item.wichtigeHinweise || "").trim(),
+            updatedAt: item.updatedAt || new Date().toISOString()
+          }));
+
+          writeEntries(sanitized);
+          renderClientSuggestions();
+          renderEntries();
+          clearForm();
+          setStatus("JSON erfolgreich importiert. Vorhandene Einträge wurden ersetzt.", "ok");
+        } catch {
+          setStatus("Import fehlgeschlagen. Datei ist kein gültiger JSON-Export.", "error");
+        } finally {
+          jsonFileInput.value = "";
+        }
+      };
+      reader.readAsText(file, "UTF-8");
+    }
+
+    function toCsvValue(value) {
+      const str = String(value ?? "");
+      return `"${str.replace(/"/g, '""')}"`;
+    }
+
+    function exportCsv() {
+      const entries = sortEntries(readEntries());
+      const header = [
+        "id",
+        "name",
+        "kuerzel",
+        "geburtsdatum",
+        "alterInfo",
+        "anschrift",
+        "telefon",
+        "kontaktpersonName",
+        "kontaktpersonTelefon",
+        "hausarztPraxis",
+        "wichtigeHinweise",
+        "updatedAt"
+      ];
+
+      const rows = entries.map(entry => [
+        entry.id,
+        entry.name,
+        entry.kuerzel,
+        entry.geburtsdatum,
+        calculateAge(entry.geburtsdatum),
+        entry.anschrift,
+        entry.telefon,
+        entry.kontaktpersonName,
+        entry.kontaktpersonTelefon,
+        entry.hausarztPraxis,
+        entry.wichtigeHinweise,
+        entry.updatedAt
+      ]);
+
+      const csv = [header, ...rows]
+        .map(row => row.map(toCsvValue).join(";"))
+        .join("\n");
+
+      const stamp = new Date().toISOString().slice(0, 10);
+      downloadFile(`aufnahmebogen_export_${stamp}.csv`, csv, "text/csv;charset=utf-8");
+      setStatus("CSV-Export erstellt.", "ok");
+    }
+
+    window.editEntry = function(id) {
+      const entry = readEntries().find(item => item.id === id);
+      if (!entry) {
+        setStatus("Eintrag konnte nicht geladen werden.", "error");
+        return;
+      }
+      fillForm(entry);
+    };
+
+    window.confirmDelete = function(id) {
+      const ok = window.confirm("Diesen Eintrag wirklich löschen?");
+      if (!ok) return;
+      deleteEntry(id);
+    };
+
+    Object.values(fields).forEach(el => {
+      if (!el || el.readOnly) return;
+      el.addEventListener("input", () => { isDirty = true; });
+      el.addEventListener("change", () => { isDirty = true; });
+    });
+
+    fields.geburtsdatum.addEventListener("input", updateAgeDisplay);
+    fields.geburtsdatum.addEventListener("change", updateAgeDisplay);
+
+    fields.kuerzel.addEventListener("input", () => {
+      fields.kuerzel.value = fields.kuerzel.value.toUpperCase().replace(/[^A-ZÄÖÜ]/g, "").slice(0, 2);
+    });
+
+    saveBtn.addEventListener("click", saveEntry);
+
+    resetBtn.addEventListener("click", () => {
+      clearForm();
+      setStatus("Formular zurückgesetzt. Neuer Aufnahmebogen kann erfasst werden.", "ok");
+    });
+
+    printBtn.addEventListener("click", () => window.print());
+    exportJsonBtn.addEventListener("click", exportJson);
+    importJsonBtn.addEventListener("click", () => jsonFileInput.click());
+    exportCsvBtn.addEventListener("click", exportCsv);
+
+    jsonFileInput.addEventListener("change", (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      importJsonFile(file);
+    });
+
+    window.addEventListener("beforeunload", function (e) {
+      if (!isDirty) return;
+      e.preventDefault();
+      e.returnValue = "";
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+      clearForm();
+      renderClientSuggestions();
+      renderEntries();
+      setStatus("Bereit.");
+    });
+  </script>
+</body>
+</html>
