@@ -1,0 +1,1439 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kontaktdokumentation – Vertraute Zeit</title>
+  <style>
+    :root{
+      --blue:#2f4f86;
+      --blue-strong:#2449d8;
+      --blue-light:#e9eef7;
+      --line:#cfd7e6;
+      --text:#1f2430;
+      --muted:#6b7280;
+      --bg:#f4f6fa;
+      --card:#ffffff;
+      --danger:#b42318;
+      --success:#1d7a46;
+      --warning:#b54708;
+      --shadow:0 8px 24px rgba(16,24,40,.08);
+      --radius:16px;
+    }
+
+    *{box-sizing:border-box}
+
+    html,body{
+      margin:0;
+      padding:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family: Georgia, "Times New Roman", serif;
+      -webkit-text-size-adjust:100%;
+    }
+
+    body{
+      padding:20px;
+    }
+
+    .app{
+      max-width:1320px;
+      margin:0 auto;
+    }
+
+    .toolbar,
+    .searchbar{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:18px;
+    }
+
+    .toolbar-left,
+    .toolbar-right,
+    .searchbar-left,
+    .searchbar-right{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+    }
+
+    .btn{
+      appearance:none;
+      border:none;
+      border-radius:12px;
+      padding:14px 18px;
+      font-size:17px;
+      line-height:1;
+      font-family:inherit;
+      cursor:pointer;
+      min-height:48px;
+      box-shadow:var(--shadow);
+      transition:transform .04s ease, opacity .2s ease;
+    }
+
+    .btn:active{
+      transform:translateY(1px);
+    }
+
+    .btn-primary{
+      background:var(--blue-strong);
+      color:#fff;
+    }
+
+    .btn-secondary{
+      background:#fff;
+      color:var(--text);
+      border:1px solid var(--line);
+    }
+
+    .btn-danger{
+      background:#fff;
+      color:var(--danger);
+      border:1px solid #efc5c0;
+    }
+
+    .btn-print{
+      background:#fff;
+      color:var(--text);
+      border:1px solid var(--line);
+    }
+
+    .status{
+      font-size:15px;
+      color:var(--muted);
+      min-height:22px;
+      padding-left:4px;
+      margin-bottom:14px;
+    }
+
+    .sheet,
+    .records,
+    .search-panel,
+    .history-panel{
+      background:var(--card);
+      border-radius:20px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      border:1px solid #e6eaf2;
+    }
+
+    .sheet-header{
+      background:var(--blue-strong);
+      color:#fff;
+      padding:28px 28px 24px;
+    }
+
+    .sheet-header h1{
+      margin:0;
+      font-size:30px;
+      line-height:1.1;
+      font-weight:700;
+    }
+
+    .sheet-header p{
+      margin:8px 0 0;
+      font-size:17px;
+      opacity:.95;
+    }
+
+    .form-wrap{
+      padding:26px;
+    }
+
+    .layout{
+      display:grid;
+      grid-template-columns:minmax(0, 1fr) 360px;
+      gap:18px;
+      align-items:start;
+    }
+
+    .two-col{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:24px;
+    }
+
+    .col{
+      display:grid;
+      gap:16px;
+      align-content:start;
+    }
+
+    .field{
+      display:grid;
+      gap:7px;
+    }
+
+    .field label{
+      color:var(--blue);
+      font-size:16px;
+      font-weight:700;
+      letter-spacing:.01em;
+    }
+
+    .required::after{
+      content:" *";
+      color:var(--danger);
+    }
+
+    input[type="text"],
+    input[type="date"],
+    input[type="time"],
+    textarea{
+      width:100%;
+      border:1.5px solid var(--line);
+      border-radius:12px;
+      background:#fff;
+      color:var(--text);
+      padding:14px 15px;
+      font-size:18px;
+      font-family:inherit;
+      outline:none;
+    }
+
+    input:focus,
+    textarea:focus{
+      border-color:#6b8cff;
+      box-shadow:0 0 0 4px rgba(36,73,216,.09);
+    }
+
+    .invalid{
+      border-color:var(--danger) !important;
+      box-shadow:0 0 0 4px rgba(180,35,24,.08) !important;
+    }
+
+    textarea{
+      resize:vertical;
+      min-height:84px;
+    }
+
+    .h-small{ min-height:84px; }
+    .h-medium{ min-height:120px; }
+    .h-large{ min-height:160px; }
+    .h-sign{ min-height:92px; }
+
+    .divider{
+      margin:26px 0 18px;
+      border:none;
+      border-top:1px solid var(--line);
+    }
+
+    .bottom-block h2{
+      margin:0 0 10px;
+      color:var(--blue);
+      font-size:22px;
+      line-height:1.2;
+    }
+
+    .hint{
+      margin-top:8px;
+      color:var(--muted);
+      font-style:italic;
+      font-size:16px;
+      line-height:1.45;
+    }
+
+    .history-panel{
+      padding:0;
+    }
+
+    .history-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      padding:16px 18px;
+      border-bottom:1px solid #edf1f7;
+      background:#fafbfd;
+    }
+
+    .history-head h3{
+      margin:0;
+      font-size:20px;
+      color:var(--blue);
+    }
+
+    .history-sub{
+      color:var(--muted);
+      font-size:14px;
+      margin-top:4px;
+    }
+
+    .history-toggle{
+      appearance:none;
+      border:none;
+      background:#eef3ff;
+      color:#1d43cc;
+      border-radius:10px;
+      padding:10px 12px;
+      font-family:inherit;
+      font-size:14px;
+      cursor:pointer;
+      min-width:120px;
+    }
+
+    .history-body{
+      padding:14px 14px 16px;
+    }
+
+    .history-empty{
+      color:var(--muted);
+      font-size:15px;
+      line-height:1.45;
+      padding:8px 4px 4px;
+    }
+
+    .history-item{
+      border:1px solid #e8edf5;
+      border-radius:14px;
+      padding:12px;
+      background:#fff;
+      margin-top:10px;
+    }
+
+    .history-item:first-child{
+      margin-top:0;
+    }
+
+    .history-block{
+      margin-top:10px;
+    }
+
+    .history-block:first-child{
+      margin-top:0;
+    }
+
+    .history-label{
+      color:var(--blue);
+      font-size:14px;
+      font-weight:700;
+      margin-bottom:4px;
+    }
+
+    .history-value{
+      color:var(--text);
+      font-size:15px;
+      line-height:1.45;
+      white-space:pre-wrap;
+      word-break:break-word;
+    }
+
+    .collapsed .history-body{
+      display:none;
+    }
+
+    .search-panel{
+      margin-top:18px;
+      padding:18px 20px;
+    }
+
+    .search-panel h3{
+      margin:0 0 14px;
+      font-size:22px;
+      color:var(--blue);
+    }
+
+    .search-grid{
+      display:grid;
+      grid-template-columns:1.2fr .9fr .9fr auto;
+      gap:12px;
+      align-items:end;
+    }
+
+    .search-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .search-info{
+      margin-top:12px;
+      color:var(--muted);
+      font-size:15px;
+    }
+
+    .records{
+      margin-top:18px;
+    }
+
+    .records-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      padding:18px 20px;
+      border-bottom:1px solid #edf1f7;
+      background:#fafbfd;
+    }
+
+    .records-head h3{
+      margin:0;
+      font-size:22px;
+      color:var(--blue);
+    }
+
+    .records-count{
+      color:var(--muted);
+      font-size:15px;
+    }
+
+    .records-list{
+      padding:8px 14px 16px;
+    }
+
+    .record{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      gap:14px;
+      align-items:center;
+      border:1px solid #e8edf5;
+      border-radius:14px;
+      padding:14px;
+      margin-top:12px;
+      background:#fff;
+    }
+
+    .record-main{
+      min-width:0;
+    }
+
+    .record-title{
+      font-size:18px;
+      color:var(--text);
+      font-weight:700;
+      margin:0 0 6px;
+      word-break:break-word;
+    }
+
+    .record-meta{
+      color:var(--muted);
+      font-size:15px;
+      line-height:1.45;
+      word-break:break-word;
+    }
+
+    .record-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .small-btn{
+      appearance:none;
+      border:none;
+      border-radius:10px;
+      padding:10px 12px;
+      font-size:15px;
+      font-family:inherit;
+      cursor:pointer;
+      min-height:40px;
+    }
+
+    .small-edit{
+      background:#eef3ff;
+      color:#1d43cc;
+    }
+
+    .small-delete{
+      background:#fff2f1;
+      color:var(--danger);
+    }
+
+    .badge{
+      display:inline-block;
+      padding:5px 10px;
+      border-radius:999px;
+      background:#eef3ff;
+      color:#2449d8;
+      font-size:14px;
+      font-weight:700;
+    }
+
+    .empty{
+      padding:24px 8px 10px;
+      color:var(--muted);
+      font-size:16px;
+    }
+
+    .hidden{
+      display:none !important;
+    }
+
+    @media (max-width: 1180px){
+      .layout{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width: 980px){
+      .two-col{
+        grid-template-columns:1fr;
+      }
+
+      .toolbar,
+      .searchbar{
+        align-items:stretch;
+      }
+
+      .toolbar-left,
+      .toolbar-right,
+      .searchbar-left,
+      .searchbar-right{
+        width:100%;
+      }
+
+      .toolbar-right,
+      .searchbar-right{
+        justify-content:flex-start;
+      }
+
+      .btn{
+        flex:1 1 auto;
+      }
+
+      .record{
+        grid-template-columns:1fr;
+      }
+
+      .record-actions{
+        justify-content:flex-start;
+      }
+
+      .search-grid{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media print{
+      @page{
+        size:A4;
+        margin:12mm;
+      }
+
+      body{
+        background:#fff;
+        padding:0;
+      }
+
+      .toolbar,
+      .records,
+      .search-panel,
+      .history-panel,
+      .status{
+        display:none !important;
+      }
+
+      .sheet{
+        border:none;
+        box-shadow:none;
+        border-radius:0;
+      }
+
+      .sheet-header{
+        background:#fff !important;
+        color:var(--blue) !important;
+        padding:0 0 10px 0;
+        border-bottom:2px solid #97acd4;
+      }
+
+      .sheet-header h1{
+        font-size:28px;
+      }
+
+      .sheet-header p{
+        color:#5f6675 !important;
+        font-style:italic;
+      }
+
+      .form-wrap{
+        padding:16px 0 0 0;
+      }
+
+      input[type="text"],
+      input[type="date"],
+      input[type="time"],
+      textarea{
+        border:1px solid #cfd7e6;
+        border-radius:0;
+        padding:8px 6px;
+        box-shadow:none !important;
+        background:#fff;
+        font-size:15px;
+      }
+
+      .field label{
+        font-size:15px;
+      }
+
+      .divider{
+        margin:18px 0 14px;
+      }
+
+      .bottom-block h2{
+        font-size:19px;
+      }
+
+      .hint{
+        font-size:14px;
+      }
+
+      .layout{
+        display:block;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="toolbar" id="toolbar">
+      <div class="toolbar-left">
+        <button class="btn btn-primary" id="saveBtn" type="button">Speichern</button>
+        <button class="btn btn-secondary" id="duplicateBtn" type="button">Duplizieren</button>
+        <button class="btn btn-secondary" id="resetBtn" type="button">Zurücksetzen</button>
+      </div>
+      <div class="toolbar-right">
+        <button class="btn btn-print" id="printBtn" type="button">Drucken / PDF</button>
+        <button class="btn btn-secondary" id="exportJsonBtn" type="button">Export JSON</button>
+        <button class="btn btn-secondary" id="importJsonBtn" type="button">Import JSON</button>
+        <button class="btn btn-secondary" id="exportCsvBtn" type="button">Export CSV</button>
+        <input type="file" id="jsonFileInput" accept=".json,application/json" class="hidden" />
+      </div>
+    </div>
+
+    <div class="status" id="status"></div>
+
+    <section class="sheet">
+      <div class="sheet-header">
+        <h1>Kontaktdokumentation</h1>
+        <p>Vertraute Zeit – Thomas Marx</p>
+      </div>
+
+      <div class="form-wrap">
+        <form id="docForm">
+          <input type="hidden" id="entryId" />
+
+          <div class="layout">
+            <div>
+              <div class="two-col">
+                <div class="col">
+                  <div class="field">
+                    <label for="nameKuerzel" class="required">Name / Kürzel</label>
+                    <input type="text" id="nameKuerzel" list="clientSuggestions" autocomplete="off" placeholder="Name oder Kürzel eingeben oder auswählen" />
+                    <datalist id="clientSuggestions"></datalist>
+                  </div>
+
+                  <div class="field">
+                    <label for="zeitVon">Zeit von</label>
+                    <input type="time" id="zeitVon" />
+                  </div>
+
+                  <div class="field">
+                    <label for="ort">Ort</label>
+                    <input type="text" id="ort" />
+                  </div>
+
+                  <div class="field">
+                    <label for="artDesEinsatzes" class="required">Art des Einsatzes</label>
+                    <input type="text" id="artDesEinsatzes" />
+                  </div>
+
+                  <div class="field">
+                    <label for="wichtigeBeobachtungen">Wichtige Beobachtungen</label>
+                    <textarea id="wichtigeBeobachtungen" class="h-large"></textarea>
+                  </div>
+
+                  <div class="field">
+                    <label for="naechsteAbsprache">Nächste Absprache</label>
+                    <textarea id="naechsteAbsprache" class="h-medium"></textarea>
+                  </div>
+                </div>
+
+                <div class="col">
+                  <div class="field">
+                    <label for="datum" class="required">Datum</label>
+                    <input type="date" id="datum" />
+                  </div>
+
+                  <div class="field">
+                    <label for="zeitBis">Zeit bis</label>
+                    <input type="time" id="zeitBis" />
+                  </div>
+
+                  <div class="field">
+                    <label for="begleitperson">Begleitperson</label>
+                    <input type="text" id="begleitperson" />
+                  </div>
+
+                  <div class="field">
+                    <label for="thomasMarxVertretung">Thomas Marx / Vertretung</label>
+                    <textarea id="thomasMarxVertretung" class="h-small"></textarea>
+                  </div>
+
+                  <div class="field">
+                    <label for="schwerpunkt">Schwerpunkt</label>
+                    <textarea id="schwerpunkt" class="h-medium"></textarea>
+                  </div>
+
+                  <div class="field">
+                    <label for="abweichungenBesonderheiten">Abweichungen / Besonderheiten</label>
+                    <textarea id="abweichungenBesonderheiten" class="h-medium"></textarea>
+                  </div>
+
+                  <div class="field">
+                    <label for="unterschriftKuerzel">Unterschrift / Kürzel</label>
+                    <textarea id="unterschriftKuerzel" class="h-sign"></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <hr class="divider" />
+
+              <div class="bottom-block">
+                <h2>Kurznotiz zum Verlauf</h2>
+                <div class="field">
+                  <textarea id="kurznotizVerlauf" class="h-medium"></textarea>
+                </div>
+                <div class="hint">
+                  Nur sachliche, alltagsbezogene Dokumentation. Keine Diagnosen, keine Therapieanweisungen.
+                </div>
+              </div>
+            </div>
+
+            <aside class="history-panel collapsed" id="historyPanel">
+              <div class="history-head">
+                <div>
+                  <h3>Historie</h3>
+                  <div class="history-sub" id="historySub">Zeigt die letzten 3 Einträge desselben Klienten.</div>
+                </div>
+                <button class="history-toggle" id="historyToggle" type="button">Anzeigen</button>
+              </div>
+              <div class="history-body" id="historyBody">
+                <div class="history-empty" id="historyEmpty">
+                  Noch keine Historie verfügbar.
+                </div>
+                <div id="historyList"></div>
+              </div>
+            </aside>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section class="search-panel">
+      <h3>Suche / Filter</h3>
+      <div class="search-grid">
+        <div class="field">
+          <label for="searchKuerzel">Kürzel</label>
+          <input type="text" id="searchKuerzel" placeholder="Exakte Suche, ohne Groß-/Kleinschreibung" />
+        </div>
+
+        <div class="field">
+          <label for="searchDateFrom">Datum von</label>
+          <input type="date" id="searchDateFrom" />
+        </div>
+
+        <div class="field">
+          <label for="searchDateTo">Datum bis</label>
+          <input type="date" id="searchDateTo" />
+        </div>
+
+        <div class="search-actions">
+          <button class="btn btn-secondary" id="searchResetBtn" type="button">Filter zurücksetzen</button>
+        </div>
+      </div>
+      <div class="search-info" id="searchInfo">
+        Kein Filter aktiv. Es werden alle Einträge angezeigt.
+      </div>
+    </section>
+
+    <section class="records" id="recordsSection">
+      <div class="records-head">
+        <div>
+          <h3>Gespeicherte Einträge</h3>
+          <div class="records-count" id="recordsCount">0 Einträge</div>
+        </div>
+        <div class="badge" id="resultBadge">0 Treffer</div>
+      </div>
+      <div class="records-list" id="recordsList"></div>
+    </section>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "kontaktdokumentation_eintraege_v3";
+
+    const form = document.getElementById("docForm");
+    const statusEl = document.getElementById("status");
+    const saveBtn = document.getElementById("saveBtn");
+    const duplicateBtn = document.getElementById("duplicateBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const printBtn = document.getElementById("printBtn");
+    const exportJsonBtn = document.getElementById("exportJsonBtn");
+    const importJsonBtn = document.getElementById("importJsonBtn");
+    const exportCsvBtn = document.getElementById("exportCsvBtn");
+    const jsonFileInput = document.getElementById("jsonFileInput");
+
+    const recordsList = document.getElementById("recordsList");
+    const recordsCount = document.getElementById("recordsCount");
+    const resultBadge = document.getElementById("resultBadge");
+
+    const searchKuerzel = document.getElementById("searchKuerzel");
+    const searchDateFrom = document.getElementById("searchDateFrom");
+    const searchDateTo = document.getElementById("searchDateTo");
+    const searchResetBtn = document.getElementById("searchResetBtn");
+    const searchInfo = document.getElementById("searchInfo");
+
+    const historyPanel = document.getElementById("historyPanel");
+    const historyToggle = document.getElementById("historyToggle");
+    const historySub = document.getElementById("historySub");
+    const historyEmpty = document.getElementById("historyEmpty");
+    const historyList = document.getElementById("historyList");
+    const clientSuggestions = document.getElementById("clientSuggestions");
+
+    let isDirty = false;
+
+    const fields = {
+      entryId: document.getElementById("entryId"),
+      nameKuerzel: document.getElementById("nameKuerzel"),
+      zeitVon: document.getElementById("zeitVon"),
+      ort: document.getElementById("ort"),
+      artDesEinsatzes: document.getElementById("artDesEinsatzes"),
+      wichtigeBeobachtungen: document.getElementById("wichtigeBeobachtungen"),
+      naechsteAbsprache: document.getElementById("naechsteAbsprache"),
+      datum: document.getElementById("datum"),
+      zeitBis: document.getElementById("zeitBis"),
+      begleitperson: document.getElementById("begleitperson"),
+      thomasMarxVertretung: document.getElementById("thomasMarxVertretung"),
+      schwerpunkt: document.getElementById("schwerpunkt"),
+      abweichungenBesonderheiten: document.getElementById("abweichungenBesonderheiten"),
+      unterschriftKuerzel: document.getElementById("unterschriftKuerzel"),
+      kurznotizVerlauf: document.getElementById("kurznotizVerlauf")
+    };
+
+    const requiredFieldIds = ["nameKuerzel", "artDesEinsatzes", "datum"];
+
+    function todayForInput() {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, "0");
+      const d = String(now.getDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    }
+
+    function uid() {
+      return "id_" + Date.now() + "_" + Math.random().toString(36).slice(2, 9);
+    }
+
+    function normalizeText(value) {
+      return String(value || "").trim().toLowerCase();
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function formatDateDisplay(value) {
+      if (!value) return "ohne Datum";
+      const [y, m, d] = value.split("-");
+      if (!y || !m || !d) return value;
+      return `${d}.${m}.${y}`;
+    }
+
+    function readEntries() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function writeEntries(entries) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+    }
+
+    function sortEntries(entries) {
+      return [...entries].sort((a, b) => {
+        const dateA = a.datum || "";
+        const dateB = b.datum || "";
+        if (dateA !== dateB) return dateB.localeCompare(dateA);
+
+        const timeA = a.zeitVon || "";
+        const timeB = b.zeitVon || "";
+        if (timeA !== timeB) return timeB.localeCompare(timeA);
+
+        return (b.updatedAt || "").localeCompare(a.updatedAt || "");
+      });
+    }
+
+    function getUniqueClients() {
+      const entries = readEntries();
+      const unique = new Map();
+
+      entries.forEach(entry => {
+        const original = String(entry.nameKuerzel || "").trim();
+        const normalized = normalizeText(original);
+        if (!normalized) return;
+        if (!unique.has(normalized)) {
+          unique.set(normalized, original);
+        }
+      });
+
+      return [...unique.values()].sort((a, b) => a.localeCompare(b, "de"));
+    }
+
+    function renderClientSuggestions() {
+      const clients = getUniqueClients();
+      clientSuggestions.innerHTML = clients
+        .map(client => `<option value="${escapeHtml(client)}"></option>`)
+        .join("");
+    }
+
+    function setStatus(message, type = "neutral") {
+      statusEl.textContent = message;
+      if (type === "error") {
+        statusEl.style.color = "var(--danger)";
+      } else if (type === "ok") {
+        statusEl.style.color = "var(--success)";
+      } else if (type === "warn") {
+        statusEl.style.color = "var(--warning)";
+      } else {
+        statusEl.style.color = "var(--muted)";
+      }
+    }
+
+    function clearValidation() {
+      requiredFieldIds.forEach(id => fields[id].classList.remove("invalid"));
+    }
+
+    function validateForm() {
+      clearValidation();
+      let valid = true;
+
+      requiredFieldIds.forEach(id => {
+        if (!String(fields[id].value || "").trim()) {
+          fields[id].classList.add("invalid");
+          valid = false;
+        }
+      });
+
+      if (!valid) {
+        setStatus("Bitte die Pflichtfelder Datum, Name/Kürzel und Art des Einsatzes ausfüllen.", "error");
+      }
+
+      return valid;
+    }
+
+    function clearForm() {
+      form.reset();
+      fields.entryId.value = "";
+      fields.datum.value = todayForInput();
+      clearValidation();
+      saveBtn.textContent = "Speichern";
+      isDirty = false;
+      updateHistoryPanel();
+    }
+
+    function fillForm(entry) {
+      fields.entryId.value = entry.id || "";
+      fields.nameKuerzel.value = entry.nameKuerzel || "";
+      fields.zeitVon.value = entry.zeitVon || "";
+      fields.ort.value = entry.ort || "";
+      fields.artDesEinsatzes.value = entry.artDesEinsatzes || "";
+      fields.wichtigeBeobachtungen.value = entry.wichtigeBeobachtungen || "";
+      fields.naechsteAbsprache.value = entry.naechsteAbsprache || "";
+      fields.datum.value = entry.datum || todayForInput();
+      fields.zeitBis.value = entry.zeitBis || "";
+      fields.begleitperson.value = entry.begleitperson || "";
+      fields.thomasMarxVertretung.value = entry.thomasMarxVertretung || "";
+      fields.schwerpunkt.value = entry.schwerpunkt || "";
+      fields.abweichungenBesonderheiten.value = entry.abweichungenBesonderheiten || "";
+      fields.unterschriftKuerzel.value = entry.unterschriftKuerzel || "";
+      fields.kurznotizVerlauf.value = entry.kurznotizVerlauf || "";
+
+      clearValidation();
+      saveBtn.textContent = "Aktualisieren";
+      isDirty = false;
+      setStatus("Eintrag zum Bearbeiten geladen.", "ok");
+      updateHistoryPanel();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function getFormData() {
+      return {
+        id: fields.entryId.value || uid(),
+        nameKuerzel: fields.nameKuerzel.value.trim(),
+        zeitVon: fields.zeitVon.value,
+        ort: fields.ort.value.trim(),
+        artDesEinsatzes: fields.artDesEinsatzes.value.trim(),
+        wichtigeBeobachtungen: fields.wichtigeBeobachtungen.value.trim(),
+        naechsteAbsprache: fields.naechsteAbsprache.value.trim(),
+        datum: fields.datum.value,
+        zeitBis: fields.zeitBis.value,
+        begleitperson: fields.begleitperson.value.trim(),
+        thomasMarxVertretung: fields.thomasMarxVertretung.value.trim(),
+        schwerpunkt: fields.schwerpunkt.value.trim(),
+        abweichungenBesonderheiten: fields.abweichungenBesonderheiten.value.trim(),
+        unterschriftKuerzel: fields.unterschriftKuerzel.value.trim(),
+        kurznotizVerlauf: fields.kurznotizVerlauf.value.trim(),
+        updatedAt: new Date().toISOString()
+      };
+    }
+
+    function saveEntry() {
+      if (!validateForm()) return;
+
+      const data = getFormData();
+      const entries = readEntries();
+      const index = entries.findIndex(entry => entry.id === data.id);
+
+      if (index >= 0) {
+        entries[index] = data;
+        writeEntries(entries);
+        setStatus("Eintrag aktualisiert und im Browser gespeichert.", "ok");
+      } else {
+        entries.push(data);
+        writeEntries(entries);
+        fields.entryId.value = data.id;
+        setStatus("Eintrag gespeichert und im Browser gesichert.", "ok");
+      }
+
+      saveBtn.textContent = "Aktualisieren";
+      isDirty = false;
+      renderClientSuggestions();
+      renderEntries();
+      updateHistoryPanel();
+    }
+
+    function deleteEntry(id) {
+      const entries = readEntries().filter(entry => entry.id !== id);
+      writeEntries(entries);
+
+      if (fields.entryId.value === id) {
+        clearForm();
+      }
+
+      renderClientSuggestions();
+      renderEntries();
+      updateHistoryPanel();
+      setStatus("Eintrag gelöscht.", "ok");
+    }
+
+    function duplicateCurrentEntry() {
+      const data = getFormData();
+
+      if (!data.nameKuerzel && !data.artDesEinsatzes && !data.ort && !data.kurznotizVerlauf) {
+        setStatus("Nichts zum Duplizieren vorhanden.", "error");
+        return;
+      }
+
+      fields.entryId.value = "";
+      saveBtn.textContent = "Speichern";
+      isDirty = true;
+      updateHistoryPanel();
+      setStatus("Aktuellen Inhalt als neue Dokumentation vorbereitet. Beim Speichern wird ein neuer Eintrag angelegt.", "ok");
+    }
+
+    function getActiveFilters() {
+      return {
+        kuerzel: normalizeText(searchKuerzel.value),
+        from: searchDateFrom.value,
+        to: searchDateTo.value
+      };
+    }
+
+    function entryMatchesFilters(entry, filters) {
+      const hasKuerzel = !!filters.kuerzel;
+      const hasFrom = !!filters.from;
+      const hasTo = !!filters.to;
+
+      let kuerzelOk = true;
+      let fromOk = true;
+      let toOk = true;
+
+      if (hasKuerzel) {
+        kuerzelOk = normalizeText(entry.nameKuerzel) === filters.kuerzel;
+      }
+
+      if (hasFrom) {
+        fromOk = !!entry.datum && entry.datum >= filters.from;
+      }
+
+      if (hasTo) {
+        toOk = !!entry.datum && entry.datum <= filters.to;
+      }
+
+      return kuerzelOk && fromOk && toOk;
+    }
+
+    function getFilteredEntries() {
+      const allEntries = sortEntries(readEntries());
+      const filters = getActiveFilters();
+      return allEntries.filter(entry => entryMatchesFilters(entry, filters));
+    }
+
+    function updateSearchInfo(total, filtered) {
+      const filters = getActiveFilters();
+      const hasKuerzel = !!filters.kuerzel;
+      const hasFrom = !!filters.from;
+      const hasTo = !!filters.to;
+
+      if (!hasKuerzel && !hasFrom && !hasTo) {
+        searchInfo.textContent = "Kein Filter aktiv. Es werden alle Einträge angezeigt.";
+        return;
+      }
+
+      const parts = [];
+
+      if (hasKuerzel) {
+        parts.push(`Kürzel exakt: ${searchKuerzel.value.trim()}`);
+      }
+      if (hasFrom) {
+        parts.push(`von ${formatDateDisplay(filters.from)}`);
+      }
+      if (hasTo) {
+        parts.push(`bis ${formatDateDisplay(filters.to)}`);
+      }
+
+      searchInfo.textContent = `Aktiver Filter: ${parts.join(" | ")}. Angezeigt werden ${filtered} von ${total} Einträgen.`;
+    }
+
+    function renderEntries() {
+      const allEntries = sortEntries(readEntries());
+      const filteredEntries = getFilteredEntries();
+
+      recordsCount.textContent = `${allEntries.length} ${allEntries.length === 1 ? "Eintrag gesamt" : "Einträge gesamt"}`;
+      resultBadge.textContent = `${filteredEntries.length} Treffer`;
+      updateSearchInfo(allEntries.length, filteredEntries.length);
+
+      if (!filteredEntries.length) {
+        recordsList.innerHTML = `<div class="empty">Keine Einträge passend zum aktuellen Filter gefunden.</div>`;
+        return;
+      }
+
+      recordsList.innerHTML = filteredEntries.map(entry => {
+        const titleParts = [
+          entry.nameKuerzel || "Ohne Name/Kürzel",
+          entry.artDesEinsatzes || "ohne Art des Einsatzes"
+        ];
+
+        const metaParts = [
+          formatDateDisplay(entry.datum),
+          entry.zeitVon ? `von ${entry.zeitVon}` : "",
+          entry.zeitBis ? `bis ${entry.zeitBis}` : "",
+          entry.ort ? `Ort: ${escapeHtml(entry.ort)}` : "",
+          entry.begleitperson ? `Begleitperson: ${escapeHtml(entry.begleitperson)}` : ""
+        ].filter(Boolean);
+
+        return `
+          <div class="record">
+            <div class="record-main">
+              <div class="record-title">${escapeHtml(titleParts.join(" – "))}</div>
+              <div class="record-meta">${metaParts.join(" | ")}</div>
+            </div>
+            <div class="record-actions">
+              <button class="small-btn small-edit" type="button" onclick="editEntry('${entry.id}')">Bearbeiten</button>
+              <button class="small-btn small-delete" type="button" onclick="confirmDelete('${entry.id}')">Löschen</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function resetSearch() {
+      searchKuerzel.value = "";
+      searchDateFrom.value = "";
+      searchDateTo.value = "";
+      renderEntries();
+      setStatus("Filter zurückgesetzt.", "ok");
+    }
+
+    function getClientHistoryEntries() {
+      const currentName = normalizeText(fields.nameKuerzel.value);
+      if (!currentName) return [];
+
+      const currentId = fields.entryId.value || "";
+      const allEntries = sortEntries(readEntries());
+
+      return allEntries
+        .filter(entry => normalizeText(entry.nameKuerzel) === currentName && entry.id !== currentId)
+        .slice(0, 3);
+    }
+
+    function getHistoryBlocks(entry) {
+      const blocks = [
+        { label: "Wichtige Beobachtungen", value: entry.wichtigeBeobachtungen },
+        { label: "Nächste Absprache", value: entry.naechsteAbsprache },
+        { label: "Schwerpunkt", value: entry.schwerpunkt },
+        { label: "Abweichungen / Besonderheiten", value: entry.abweichungenBesonderheiten },
+        { label: "Kurznotiz zum Verlauf", value: entry.kurznotizVerlauf }
+      ];
+
+      return blocks.filter(block => String(block.value || "").trim());
+    }
+
+    function updateHistoryPanel() {
+      const currentNameRaw = String(fields.nameKuerzel.value || "").trim();
+      const currentName = normalizeText(currentNameRaw);
+
+      if (!currentName) {
+        historyPanel.classList.add("collapsed");
+        historyToggle.textContent = "Anzeigen";
+        historySub.textContent = "Zeigt die letzten 3 Einträge desselben Klienten.";
+        historyList.innerHTML = "";
+        historyEmpty.textContent = "Noch keine Historie verfügbar.";
+        return;
+      }
+
+      const clients = getUniqueClients();
+      const isKnownClient = clients.some(client => normalizeText(client) === currentName);
+      const historyEntries = getClientHistoryEntries();
+
+      if (!isKnownClient && !fields.entryId.value) {
+        historyPanel.classList.add("collapsed");
+        historyToggle.textContent = "Anzeigen";
+        historySub.textContent = "Neuer Klient. Historie entsteht nach dem ersten gespeicherten Eintrag.";
+        historyList.innerHTML = "";
+        historyEmpty.textContent = "Noch keine Historie verfügbar.";
+        return;
+      }
+
+      historyPanel.classList.remove("collapsed");
+      historyToggle.textContent = "Ausblenden";
+      historySub.textContent = `Klient: ${currentNameRaw}. Letzte 3 Einträge, neueste oben.`;
+
+      if (!historyEntries.length) {
+        historyList.innerHTML = "";
+        historyEmpty.textContent = "Für diesen Klienten sind noch keine früheren Einträge vorhanden.";
+        return;
+      }
+
+      historyEmpty.textContent = "";
+      historyList.innerHTML = historyEntries.map(entry => {
+        const blocks = getHistoryBlocks(entry);
+
+        if (!blocks.length) {
+          return `<div class="history-item"><div class="history-value">In diesem Eintrag sind keine Inhalte für die Historie vorhanden.</div></div>`;
+        }
+
+        return `
+          <div class="history-item">
+            ${blocks.map(block => `
+              <div class="history-block">
+                <div class="history-label">${escapeHtml(block.label)}</div>
+                <div class="history-value">${escapeHtml(block.value)}</div>
+              </div>
+            `).join("")}
+          </div>
+        `;
+      }).join("");
+    }
+
+    function toggleHistory() {
+      const hasCollapsed = historyPanel.classList.contains("collapsed");
+      if (hasCollapsed) {
+        historyPanel.classList.remove("collapsed");
+        historyToggle.textContent = "Ausblenden";
+      } else {
+        historyPanel.classList.add("collapsed");
+        historyToggle.textContent = "Anzeigen";
+      }
+    }
+
+    function downloadFile(filename, content, mimeType) {
+      const blob = new Blob([content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function exportJson() {
+      const entries = sortEntries(readEntries());
+      const content = JSON.stringify(entries, null, 2);
+      const stamp = new Date().toISOString().slice(0, 10);
+      downloadFile(`kontaktdokumentation_export_${stamp}.json`, content, "application/json");
+      setStatus("JSON-Export erstellt.", "ok");
+    }
+
+    function importJsonFile(file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (!Array.isArray(parsed)) {
+            throw new Error("Ungültiges Format");
+          }
+
+          const sanitized = parsed.map(item => ({
+            id: item.id || uid(),
+            nameKuerzel: String(item.nameKuerzel || "").trim(),
+            zeitVon: String(item.zeitVon || ""),
+            ort: String(item.ort || "").trim(),
+            artDesEinsatzes: String(item.artDesEinsatzes || "").trim(),
+            wichtigeBeobachtungen: String(item.wichtigeBeobachtungen || "").trim(),
+            naechsteAbsprache: String(item.naechsteAbsprache || "").trim(),
+            datum: String(item.datum || ""),
+            zeitBis: String(item.zeitBis || ""),
+            begleitperson: String(item.begleitperson || "").trim(),
+            thomasMarxVertretung: String(item.thomasMarxVertretung || "").trim(),
+            schwerpunkt: String(item.schwerpunkt || "").trim(),
+            abweichungenBesonderheiten: String(item.abweichungenBesonderheiten || "").trim(),
+            unterschriftKuerzel: String(item.unterschriftKuerzel || "").trim(),
+            kurznotizVerlauf: String(item.kurznotizVerlauf || "").trim(),
+            updatedAt: item.updatedAt || new Date().toISOString()
+          }));
+
+          writeEntries(sanitized);
+          renderClientSuggestions();
+          renderEntries();
+          updateHistoryPanel();
+          setStatus("JSON erfolgreich importiert. Vorhandene Einträge wurden ersetzt.", "ok");
+        } catch (err) {
+          setStatus("Import fehlgeschlagen. Datei ist kein gültiger JSON-Export.", "error");
+        } finally {
+          jsonFileInput.value = "";
+        }
+      };
+      reader.readAsText(file, "UTF-8");
+    }
+
+    function toCsvValue(value) {
+      const str = String(value ?? "");
+      return `"${str.replace(/"/g, '""')}"`;
+    }
+
+    function exportCsv() {
+      const entries = sortEntries(readEntries());
+      const header = [
+        "id",
+        "nameKuerzel",
+        "datum",
+        "zeitVon",
+        "zeitBis",
+        "ort",
+        "artDesEinsatzes",
+        "wichtigeBeobachtungen",
+        "naechsteAbsprache",
+        "begleitperson",
+        "thomasMarxVertretung",
+        "schwerpunkt",
+        "abweichungenBesonderheiten",
+        "unterschriftKuerzel",
+        "kurznotizVerlauf",
+        "updatedAt"
+      ];
+
+      const rows = entries.map(entry => [
+        entry.id,
+        entry.nameKuerzel,
+        entry.datum,
+        entry.zeitVon,
+        entry.zeitBis,
+        entry.ort,
+        entry.artDesEinsatzes,
+        entry.wichtigeBeobachtungen,
+        entry.naechsteAbsprache,
+        entry.begleitperson,
+        entry.thomasMarxVertretung,
+        entry.schwerpunkt,
+        entry.abweichungenBesonderheiten,
+        entry.unterschriftKuerzel,
+        entry.kurznotizVerlauf,
+        entry.updatedAt
+      ]);
+
+      const csv = [header, ...rows]
+        .map(row => row.map(toCsvValue).join(";"))
+        .join("\n");
+
+      const stamp = new Date().toISOString().slice(0, 10);
+      downloadFile(`kontaktdokumentation_export_${stamp}.csv`, csv, "text/csv;charset=utf-8");
+      setStatus("CSV-Export erstellt.", "ok");
+    }
+
+    function markDirty() {
+      isDirty = true;
+    }
+
+    window.editEntry = function(id) {
+      const entry = readEntries().find(item => item.id === id);
+      if (!entry) {
+        setStatus("Eintrag konnte nicht geladen werden.", "error");
+        return;
+      }
+      fillForm(entry);
+    };
+
+    window.confirmDelete = function(id) {
+      const ok = window.confirm("Diesen Eintrag wirklich löschen?");
+      if (!ok) return;
+      deleteEntry(id);
+    };
+
+    Object.values(fields).forEach(el => {
+      if (!el) return;
+      el.addEventListener("input", () => {
+        markDirty();
+        if (el === fields.nameKuerzel) updateHistoryPanel();
+      });
+      el.addEventListener("change", () => {
+        markDirty();
+        if (el === fields.nameKuerzel) updateHistoryPanel();
+      });
+    });
+
+    searchKuerzel.addEventListener("input", renderEntries);
+    searchDateFrom.addEventListener("change", renderEntries);
+    searchDateTo.addEventListener("change", renderEntries);
+
+    searchResetBtn.addEventListener("click", resetSearch);
+    saveBtn.addEventListener("click", saveEntry);
+    duplicateBtn.addEventListener("click", duplicateCurrentEntry);
+    resetBtn.addEventListener("click", () => {
+      clearForm();
+      setStatus("Formular zurückgesetzt. Neue Dokumentation kann erfasst werden.", "ok");
+    });
+    printBtn.addEventListener("click", () => window.print());
+    historyToggle.addEventListener("click", toggleHistory);
+
+    exportJsonBtn.addEventListener("click", exportJson);
+    importJsonBtn.addEventListener("click", () => jsonFileInput.click());
+    exportCsvBtn.addEventListener("click", exportCsv);
+
+    jsonFileInput.addEventListener("change", (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      importJsonFile(file);
+    });
+
+    window.addEventListener("beforeunload", function (e) {
+      if (!isDirty) return;
+      e.preventDefault();
+      e.returnValue = "";
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+      clearForm();
+      renderClientSuggestions();
+      renderEntries();
+      updateHistoryPanel();
+      setStatus("Bereit.", "neutral");
+    });
+  </script>
+</body>
+</html>
