@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kontaktbörse Erfurt</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --card: #ffffff;
+      --text: #1e2430;
+      --muted: #667085;
+      --line: #d9dee8;
+      --accent: #1f6feb;
+      --accent-2: #0f4db8;
+      --good: #137333;
+      --warn: #b54708;
+      --danger: #b42318;
+      --shadow: 0 8px 28px rgba(15, 23, 42, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      line-height: 1.45;
+    }
+
+    body {
+      padding: 18px;
+    }
+
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #ffffff 0%, #eef4ff 100%);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 24px 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0 0 8px 0;
+      font-size: clamp(28px, 5vw, 42px);
+      line-height: 1.1;
+    }
+
+    .sub {
+      margin: 0;
+      color: var(--muted);
+      font-size: 18px;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+
+    @media (min-width: 980px) {
+      .grid {
+        grid-template-columns: 1.05fr 0.95fr;
+      }
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .section-title {
+      margin: 0 0 14px 0;
+      font-size: 28px;
+      line-height: 1.15;
+    }
+
+    .hint {
+      color: var(--muted);
+      margin: -4px 0 16px 0;
+      font-size: 15px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    @media (min-width: 720px) {
+      .form-grid.two {
+        grid-template-columns: 1fr 1fr;
+      }
+      .form-grid.three {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      margin: 0 0 6px 0;
+      font-size: 15px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid #cdd5df;
+      border-radius: 14px;
+      padding: 14px 14px;
+      font-size: 17px;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+      transition: border-color .15s ease, box-shadow .15s ease;
+      min-height: 52px;
+    }
+
+    textarea {
+      min-height: 92px;
+      resize: vertical;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(31, 111, 235, 0.12);
+    }
+
+    .row-span-2 {
+      grid-column: span 2;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 14px;
+      padding: 14px 16px;
+      min-height: 52px;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform .04s ease, opacity .15s ease, background .15s ease;
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn.primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn.primary:hover {
+      background: var(--accent-2);
+    }
+
+    .btn.secondary {
+      background: #e8eef9;
+      color: #103b88;
+    }
+
+    .btn.light {
+      background: #eef2f7;
+      color: #263445;
+    }
+
+    .btn.warn {
+      background: #fff1e6;
+      color: var(--warn);
+    }
+
+    .btn.danger {
+      background: #fdecec;
+      color: var(--danger);
+    }
+
+    .btn.good {
+      background: #eaf7ee;
+      color: var(--good);
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    @media (min-width: 700px) {
+      .stats {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .stat {
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+    }
+
+    .stat .label {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+
+    .stat .value {
+      font-weight: 800;
+      font-size: 30px;
+      line-height: 1;
+    }
+
+    .searchbar {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    @media (min-width: 760px) {
+      .searchbar {
+        grid-template-columns: 1.2fr .8fr .8fr .8fr;
+      }
+    }
+
+    .list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .person {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+      background: #fff;
+    }
+
+    .person-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+
+    .person-name {
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.15;
+      margin: 0;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #eef3f8;
+      color: #334155;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .badge.good { background: #e9f8ed; color: var(--good); }
+    .badge.warn { background: #fff4e9; color: var(--warn); }
+    .badge.blue { background: #e9f1ff; color: #174ea6; }
+
+    .person-notes {
+      margin-top: 10px;
+      color: #334155;
+      font-size: 15px;
+      white-space: pre-wrap;
+    }
+
+    .mini-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .pair-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .pair-card {
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 16px;
+      background: linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
+    }
+
+    .pair-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .pair-title {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.2;
+    }
+
+    .score {
+      font-weight: 900;
+      font-size: 26px;
+      color: #1147a6;
+      background: #e9f1ff;
+      padding: 8px 12px;
+      border-radius: 14px;
+      white-space: nowrap;
+    }
+
+    .why {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .empty {
+      border: 2px dashed #cfd8e3;
+      border-radius: 18px;
+      padding: 22px;
+      color: var(--muted);
+      text-align: center;
+      background: #fbfcfe;
+    }
+
+    .footnote {
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    .danger-zone {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px dashed var(--line);
+    }
+
+    .small {
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+      border: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <h1>Kontaktbörse Erfurt</h1>
+      <p class="sub">Kontakte erfassen, filtern und automatisch passende Paar-Vorschläge erzeugen. Alles läuft direkt in dieser einen HTML-Datei.</p>
+
+      <div class="toolbar">
+        <button class="btn secondary" id="exportJsonBtn">Export JSON</button>
+        <button class="btn secondary" id="exportCsvBtn">Export CSV</button>
+        <label for="importJsonInput" class="btn light" style="display:inline-flex;align-items:center;justify-content:center;">Import JSON</label>
+        <input id="importJsonInput" type="file" accept=".json,application/json" class="sr-only" />
+        <button class="btn warn" id="demoBtn">Demo-Daten laden</button>
+      </div>
+    </section>
+
+    <section class="stats">
+      <div class="stat">
+        <div class="label">Kontakte gesamt</div>
+        <div class="value" id="statContacts">0</div>
+      </div>
+      <div class="stat">
+        <div class="label">Aktive Kontakte</div>
+        <div class="value" id="statActive">0</div>
+      </div>
+      <div class="stat">
+        <div class="label">Paar-Vorschläge</div>
+        <div class="value" id="statPairs">0</div>
+      </div>
+      <div class="stat">
+        <div class="label">Mit Telefonnummer</div>
+        <div class="value" id="statPhone">0</div>
+      </div>
+    </section>
+
+    <div class="grid">
+      <section class="card">
+        <h2 class="section-title" id="formTitle">Neuen Kontakt anlegen</h2>
+        <p class="hint">Komma-getrennte Eingaben sind bei Interessen, Tagen und Zeiten möglich. Beispiel: Spazieren, Kaffee, Lesen</p>
+
+        <form id="contactForm">
+          <input type="hidden" id="contactId" />
+
+          <div class="form-grid two">
+            <div>
+              <label for="name">Name</label>
+              <input id="name" required placeholder="Vor- und Nachname" />
+            </div>
+
+            <div>
+              <label for="status">Status</label>
+              <select id="status">
+                <option value="aktiv">aktiv</option>
+                <option value="wartend">wartend</option>
+                <option value="pausiert">pausiert</option>
+                <option value="inaktiv">inaktiv</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="phone">Telefon</label>
+              <input id="phone" inputmode="tel" placeholder="Telefonnummer" />
+            </div>
+
+            <div>
+              <label for="email">E-Mail</label>
+              <input id="email" type="email" placeholder="E-Mail-Adresse" />
+            </div>
+
+            <div>
+              <label for="city">Ort / Stadtteil</label>
+              <input id="city" placeholder="z. B. Erfurt, Berliner Platz" />
+            </div>
+
+            <div>
+              <label for="age">Alter</label>
+              <input id="age" type="number" min="18" max="120" placeholder="z. B. 78" />
+            </div>
+
+            <div>
+              <label for="gender">Geschlecht</label>
+              <select id="gender">
+                <option value="">keine Angabe</option>
+                <option value="weiblich">weiblich</option>
+                <option value="männlich">männlich</option>
+                <option value="divers">divers</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="mobility">Mobilität</label>
+              <select id="mobility">
+                <option value="">keine Angabe</option>
+                <option value="selbstständig">selbstständig</option>
+                <option value="etwas eingeschränkt">etwas eingeschränkt</option>
+                <option value="stark eingeschränkt">stark eingeschränkt</option>
+              </select>
+            </div>
+
+            <div class="row-span-2">
+              <label for="interests">Interessen</label>
+              <textarea id="interests" placeholder="z. B. Spaziergänge, Kaffee, Biografie, Kirche, Garten, Musik"></textarea>
+            </div>
+
+            <div class="row-span-2">
+              <label for="days">Mögliche Tage</label>
+              <textarea id="days" placeholder="z. B. Montag, Mittwoch, Freitag"></textarea>
+            </div>
+
+            <div class="row-span-2">
+              <label for="times">Mögliche Zeiten</label>
+              <textarea id="times" placeholder="z. B. Vormittag, Nachmittag"></textarea>
+            </div>
+
+            <div class="row-span-2">
+              <label for="notes">Notizen</label>
+              <textarea id="notes" placeholder="Wichtige Hinweise, Besonderheiten, Wünsche"></textarea>
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button type="submit" class="btn primary" id="saveBtn">Kontakt speichern</button>
+            <button type="button" class="btn light" id="resetBtn">Formular leeren</button>
+          </div>
+        </form>
+
+        <div class="danger-zone">
+          <div class="small">Achtung: Die Daten bleiben lokal im Browser gespeichert. Für Sicherung bitte regelmäßig JSON exportieren.</div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2 class="section-title">Suche, Filter und Kontaktliste</h2>
+
+        <div class="searchbar">
+          <div>
+            <label for="searchInput">Suche</label>
+            <input id="searchInput" placeholder="Name, Ort, Interesse, Telefonnummer, Notiz" />
+          </div>
+
+          <div>
+            <label for="filterStatus">Status</label>
+            <select id="filterStatus">
+              <option value="">alle</option>
+              <option value="aktiv">aktiv</option>
+              <option value="wartend">wartend</option>
+              <option value="pausiert">pausiert</option>
+              <option value="inaktiv">inaktiv</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="filterCity">Ort enthält</label>
+            <input id="filterCity" placeholder="z. B. Erfurt" />
+          </div>
+
+          <div>
+            <label>&nbsp;</label>
+            <button class="btn light" id="resetFiltersBtn" type="button">Filter zurücksetzen</button>
+          </div>
+        </div>
+
+        <div id="contactList" class="list"></div>
+      </section>
+    </div>
+
+    <section class="card" style="margin-top:18px;">
+      <h2 class="section-title">Paar-Vorschläge</h2>
+      <p class="hint">Die Vorschläge werden automatisch aus Interessen, Tagen, Zeiten, Ort, Alter und Mobilität berechnet. Standardmäßig werden nur aktive Kontakte berücksichtigt.</p>
+
+      <div class="searchbar">
+        <div>
+          <label for="pairMode">Vorschlags-Modus</label>
+          <select id="pairMode">
+            <option value="activeOnly">nur aktive Kontakte</option>
+            <option value="all">alle Kontakte</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="pairMinScore">Mindest-Score</label>
+          <select id="pairMinScore">
+            <option value="20">20</option>
+            <option value="30">30</option>
+            <option value="40" selected>40</option>
+            <option value="50">50</option>
+            <option value="60">60</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="pairLimit">Anzahl anzeigen</label>
+          <select id="pairLimit">
+            <option value="5">5</option>
+            <option value="10" selected>10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+          </select>
+        </div>
+
+        <div>
+          <label>&nbsp;</label>
+          <button class="btn good" id="recalcBtn" type="button">Vorschläge neu berechnen</button>
+        </div>
+      </div>
+
+      <div id="pairList" class="pair-list"></div>
+      <div class="footnote">Score-Logik: gemeinsame Interessen, gemeinsame Tage, gemeinsame Zeiten, gleicher Ort/Stadtteil, ähnliche Altersgruppe und ähnliche Mobilität erhöhen die Passung.</div>
+    </section>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "kontaktboerse_erfurt_v1";
+
+    const els = {
+      form: document.getElementById("contactForm"),
+      formTitle: document.getElementById("formTitle"),
+      contactId: document.getElementById("contactId"),
+      name: document.getElementById("name"),
+      status: document.getElementById("status"),
+      phone: document.getElementById("phone"),
+      email: document.getElementById("email"),
+      city: document.getElementById("city"),
+      age: document.getElementById("age"),
+      gender: document.getElementById("gender"),
+      mobility: document.getElementById("mobility"),
+      interests: document.getElementById("interests"),
+      days: document.getElementById("days"),
+      times: document.getElementById("times"),
+      notes: document.getElementById("notes"),
+      saveBtn: document.getElementById("saveBtn"),
+      resetBtn: document.getElementById("resetBtn"),
+
+      searchInput: document.getElementById("searchInput"),
+      filterStatus: document.getElementById("filterStatus"),
+      filterCity: document.getElementById("filterCity"),
+      resetFiltersBtn: document.getElementById("resetFiltersBtn"),
+
+      contactList: document.getElementById("contactList"),
+      pairList: document.getElementById("pairList"),
+      pairMode: document.getElementById("pairMode"),
+      pairMinScore: document.getElementById("pairMinScore"),
+      pairLimit: document.getElementById("pairLimit"),
+      recalcBtn: document.getElementById("recalcBtn"),
+
+      exportJsonBtn: document.getElementById("exportJsonBtn"),
+      exportCsvBtn: document.getElementById("exportCsvBtn"),
+      importJsonInput: document.getElementById("importJsonInput"),
+      demoBtn: document.getElementById("demoBtn"),
+
+      statContacts: document.getElementById("statContacts"),
+      statActive: document.getElementById("statActive"),
+      statPairs: document.getElementById("statPairs"),
+      statPhone: document.getElementById("statPhone"),
+    };
+
+    let state = {
+      contacts: []
+    };
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        if (parsed && Array.isArray(parsed.contacts)) {
+          state.contacts = parsed.contacts;
+        }
+      } catch (err) {
+        console.error("Fehler beim Laden aus localStorage:", err);
+      }
+    }
+
+    function uid() {
+      return "id_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 8);
+    }
+
+    function normalizeText(v) {
+      return String(v || "")
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, " ");
+    }
+
+    function splitList(v) {
+      return String(v || "")
+        .split(/[,\n;]+/)
+        .map(s => s.trim())
+        .filter(Boolean);
+    }
+
+    function uniqueNormalized(arr) {
+      const map = new Map();
+      for (const item of arr) {
+        const key = normalizeText(item);
+        if (key) map.set(key, item.trim());
+      }
+      return Array.from(map.keys());
+    }
+
+    function intersectionSize(a, b) {
+      const setB = new Set(b);
+      let count = 0;
+      for (const item of a) {
+        if (setB.has(item)) count++;
+      }
+      return count;
+    }
+
+    function escapeHtml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function getFormData() {
+      return {
+        id: els.contactId.value || uid(),
+        name: els.name.value.trim(),
+        status: els.status.value,
+        phone: els.phone.value.trim(),
+        email: els.email.value.trim(),
+        city: els.city.value.trim(),
+        age: els.age.value ? Number(els.age.value) : null,
+        gender: els.gender.value,
+        mobility: els.mobility.value,
+        interests: splitList(els.interests.value),
+        days: splitList(els.days.value),
+        times: splitList(els.times.value),
+        notes: els.notes.value.trim(),
+        updatedAt: new Date().toISOString()
+      };
+    }
+
+    function setFormData(contact) {
+      els.contactId.value = contact.id || "";
+      els.name.value = contact.name || "";
+      els.status.value = contact.status || "aktiv";
+      els.phone.value = contact.phone || "";
+      els.email.value = contact.email || "";
+      els.city.value = contact.city || "";
+      els.age.value = contact.age ?? "";
+      els.gender.value = contact.gender || "";
+      els.mobility.value = contact.mobility || "";
+      els.interests.value = (contact.interests || []).join(", ");
+      els.days.value = (contact.days || []).join(", ");
+      els.times.value = (contact.times || []).join(", ");
+      els.notes.value = contact.notes || "";
+
+      els.formTitle.textContent = "Kontakt bearbeiten";
+      els.saveBtn.textContent = "Änderungen speichern";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function resetForm() {
+      els.form.reset();
+      els.contactId.value = "";
+      els.status.value = "aktiv";
+      els.formTitle.textContent = "Neuen Kontakt anlegen";
+      els.saveBtn.textContent = "Kontakt speichern";
+    }
+
+    function upsertContact(contact) {
+      if (!contact.name) {
+        alert("Bitte mindestens einen Namen eingeben.");
+        return;
+      }
+
+      const idx = state.contacts.findIndex(c => c.id === contact.id);
+      if (idx >= 0) {
+        state.contacts[idx] = contact;
+      } else {
+        state.contacts.unshift(contact);
+      }
+      saveState();
+      resetForm();
+      renderAll();
+    }
+
+    function deleteContact(id) {
+      const contact = state.contacts.find(c => c.id === id);
+      const name = contact ? contact.name : "diesen Kontakt";
+      if (!confirm("Soll " + name + " wirklich gelöscht werden?")) return;
+
+      state.contacts = state.contacts.filter(c => c.id !== id);
+      saveState();
+      renderAll();
+    }
+
+    function duplicateContact(id) {
+      const original = state.contacts.find(c => c.id === id);
+      if (!original) return;
+
+      const copy = {
+        ...structuredCloneSafe(original),
+        id: uid(),
+        name: original.name + " (Kopie)",
+        updatedAt: new Date().toISOString()
+      };
+
+      state.contacts.unshift(copy);
+      saveState();
+      renderAll();
+    }
+
+    function structuredCloneSafe(obj) {
+      return JSON.parse(JSON.stringify(obj));
+    }
+
+    function filteredContacts() {
+      const q = normalizeText(els.searchInput.value);
+      const status = els.filterStatus.value;
+      const city = normalizeText(els.filterCity.value);
+
+      return state.contacts.filter(c => {
+        if (status && c.status !== status) return false;
+        if (city && !normalizeText(c.city).includes(city)) return false;
+
+        if (!q) return true;
+
+        const haystack = [
+          c.name, c.phone, c.email, c.city, c.notes,
+          ...(c.interests || []),
+          ...(c.days || []),
+          ...(c.times || [])
+        ].join(" | ");
+
+        return normalizeText(haystack).includes(q);
+      });
+    }
+
+    function ageGroupBonus(a, b) {
+      if (!a || !b) return 0;
+      const diff = Math.abs(a - b);
+      if (diff <= 5) return 10;
+      if (diff <= 10) return 7;
+      if (diff <= 15) return 4;
+      return 0;
+    }
+
+    function mobilityBonus(a, b) {
+      if (!a || !b) return 0;
+      return normalizeText(a) === normalizeText(b) ? 8 : 0;
+    }
+
+    function cityBonus(a, b) {
+      if (!a || !b) return 0;
+      const aa = normalizeText(a);
+      const bb = normalizeText(b);
+      if (aa === bb) return 12;
+      if (aa.includes(bb) || bb.includes(aa)) return 7;
+      return 0;
+    }
+
+    function computePairScore(a, b) {
+      const interestsA = uniqueNormalized(a.interests || []);
+      const interestsB = uniqueNormalized(b.interests || []);
+      const daysA = uniqueNormalized(a.days || []);
+      const daysB = uniqueNormalized(b.days || []);
+      const timesA = uniqueNormalized(a.times || []);
+      const timesB = uniqueNormalized(b.times || []);
+
+      const commonInterests = intersectionSize(interestsA, interestsB);
+      const commonDays = intersectionSize(daysA, daysB);
+      const commonTimes = intersectionSize(timesA, timesB);
+
+      let score = 0;
+      const reasons = [];
+
+      if (commonInterests > 0) {
+        const points = Math.min(commonInterests * 12, 36);
+        score += points;
+        reasons.push(commonInterests + " gemeinsame Interessen");
+      }
+
+      if (commonDays > 0) {
+        const points = Math.min(commonDays * 10, 20);
+        score += points;
+        reasons.push(commonDays + " gemeinsame Tage");
+      }
+
+      if (commonTimes > 0) {
+        const points = Math.min(commonTimes * 8, 16);
+        score += points;
+        reasons.push(commonTimes + " gemeinsame Zeiten");
+      }
+
+      const cBonus = cityBonus(a.city, b.city);
+      if (cBonus > 0) {
+        score += cBonus;
+        reasons.push("räumliche Nähe");
+      }
+
+      const agBonus = ageGroupBonus(a.age, b.age);
+      if (agBonus > 0) {
+        score += agBonus;
+        reasons.push("ähnliche Altersgruppe");
+      }
+
+      const mBonus = mobilityBonus(a.mobility, b.mobility);
+      if (mBonus > 0) {
+        score += mBonus;
+        reasons.push("ähnliche Mobilität");
+      }
+
+      score = Math.min(score, 100);
+
+      return {
+        score,
+        reasons,
+        commonInterests,
+        commonDays,
+        commonTimes
+      };
+    }
+
+    function buildPairs() {
+      const mode = els.pairMode.value;
+      const minScore = Number(els.pairMinScore.value);
+      const limit = Number(els.pairLimit.value);
+
+      let pool = [...state.contacts];
+      if (mode === "activeOnly") {
+        pool = pool.filter(c => c.status === "aktiv");
+      }
+
+      const pairs = [];
+      for (let i = 0; i < pool.length; i++) {
+        for (let j = i + 1; j < pool.length; j++) {
+          const a = pool[i];
+          const b = pool[j];
+          const res = computePairScore(a, b);
+          if (res.score >= minScore) {
+            pairs.push({
+              a,
+              b,
+              ...res
+            });
+          }
+        }
+      }
+
+      pairs.sort((x, y) => {
+        if (y.score !== x.score) return y.score - x.score;
+        return x.a.name.localeCompare(y.a.name, "de");
+      });
+
+      return pairs.slice(0, limit);
+    }
+
+    function renderStats() {
+      const all = state.contacts.length;
+      const active = state.contacts.filter(c => c.status === "aktiv").length;
+      const withPhone = state.contacts.filter(c => c.phone).length;
+      const pairCount = buildPairs().length;
+
+      els.statContacts.textContent = String(all);
+      els.statActive.textContent = String(active);
+      els.statPairs.textContent = String(pairCount);
+      els.statPhone.textContent = String(withPhone);
+    }
+
+    function statusBadge(status) {
+      const map = {
+        aktiv: "good",
+        wartend: "blue",
+        pausiert: "warn",
+        inaktiv: ""
+      };
+      return `<span class="badge ${map[status] || ""}">${escapeHtml(status || "unbekannt")}</span>`;
+    }
+
+    function renderContacts() {
+      const items = filteredContacts();
+
+      if (!items.length) {
+        els.contactList.innerHTML = `<div class="empty">Keine Kontakte gefunden.</div>`;
+        return;
+      }
+
+      els.contactList.innerHTML = items.map(c => {
+        const tags = [];
+
+        if (c.city) tags.push(`<span class="badge">${escapeHtml(c.city)}</span>`);
+        if (c.age) tags.push(`<span class="badge">${escapeHtml(c.age)} Jahre</span>`);
+        if (c.phone) tags.push(`<span class="badge">${escapeHtml(c.phone)}</span>`);
+        if (c.email) tags.push(`<span class="badge">${escapeHtml(c.email)}</span>`);
+        if (c.mobility) tags.push(`<span class="badge">${escapeHtml(c.mobility)}</span>`);
+        tags.push(statusBadge(c.status));
+
+        const interestTags = (c.interests || []).slice(0, 5).map(i => `<span class="badge blue">${escapeHtml(i)}</span>`).join("");
+
+        return `
+          <article class="person">
+            <div class="person-top">
+              <div>
+                <h3 class="person-name">${escapeHtml(c.name || "Ohne Namen")}</h3>
+                <div class="meta">${tags.join("")}</div>
+              </div>
+            </div>
+
+            ${(interestTags || c.days?.length || c.times?.length) ? `
+              <div class="meta" style="margin-top:10px;">
+                ${interestTags}
+                ${(c.days || []).slice(0, 3).map(d => `<span class="badge">${escapeHtml(d)}</span>`).join("")}
+                ${(c.times || []).slice(0, 3).map(t => `<span class="badge">${escapeHtml(t)}</span>`).join("")}
+              </div>
+            ` : ""}
+
+            ${c.notes ? `<div class="person-notes">${escapeHtml(c.notes)}</div>` : ""}
+
+            <div class="mini-actions">
+              <button class="btn light" type="button" onclick="editContact('${c.id}')">Bearbeiten</button>
+              <button class="btn light" type="button" onclick="duplicateExistingContact('${c.id}')">Duplizieren</button>
+              <button class="btn danger" type="button" onclick="removeContact('${c.id}')">Löschen</button>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function renderPairs() {
+      const pairs = buildPairs();
+
+      if (!pairs.length) {
+        els.pairList.innerHTML = `<div class="empty">Noch keine passenden Paar-Vorschläge. Entweder sind zu wenig Kontakte erfasst oder der Mindest-Score ist zu hoch.</div>`;
+        return;
+      }
+
+      els.pairList.innerHTML = pairs.map(pair => {
+        return `
+          <article class="pair-card">
+            <div class="pair-head">
+              <h3 class="pair-title">${escapeHtml(pair.a.name)} + ${escapeHtml(pair.b.name)}</h3>
+              <div class="score">${pair.score}</div>
+            </div>
+
+            <div class="meta">
+              ${pair.a.city ? `<span class="badge">${escapeHtml(pair.a.city)}</span>` : ""}
+              ${pair.b.city ? `<span class="badge">${escapeHtml(pair.b.city)}</span>` : ""}
+              ${pair.a.age ? `<span class="badge">${escapeHtml(pair.a.age)} J.</span>` : ""}
+              ${pair.b.age ? `<span class="badge">${escapeHtml(pair.b.age)} J.</span>` : ""}
+            </div>
+
+            <div class="why">
+              ${pair.reasons.map(r => `<span class="badge good">${escapeHtml(r)}</span>`).join("")}
+            </div>
+
+            <div class="mini-actions">
+              <button class="btn light" type="button" onclick="editContact('${pair.a.id}')">${escapeHtml(pair.a.name)} öffnen</button>
+              <button class="btn light" type="button" onclick="editContact('${pair.b.id}')">${escapeHtml(pair.b.name)} öffnen</button>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function renderAll() {
+      renderStats();
+      renderContacts();
+      renderPairs();
+    }
+
+    function exportJson() {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json;charset=utf-8" });
+      downloadBlob(blob, "kontaktboerse_export.json");
+    }
+
+    function csvEscape(v) {
+      const s = String(v ?? "");
+      return `"${s.replace(/"/g, '""')}"`;
+    }
+
+    function exportCsv() {
+      const headers = [
+        "id", "name", "status", "phone", "email", "city", "age", "gender", "mobility",
+        "interests", "days", "times", "notes", "updatedAt"
+      ];
+
+      const rows = state.contacts.map(c => [
+        c.id, c.name, c.status, c.phone, c.email, c.city, c.age ?? "", c.gender, c.mobility,
+        (c.interests || []).join(" | "),
+        (c.days || []).join(" | "),
+        (c.times || []).join(" | "),
+        c.notes,
+        c.updatedAt
+      ]);
+
+      const content = [headers, ...rows]
+        .map(row => row.map(csvEscape).join(";"))
+        .join("\n");
+
+      const blob = new Blob([content], { type: "text/csv;charset=utf-8" });
+      downloadBlob(blob, "kontaktboerse_export.csv");
+    }
+
+    function downloadBlob(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function importJsonFile(file) {
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const parsed = JSON.parse(reader.result);
+          if (!parsed || !Array.isArray(parsed.contacts)) {
+            alert("Die JSON-Datei hat nicht das erwartete Format.");
+            return;
+          }
+
+          const cleaned = parsed.contacts.map(c => ({
+            id: c.id || uid(),
+            name: c.name || "",
+            status: c.status || "aktiv",
+            phone: c.phone || "",
+            email: c.email || "",
+            city: c.city || "",
+            age: c.age ? Number(c.age) : null,
+            gender: c.gender || "",
+            mobility: c.mobility || "",
+            interests: Array.isArray(c.interests) ? c.interests : splitList(c.interests),
+            days: Array.isArray(c.days) ? c.days : splitList(c.days),
+            times: Array.isArray(c.times) ? c.times : splitList(c.times),
+            notes: c.notes || "",
+            updatedAt: c.updatedAt || new Date().toISOString()
+          }));
+
+          state.contacts = cleaned;
+          saveState();
+          renderAll();
+          alert("Import erfolgreich.");
+        } catch (err) {
+          console.error(err);
+          alert("Die JSON-Datei konnte nicht gelesen werden.");
+        }
+      };
+      reader.readAsText(file, "utf-8");
+    }
+
+    function loadDemoData() {
+      if (!confirm("Demo-Daten laden? Bereits vorhandene Kontakte bleiben erhalten.")) return;
+
+      const demo = [
+        {
+          id: uid(),
+          name: "Brigitte Lehmann",
+          status: "aktiv",
+          phone: "0171 1111111",
+          email: "",
+          city: "Erfurt Berliner Platz",
+          age: 87,
+          gender: "weiblich",
+          mobility: "etwas eingeschränkt",
+          interests: ["Kaffee", "Biografie", "Erfurt früher", "Spazieren"],
+          days: ["Montag", "Donnerstag"],
+          times: ["Vormittag", "Nachmittag"],
+          notes: "Erzählt gern aus ihrem Leben, mag vertraute Gespräche.",
+          updatedAt: new Date().toISOString()
+        },
+        {
+          id: uid(),
+          name: "Werner Koch",
+          status: "aktiv",
+          phone: "0171 2222222",
+          email: "",
+          city: "Erfurt Berliner Platz",
+          age: 82,
+          gender: "männlich",
+          mobility: "etwas eingeschränkt",
+          interests: ["Spazieren", "Erfurt früher", "Zeitung", "Kaffee"],
+          days: ["Montag", "Mittwoch"],
+          times: ["Vormittag", "Nachmittag"],
+          notes: "Gesprächig, freut sich über regelmäßige Kontakte.",
+          updatedAt: new Date().toISOString()
+        },
+        {
+          id: uid(),
+          name: "Gisela Hartmann",
+          status: "aktiv",
+          phone: "0171 3333333",
+          email: "",
+          city: "Erfurt Süd",
+          age: 76,
+          gender: "weiblich",
+          mobility: "selbstständig",
+          interests: ["Lesen", "Kaffee", "Kirche", "Musik"],
+          days: ["Dienstag", "Freitag"],
+          times: ["Nachmittag"],
+          notes: "Sucht ruhige Begegnungen in kleiner Runde.",
+          updatedAt: new Date().toISOString()
+        },
+        {
+          id: uid(),
+          name: "Helmut Berger",
+          status: "wartend",
+          phone: "0171 4444444",
+          email: "",
+          city: "Erfurt Süd",
+          age: 79,
+          gender: "männlich",
+          mobility: "selbstständig",
+          interests: ["Musik", "Kaffee", "Spazieren", "Lesen"],
+          days: ["Freitag"],
+          times: ["Nachmittag"],
+          notes: "Offen für neue Kontakte, mag klare Absprachen.",
+          updatedAt: new Date().toISOString()
+        }
+      ];
+
+      state.contacts = [...demo, ...state.contacts];
+      saveState();
+      renderAll();
+    }
+
+    function attachEvents() {
+      els.form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        upsertContact(getFormData());
+      });
+
+      els.resetBtn.addEventListener("click", resetForm);
+
+      els.searchInput.addEventListener("input", renderContacts);
+      els.filterStatus.addEventListener("change", renderContacts);
+      els.filterCity.addEventListener("input", renderContacts);
+
+      els.resetFiltersBtn.addEventListener("click", () => {
+        els.searchInput.value = "";
+        els.filterStatus.value = "";
+        els.filterCity.value = "";
+        renderContacts();
+      });
+
+      els.pairMode.addEventListener("change", renderAll);
+      els.pairMinScore.addEventListener("change", renderAll);
+      els.pairLimit.addEventListener("change", renderAll);
+      els.recalcBtn.addEventListener("click", renderAll);
+
+      els.exportJsonBtn.addEventListener("click", exportJson);
+      els.exportCsvBtn.addEventListener("click", exportCsv);
+      els.importJsonInput.addEventListener("change", (e) => {
+        importJsonFile(e.target.files[0]);
+        e.target.value = "";
+      });
+      els.demoBtn.addEventListener("click", loadDemoData);
+    }
+
+    function init() {
+      loadState();
+      attachEvents();
+      renderAll();
+    }
+
+    window.editContact = function(id) {
+      const contact = state.contacts.find(c => c.id === id);
+      if (!contact) return;
+      setFormData(contact);
+    };
+
+    window.removeContact = function(id) {
+      deleteContact(id);
+    };
+
+    window.duplicateExistingContact = function(id) {
+      duplicateContact(id);
+    };
+
+    init();
+  </script>
+</body>
+</html>
