@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kontaktdokumentation – Vertraute Zeit</title>
+<style>
+  :root{
+    --blue:#2f4f86;
+    --blue-strong:#2449d8;
+    --line:#cfd7e6;
+    --bg:#f4f6fa;
+    --card:#ffffff;
+    --text:#1f2430;
+    --muted:#6b7280;
+    --success:#1d7a46;
+    --danger:#b42318;
+    --warn:#b54708;
+    --shadow:0 8px 24px rgba(16,24,40,.08);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:Georgia,"Times New Roman",serif}
+  body{padding:18px}
+  .app{max-width:1480px;margin:0 auto}
+  h1,h2,h3{margin:0;color:var(--blue)}
+  .top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+  .sub{color:var(--muted);font-size:16px;margin-top:6px}
+  .kpis{display:flex;gap:10px;flex-wrap:wrap}
+  .pill{background:#eef3ff;color:#2449d8;padding:10px 14px;border-radius:999px;font-weight:700}
+  .toolbar,.tabs,.inline-actions{display:flex;gap:10px;flex-wrap:wrap}
+  .toolbar{margin-bottom:14px}
+  .tabs{margin-bottom:14px}
+  .btn{
+    appearance:none;border:1px solid var(--line);background:#fff;color:var(--text);
+    border-radius:14px;padding:14px 18px;min-height:48px;cursor:pointer;
+    font-family:inherit;font-size:16px;box-shadow:var(--shadow)
+  }
+  .btn.primary{background:var(--blue-strong);color:#fff;border-color:var(--blue-strong)}
+  .btn.danger{color:var(--danger);border-color:#efc5c0}
+  .btn.slim{min-height:42px;padding:10px 14px}
+  .tab{font-weight:700}
+  .tab.active{background:var(--blue-strong);color:#fff;border-color:var(--blue-strong)}
+  .tab.main{font-size:19px;background:#eef3ff;color:#1d43cc}
+  .tab.main.active{background:var(--blue-strong);color:#fff}
+  .notice{
+    background:#fff;border:1px solid #d9e3f3;border-radius:16px;padding:16px;margin-bottom:14px;
+    box-shadow:var(--shadow);min-height:78px
+  }
+  .notice-title{font-size:24px;font-weight:700;color:var(--blue)}
+  .notice-meta{margin-top:8px;color:var(--muted);font-size:16px}
+  .flash{font-size:20px;font-weight:700;min-height:28px;margin:10px 2px 16px;color:var(--success)}
+  .panel{background:var(--card);border:1px solid #e6eaf2;border-radius:20px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:18px}
+  .panel-head{padding:20px 24px;border-bottom:1px solid #edf1f7;background:#fafbfd}
+  .panel-head p{margin:8px 0 0;color:var(--muted);font-size:16px}
+  .panel-body{padding:22px}
+  .hidden{display:none !important}
+  .grid-2{display:grid;grid-template-columns:1.12fr .88fr;gap:18px;align-items:start}
+  .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+  .subcard{border:1px solid #e7edf7;border-radius:18px;background:#fbfcfe;padding:16px}
+  .stack{display:grid;gap:16px}
+  .field{display:grid;gap:7px}
+  .field label{font-size:16px;font-weight:700;color:var(--blue)}
+  input[type="text"], textarea, select{
+    width:100%;border:1.5px solid var(--line);border-radius:14px;background:#fff;color:var(--text);
+    padding:13px 14px;font-size:17px;font-family:inherit;outline:none
+  }
+  input:focus, textarea:focus, select:focus{border-color:#6b8cff;box-shadow:0 0 0 4px rgba(36,73,216,.09)}
+  .invalid{border-color:var(--danger)!important;box-shadow:0 0 0 4px rgba(180,35,24,.08)!important}
+  textarea{resize:vertical;min-height:118px}
+  .mini-date{max-width:110px;text-align:center}
+  .bools{display:flex;gap:10px;flex-wrap:wrap}
+  .bool-btn{
+    appearance:none;border:1px solid var(--line);background:#fff;border-radius:12px;padding:12px 16px;
+    min-width:86px;cursor:pointer;font-family:inherit;font-size:16px
+  }
+  .bool-btn.yes{background:#eef8f2;color:var(--success);border-color:#cfe8d9;font-weight:700}
+  .bool-btn.no{background:#fff2f1;color:var(--danger);border-color:#efc5c0;font-weight:700}
+  .entry-block{display:grid;gap:10px}
+  .entry-top{display:grid;grid-template-columns:110px 1fr;gap:10px;align-items:start}
+  .entry-actions{display:flex;gap:10px;flex-wrap:wrap}
+  .entry-list,.record-list{display:grid;gap:10px}
+  .record,.entry-card{border:1px solid #e7edf7;border-radius:14px;padding:12px;background:#fff}
+  .record-head,.entry-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}
+  .record-title{font-size:18px;font-weight:700}
+  .record-meta,.entry-text{font-size:15px;color:var(--muted);line-height:1.45;white-space:pre-wrap}
+  .entry-date{font-weight:700;color:var(--blue);font-size:14px}
+  .tiny-btn,.small-btn{
+    appearance:none;border:none;border-radius:10px;padding:9px 12px;cursor:pointer;font-family:inherit
+  }
+  .tiny-edit{background:#eef3ff;color:#1d43cc}
+  .tiny-delete,.small-delete{background:#fff2f1;color:var(--danger)}
+  .small-load{background:#dfe9ff;color:#1d43cc;font-size:20px;font-weight:700;padding:14px 24px;min-height:54px}
+  .summarybox .record{min-height:110px}
+  .search-grid{display:grid;grid-template-columns:1fr 140px 140px 180px auto;gap:12px;align-items:end}
+  .empty{color:var(--muted);padding:8px 4px}
+  .overlay{position:fixed;inset:0;background:rgba(15,23,42,.45);display:none;align-items:center;justify-content:center;padding:18px;z-index:50}
+  .overlay.show{display:flex}
+  .modal{width:min(780px,100%);background:#fff;border-radius:18px;border:1px solid #e6eaf2;box-shadow:var(--shadow);overflow:hidden}
+  .modal-head{padding:18px 22px;border-bottom:1px solid #edf1f7;background:#fafbfd;display:flex;justify-content:space-between;align-items:center}
+  .modal-body{padding:20px 22px;max-height:70vh;overflow:auto}
+  .close-x{appearance:none;border:none;background:#eef3ff;color:#1d43cc;border-radius:999px;width:38px;height:38px;cursor:pointer;font-size:20px}
+  .helper{color:var(--muted);font-size:14px}
+  @media (max-width:1200px){
+    .grid-2,.grid-3,.search-grid{grid-template-columns:1fr}
+    .entry-top{grid-template-columns:1fr}
+    .mini-date{max-width:none}
+  }
+  @media print{
+    body{padding:0;background:#fff}
+    .toolbar,.tabs,.flash,.overlay{display:none!important}
+    .panel,.subcard,.notice{box-shadow:none}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div>
+      <h1>Kontaktdokumentation</h1>
+      <div class="sub">Vertraute Zeit – Thomas Marx | Neu aufgebaut von Grund auf | iPad-fokussierte Ein-Datei-Version</div>
+    </div>
+    <div class="kpis">
+      <div class="pill" id="kpiClients">0 Klienten</div>
+      <div class="pill" id="kpiVisits">0 Besuche</div>
+      <div class="pill" id="kpiTasks">0 Aufgaben</div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <button class="btn primary" type="button" id="btnSaveClient">Klient speichern</button>
+    <button class="btn" type="button" id="btnNewClient">Neuer Klient</button>
+    <button class="btn" type="button" id="btnShowClients">Klientenliste öffnen</button>
+    <button class="btn" type="button" id="btnPrint">Drucken / PDF</button>
+    <button class="btn" type="button" id="btnExportJson">Export JSON</button>
+    <button class="btn" type="button" id="btnImportJson">Import JSON</button>
+    <button class="btn danger" type="button" id="btnDeleteClient">Klient löschen</button>
+    <input type="file" id="fileJson" class="hidden" accept=".json,application/json">
+  </div>
+
+  <div class="flash" id="flash"></div>
+
+  <div class="notice">
+    <div class="notice-title" id="noticeTitle">Kein Klient geladen</div>
+    <div class="notice-meta" id="noticeMeta">Bitte zuerst „Neuer Klient“ oder „Klientenliste öffnen“ verwenden.</div>
+  </div>
+
+  <div class="tabs">
+    <button class="btn tab main active" type="button" data-tab="client">Klient</button>
+    <button class="btn tab" type="button" data-tab="visits">Besuchsdokumentation</button>
+    <button class="btn tab" type="button" data-tab="tasks">Aufgaben-Doku</button>
+    <button class="btn tab" type="button" data-tab="search">Suche / Verlauf</button>
+    <button class="btn tab" type="button" data-tab="clients">Gespeicherte Klienten</button>
+  </div>
+
+  <section class="panel tab-panel" id="tab-client">
+    <div class="panel-head">
+      <h2>Klientenblatt</h2>
+      <p>Bitte nur mit Kürzeln arbeiten. Datumsformat in dieser Datei: <strong>TT.MM.JJ</strong>. Keine Gesundheitsdaten eintragen.</p>
+    </div>
+    <div class="panel-body">
+      <input type="hidden" id="clientId">
+
+      <div class="grid-2">
+        <div class="stack">
+          <div class="subcard">
+            <h3>Stammbereich</h3>
+            <div class="grid-3" style="margin-top:14px">
+              <div class="field">
+                <label for="kuerzel">Kürzel</label>
+                <input type="text" id="kuerzel" placeholder="z. B. BK">
+              </div>
+              <div class="field">
+                <label for="letzterUclaWert">letzter UCLA-Wert</label>
+                <input type="text" id="letzterUclaWert">
+              </div>
+              <div class="field">
+                <label for="naechsteUcla">nächste UCLA</label>
+                <input type="text" class="date-short" id="naechsteUcla" placeholder="TT.MM.JJ">
+              </div>
+
+              <div class="field">
+                <label>Schweigepflichtsentbindung</label>
+                <div class="bools" data-bool="schweigepflichtsentbindung">
+                  <button class="bool-btn" type="button" data-value="ja">Ja</button>
+                  <button class="bool-btn" type="button" data-value="nein">Nein</button>
+                </div>
+                <input type="hidden" id="schweigepflichtsentbindung">
+              </div>
+              <div class="field">
+                <label>akt. Rechng. bezahlt</label>
+                <div class="bools" data-bool="aktRechnungBezahlt">
+                  <button class="bool-btn" type="button" data-value="ja">Ja</button>
+                  <button class="bool-btn" type="button" data-value="nein">Nein</button>
+                </div>
+                <input type="hidden" id="aktRechnungBezahlt">
+              </div>
+              <div class="field">
+                <label>Rechng. Vormonat bezahlt</label>
+                <div class="bools" data-bool="rechnungVormonatBezahlt">
+                  <button class="bool-btn" type="button" data-value="ja">Ja</button>
+                  <button class="bool-btn" type="button" data-value="nein">Nein</button>
+                </div>
+                <input type="hidden" id="rechnungVormonatBezahlt">
+              </div>
+
+              <div class="field">
+                <label for="naechstesInterview">nächstes Interview</label>
+                <input type="text" class="date-short" id="naechstesInterview" placeholder="TT.MM.JJ">
+              </div>
+              <div class="field">
+                <label for="naechsteZufriedenheit">nächste Zufriedenheit</label>
+                <input type="text" class="date-short" id="naechsteZufriedenheit" placeholder="TT.MM.JJ">
+              </div>
+            </div>
+          </div>
+
+          <div class="subcard">
+            <h3>Inhalte und Verlauf</h3>
+            <div class="stack" id="datedFieldsHost" style="margin-top:14px"></div>
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="subcard summarybox">
+            <h3>Kurzübersicht</h3>
+            <div class="record-list" style="margin-top:14px">
+              <div class="record">
+                <div class="record-title">Nächste Termine</div>
+                <div class="record-meta" id="summaryDates">Noch keine Datumsangaben vorhanden.</div>
+              </div>
+              <div class="record">
+                <div class="record-title">Besuche</div>
+                <div class="record-meta" id="summaryVisits">Noch keine Besuchsdokumentation vorhanden.</div>
+              </div>
+              <div class="record">
+                <div class="record-title">Aufgaben</div>
+                <div class="record-meta" id="summaryTasks">Noch keine Aufgaben vorhanden.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="subcard">
+            <h3>Letzte 3 Einträge dieses Kürzels</h3>
+            <div class="record-list" id="latestThree" style="margin-top:14px"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel tab-panel hidden" id="tab-visits">
+    <div class="panel-head">
+      <h2>Besuchsdokumentation</h2>
+      <p>Besuche gehören immer zum aktuell geladenen Klienten.</p>
+    </div>
+    <div class="panel-body">
+      <div class="subcard">
+        <h3>Neuen Besuch erfassen</h3>
+        <input type="hidden" id="visitId">
+        <div class="grid-3" style="margin-top:14px">
+          <div class="field">
+            <label for="besuchAm">Besuch am</label>
+            <input type="text" class="date-short" id="besuchAm" placeholder="TT.MM.JJ">
+          </div>
+          <div class="field">
+            <label for="zeitVon">Zeit von</label>
+            <input type="text" id="zeitVon" placeholder="z. B. 10:00">
+          </div>
+          <div class="field">
+            <label for="zeitBis">Zeit bis</label>
+            <input type="text" id="zeitBis" placeholder="z. B. 12:00">
+          </div>
+        </div>
+        <div class="field" style="margin-top:14px">
+          <label for="dokuBesuch">Doku Besuch</label>
+          <textarea id="dokuBesuch"></textarea>
+        </div>
+        <div class="field">
+          <label for="aufgabeFuerKlient">Aufgabe für den Klienten bis nächster Termin</label>
+          <textarea id="aufgabeFuerKlient"></textarea>
+        </div>
+        <div class="inline-actions" style="margin-top:10px">
+          <button class="btn primary" type="button" id="btnSaveVisit">Besuch speichern</button>
+          <button class="btn" type="button" id="btnClearVisit">Besuchsformular leeren</button>
+        </div>
+      </div>
+
+      <div class="subcard" style="margin-top:16px">
+        <h3>Gespeicherte Besuche</h3>
+        <div class="record-list" id="visitList" style="margin-top:14px"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel tab-panel hidden" id="tab-tasks">
+    <div class="panel-head">
+      <h2>Aufgaben-Doku</h2>
+      <p>Das sind deine Aufgaben. Nicht die Aufgabe für den Klienten.</p>
+    </div>
+    <div class="panel-body">
+      <div class="subcard">
+        <h3>Neue Aufgabe</h3>
+        <input type="hidden" id="taskId">
+        <div class="grid-3" style="margin-top:14px">
+          <div class="field">
+            <label for="taskTitel">AUFGABE – Titel</label>
+            <input type="text" id="taskTitel">
+          </div>
+          <div class="field">
+            <label for="taskDatum">AUFGABE – Datum</label>
+            <input type="text" class="date-short" id="taskDatum" placeholder="TT.MM.JJ">
+          </div>
+          <div class="field">
+            <label>Erledigt</label>
+            <div class="bools" data-bool="taskErledigt">
+              <button class="bool-btn" type="button" data-value="ja">Ja</button>
+              <button class="bool-btn" type="button" data-value="nein">Nein</button>
+            </div>
+            <input type="hidden" id="taskErledigt">
+          </div>
+        </div>
+        <div class="field" style="margin-top:14px">
+          <label for="taskNotiz">AUFGABE – Notizfeld</label>
+          <textarea id="taskNotiz"></textarea>
+        </div>
+        <div class="inline-actions" style="margin-top:10px">
+          <button class="btn primary" type="button" id="btnSaveTask">Aufgabe speichern</button>
+          <button class="btn" type="button" id="btnClearTask">Aufgabenformular leeren</button>
+        </div>
+      </div>
+
+      <div class="subcard" style="margin-top:16px">
+        <h3>Gespeicherte Aufgaben</h3>
+        <div class="record-list" id="taskList" style="margin-top:14px"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel tab-panel hidden" id="tab-search">
+    <div class="panel-head">
+      <h2>Suche / Verlauf auf Klienten-Ebene</h2>
+      <p>Anzeige nur innerhalb des gewählten Intervalls. Datumsformat: TT.MM.JJ.</p>
+    </div>
+    <div class="panel-body">
+      <div class="subcard">
+        <div class="search-grid">
+          <div class="field">
+            <label for="searchKuerzel">Kürzel</label>
+            <input type="text" id="searchKuerzel" placeholder="z. B. BK">
+          </div>
+          <div class="field">
+            <label for="searchVon">Zeitraum von</label>
+            <input type="text" class="date-short" id="searchVon" placeholder="TT.MM.JJ">
+          </div>
+          <div class="field">
+            <label for="searchBis">Zeitraum bis</label>
+            <input type="text" class="date-short" id="searchBis" placeholder="TT.MM.JJ">
+          </div>
+          <div class="field">
+            <label for="searchSort">Sortierung</label>
+            <select id="searchSort">
+              <option value="desc">neueste zuerst</option>
+              <option value="asc">älteste zuerst</option>
+            </select>
+          </div>
+          <button class="btn" type="button" id="btnResetSearch">Filter zurücksetzen</button>
+        </div>
+        <div class="sub" id="searchInfo" style="margin-top:10px">Kein Filter aktiv.</div>
+      </div>
+
+      <div class="grid-2" style="margin-top:16px">
+        <div class="subcard">
+          <h3>Klientenfelder</h3>
+          <div class="record-list" id="searchFieldResults" style="margin-top:14px"></div>
+        </div>
+        <div class="subcard">
+          <h3>Besuche im Zeitraum</h3>
+          <div class="record-list" id="searchVisitResults" style="margin-top:14px"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel tab-panel hidden" id="tab-clients">
+    <div class="panel-head">
+      <h2>Gespeicherte Klienten</h2>
+      <p>Zum Laden, Bearbeiten und Löschen.</p>
+    </div>
+    <div class="panel-body">
+      <div class="record-list" id="clientList"></div>
+    </div>
+  </section>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="modalTitle">Alle Einträge</h3>
+      <button class="close-x" type="button" id="btnCloseModal">×</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+const STORE_KEY = "vertraute_zeit_kontaktdokumentation_clean_v1";
+const VERSION = 1;
+const FIELD_NAMES = ["kernset","zieleUndWuensche","wasBelastet","wichtigeHinweise","besondereAbsprachen"];
+const FIELD_LABELS = {
+  kernset:"Kernset",
+  zieleUndWuensche:"Ziele und Wünsche",
+  wasBelastet:"was belastet",
+  wichtigeHinweise:"wichtige Hinweise",
+  besondereAbsprachen:"besondere Absprachen"
+};
+
+const state = {
+  activeTab: "client",
+  currentClientId: null,
+  mode: "empty"
+};
+
+function byId(id){ return document.getElementById(id); }
+function esc(s){
+  return String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+}
+function uid(prefix){ return prefix + "_" + Date.now() + "_" + Math.random().toString(36).slice(2,8); }
+function monthKey(){
+  const d = new Date();
+  return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0");
+}
+function todayShort(){
+  const d = new Date();
+  return String(d.getDate()).padStart(2,"0") + "." + String(d.getMonth()+1).padStart(2,"0") + "." + String(d.getFullYear()).slice(-2);
+}
+function normalizeText(v){ return String(v || "").trim().toLowerCase(); }
+
+function canonicalDateShort(input){
+  let v = String(input || "").trim();
+  if(!v) return "";
+  v = v.replace(/\s+/g,"").replace(/-/g,".").replace(/\//g,".");
+  const parts = v.split(".");
+  if(parts.length !== 3) return "";
+  let [d,m,y] = parts;
+  if(!/^\d+$/.test(d) || !/^\d+$/.test(m) || !/^\d+$/.test(y)) return "";
+  if(y.length === 4) y = y.slice(-2);
+  if(y.length !== 2) return "";
+  d = String(Number(d)).padStart(2,"0");
+  m = String(Number(m)).padStart(2,"0");
+  const di = Number(d), mi = Number(m), yi = Number(y);
+  const fullYear = yi <= 69 ? 2000 + yi : 1900 + yi;
+  const test = new Date(fullYear, mi - 1, di);
+  if(test.getFullYear() !== fullYear || test.getMonth() !== mi - 1 || test.getDate() !== di) return "";
+  return `${d}.${m}.${y}`;
+}
+function dateSortKey(shortDate){
+  const c = canonicalDateShort(shortDate);
+  if(!c) return "";
+  const [d,m,y] = c.split(".");
+  const yi = Number(y);
+  const fullYear = yi <= 69 ? 2000 + yi : 1900 + yi;
+  return `${fullYear}-${m}-${d}`;
+}
+function displayDate(shortDate){
+  return canonicalDateShort(shortDate) || "ohne Datum";
+}
+function setFlash(msg, type="ok"){
+  const el = byId("flash");
+  el.textContent = msg;
+  el.style.color = type === "error" ? "var(--danger)" : type === "warn" ? "var(--warn)" : "var(--success)";
+}
+function clearValidation(){
+  document.querySelectorAll(".invalid").forEach(el => el.classList.remove("invalid"));
+}
+function markInvalid(el){
+  if(el) el.classList.add("invalid");
+}
+
+function emptyStore(){
+  return { version: VERSION, clients: [] };
+}
+function readStore(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    const parsed = raw ? JSON.parse(raw) : emptyStore();
+    return migrateStore(parsed);
+  }catch{
+    return emptyStore();
+  }
+}
+function writeStore(store){
+  localStorage.setItem(STORE_KEY, JSON.stringify(store));
+}
+
+function meaningfulClient(client){
+  return !!(
+    String(client.kuerzel || "").trim() ||
+    String(client.letzterUclaWert || "").trim() ||
+    String(client.naechsteUcla || "").trim() ||
+    String(client.naechstesInterview || "").trim() ||
+    String(client.naechsteZufriedenheit || "").trim() ||
+    FIELD_NAMES.some(name => Array.isArray(client.fieldEntries?.[name]) && client.fieldEntries[name].length) ||
+    (client.visits || []).length ||
+    (client.tasks || []).length
+  );
+}
+
+function migrateStore(store){
+  const out = emptyStore();
+  const source = Array.isArray(store.clients) ? store.clients : [];
+  out.clients = source.map(c => {
+    const client = {
+      id: c.id || uid("client"),
+      kuerzel: String(c.kuerzel || "").trim().toUpperCase(),
+      letzterUclaWert: String(c.letzterUclaWert || "").trim(),
+      naechsteUcla: canonicalDateShort(c.naechsteUcla),
+      schweigepflichtsentbindung: String(c.schweigepflichtsentbindung || ""),
+      aktRechnungBezahlt: String(c.aktRechnungBezahlt || "nein"),
+      rechnungVormonatBezahlt: String(c.rechnungVormonatBezahlt || ""),
+      naechstesInterview: canonicalDateShort(c.naechstesInterview),
+      naechsteZufriedenheit: canonicalDateShort(c.naechsteZufriedenheit),
+      billingResetMonth: String(c.billingResetMonth || ""),
+      fieldEntries: {},
+      visits: Array.isArray(c.visits) ? c.visits.map(v => ({
+        id: v.id || uid("visit"),
+        besuchAm: canonicalDateShort(v.besuchAm),
+        zeitVon: String(v.zeitVon || "").trim(),
+        zeitBis: String(v.zeitBis || "").trim(),
+        dokuBesuch: String(v.dokuBesuch || "").trim(),
+        aufgabeFuerKlient: String(v.aufgabeFuerKlient || "").trim(),
+        updatedAt: v.updatedAt || new Date().toISOString()
+      })).filter(v => v.besuchAm || v.zeitVon || v.zeitBis || v.dokuBesuch || v.aufgabeFuerKlient) : [],
+      tasks: Array.isArray(c.tasks) ? c.tasks.map(t => ({
+        id: t.id || uid("task"),
+        titel: String(t.titel || "").trim(),
+        datum: canonicalDateShort(t.datum),
+        notiz: String(t.notiz || "").trim(),
+        erledigt: String(t.erledigt || ""),
+        updatedAt: t.updatedAt || new Date().toISOString()
+      })).filter(t => t.titel || t.datum || t.notiz || t.erledigt) : [],
+      updatedAt: c.updatedAt || new Date().toISOString(),
+      createdAt: c.createdAt || new Date().toISOString()
+    };
+
+    FIELD_NAMES.forEach(name => {
+      let arr = [];
+      if(Array.isArray(c.fieldEntries?.[name])){
+        arr = c.fieldEntries[name].map(e => ({
+          id: e.id || uid("entry"),
+          date: canonicalDateShort(e.date),
+          text: String(e.text || "").trim(),
+          updatedAt: e.updatedAt || new Date().toISOString()
+        })).filter(e => e.date || e.text);
+      } else if(String(c[name] || "").trim()){
+        arr = [{
+          id: uid("entry"),
+          date: canonicalDateShort(c.updatedAt ? new Date(c.updatedAt).toLocaleDateString("de-DE") : todayShort()) || todayShort(),
+          text: String(c[name] || "").trim(),
+          updatedAt: c.updatedAt || new Date().toISOString()
+        }];
+      }
+      client.fieldEntries[name] = arr;
+    });
+
+    if(client.billingResetMonth !== monthKey()){
+      client.aktRechnungBezahlt = "nein";
+      client.billingResetMonth = monthKey();
+    }
+    return client;
+  }).filter(meaningfulClient);
+
+  writeStore(out);
+  return out;
+}
+
+function getCurrentClient(){
+  const store = readStore();
+  return state.currentClientId ? store.clients.find(c => c.id === state.currentClientId) || null : null;
+}
+function getClientById(id){
+  return readStore().clients.find(c => c.id === id) || null;
+}
+function sortedClients(){
+  return [...readStore().clients].sort((a,b) => normalizeText(a.kuerzel).localeCompare(normalizeText(b.kuerzel), "de"));
+}
+function sortByShortDateDesc(arr, key){
+  return [...arr].sort((a,b) => {
+    const ak = dateSortKey(a[key]);
+    const bk = dateSortKey(b[key]);
+    if(ak !== bk) return bk.localeCompare(ak);
+    return String(b.updatedAt || "").localeCompare(String(a.updatedAt || ""));
+  });
+}
+function sortByShortDateAsc(arr, key){
+  return [...arr].sort((a,b) => {
+    const ak = dateSortKey(a[key]);
+    const bk = dateSortKey(b[key]);
+    if(ak !== bk) return ak.localeCompare(bk);
+    return String(a.updatedAt || "").localeCompare(String(b.updatedAt || ""));
+  });
+}
+
+function setBool(fieldId, value){
+  byId(fieldId).value = value || "";
+  document.querySelectorAll(`[data-bool="${fieldId}"] .bool-btn`).forEach(btn => {
+    btn.classList.remove("yes","no");
+    if(btn.dataset.value === value){
+      btn.classList.add(value === "ja" ? "yes" : "no");
+    }
+  });
+}
+function bindBools(){
+  document.querySelectorAll(".bools").forEach(group => {
+    const fieldId = group.dataset.bool;
+    group.querySelectorAll(".bool-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const cur = byId(fieldId).value;
+        const next = cur === btn.dataset.value ? "" : btn.dataset.value;
+        setBool(fieldId, next);
+      });
+    });
+  });
+}
+
+function switchTab(tab){
+  state.activeTab = tab;
+  document.querySelectorAll(".tab").forEach(btn => btn.classList.toggle("active", btn.dataset.tab === tab));
+  document.querySelectorAll(".tab-panel").forEach(p => p.classList.add("hidden"));
+  byId("tab-" + tab).classList.remove("hidden");
+}
+
+function updateNotice(){
+  const client = getCurrentClient();
+  if(state.mode === "new"){
+    byId("noticeTitle").textContent = "Neues, noch nicht gespeichertes Klientenblatt";
+    byId("noticeMeta").textContent = "Bitte Kürzel eintragen und dann „Klient speichern“ verwenden.";
+    return;
+  }
+  if(!client){
+    byId("noticeTitle").textContent = "Kein Klient geladen";
+    byId("noticeMeta").textContent = "Bitte zuerst „Neuer Klient“ oder „Klientenliste öffnen“ verwenden.";
+    return;
+  }
+  byId("noticeTitle").textContent = "Klient geladen: " + (client.kuerzel || "(ohne Kürzel)");
+  byId("noticeMeta").textContent = [
+    "gespeichert: " + new Date(client.updatedAt).toLocaleString("de-DE"),
+    "Besuche: " + client.visits.length,
+    "Aufgaben: " + client.tasks.length
+  ].join(" | ");
+}
+
+function updateKpis(){
+  const clients = readStore().clients;
+  const visits = clients.reduce((sum,c) => sum + c.visits.length, 0);
+  const tasks = clients.reduce((sum,c) => sum + c.tasks.length, 0);
+  byId("kpiClients").textContent = clients.length + " Klienten";
+  byId("kpiVisits").textContent = visits + " Besuche";
+  byId("kpiTasks").textContent = tasks + " Aufgaben";
+}
+
+function clearClientForm(){
+  state.currentClientId = null;
+  state.mode = "new";
+  byId("clientId").value = "";
+  byId("kuerzel").value = "";
+  byId("letzterUclaWert").value = "";
+  byId("naechsteUcla").value = "";
+  byId("naechstesInterview").value = "";
+  byId("naechsteZufriedenheit").value = "";
+  setBool("schweigepflichtsentbindung", "");
+  setBool("aktRechnungBezahlt", "nein");
+  setBool("rechnungVormonatBezahlt", "");
+  FIELD_NAMES.forEach(name => clearEntryEditor(name));
+  clearVisitForm();
+  clearTaskForm();
+  switchTab("client");
+  renderAll();
+  setFlash("Neues leeres Klientenblatt vorbereitet.", "ok");
+}
+
+function fillClientForm(client){
+  state.currentClientId = client.id;
+  state.mode = "loaded";
+  byId("clientId").value = client.id;
+  byId("kuerzel").value = client.kuerzel || "";
+  byId("letzterUclaWert").value = client.letzterUclaWert || "";
+  byId("naechsteUcla").value = client.naechsteUcla || "";
+  byId("naechstesInterview").value = client.naechstesInterview || "";
+  byId("naechsteZufriedenheit").value = client.naechsteZufriedenheit || "";
+  setBool("schweigepflichtsentbindung", client.schweigepflichtsentbindung || "");
+  setBool("aktRechnungBezahlt", client.aktRechnungBezahlt || "nein");
+  setBool("rechnungVormonatBezahlt", client.rechnungVormonatBezahlt || "");
+  FIELD_NAMES.forEach(name => clearEntryEditor(name));
+  clearVisitForm();
+  clearTaskForm();
+  switchTab("client");
+  renderAll();
+  setFlash("Klient " + (client.kuerzel || "(ohne Kürzel)") + " geladen.", "ok");
+}
+
+function currentClientFromForm(existing=null){
+  return {
+    id: existing?.id || uid("client"),
+    kuerzel: String(byId("kuerzel").value || "").trim().toUpperCase(),
+    letzterUclaWert: String(byId("letzterUclaWert").value || "").trim(),
+    naechsteUcla: canonicalDateShort(byId("naechsteUcla").value),
+    schweigepflichtsentbindung: byId("schweigepflichtsentbindung").value,
+    aktRechnungBezahlt: byId("aktRechnungBezahlt").value || "nein",
+    rechnungVormonatBezahlt: byId("rechnungVormonatBezahlt").value,
+    naechstesInterview: canonicalDateShort(byId("naechstesInterview").value),
+    naechsteZufriedenheit: canonicalDateShort(byId("naechsteZufriedenheit").value),
+    billingResetMonth: monthKey(),
+    fieldEntries: existing?.fieldEntries || Object.fromEntries(FIELD_NAMES.map(n => [n, []])),
+    visits: existing?.visits || [],
+    tasks: existing?.tasks || [],
+    updatedAt: new Date().toISOString(),
+    createdAt: existing?.createdAt || new Date().toISOString()
+  };
+}
+
+function saveClient(){
+  clearValidation();
+  const store = readStore();
+  const existing = getCurrentClient();
+  const data = currentClientFromForm(existing);
+  if(!data.kuerzel){
+    markInvalid(byId("kuerzel"));
+    setFlash("Für einen Klienten ist ein Kürzel nötig.", "error");
+    switchTab("client");
+    return;
+  }
+  if((data.naechsteUcla && !canonicalDateShort(data.naechsteUcla)) ||
+     (data.naechstesInterview && !canonicalDateShort(data.naechstesInterview)) ||
+     (data.naechsteZufriedenheit && !canonicalDateShort(data.naechsteZufriedenheit))){
+    setFlash("Bitte Datumsfelder im Format TT.MM.JJ eintragen.", "error");
+    return;
+  }
+  const duplicate = store.clients.find(c => c.id !== data.id && normalizeText(c.kuerzel) === normalizeText(data.kuerzel));
+  if(duplicate){
+    markInvalid(byId("kuerzel"));
+    setFlash("Dieses Kürzel existiert bereits.", "error");
+    return;
+  }
+  const idx = store.clients.findIndex(c => c.id === data.id);
+  if(idx >= 0) store.clients[idx] = data; else store.clients.push(data);
+  writeStore(store);
+  fillClientForm(data);
+  setFlash("Klient gespeichert.", "ok");
+}
+
+function deleteCurrentClient(){
+  const client = getCurrentClient();
+  if(!client){
+    setFlash("Kein Klient geladen.", "error");
+    return;
+  }
+  if(!confirm("Diesen Klienten wirklich löschen?")) return;
+  const store = readStore();
+  store.clients = store.clients.filter(c => c.id !== client.id);
+  writeStore(store);
+  clearClientForm();
+  state.mode = "empty";
+  renderAll();
+  setFlash("Klient gelöscht.", "ok");
+}
+
+function clearEntryEditor(name){
+  const dateEl = byId("entryDate-" + name);
+  const textEl = byId("entryText-" + name);
+  const editEl = byId("entryEditId-" + name);
+  if(dateEl) dateEl.value = todayShort();
+  if(textEl) textEl.value = "";
+  if(editEl) editEl.value = "";
+}
+
+function getFieldEntries(client, name){
+  return sortByShortDateDesc((client?.fieldEntries?.[name] || []).filter(e => String(e.text || "").trim()), "date");
+}
+
+function saveFieldEntry(name){
+  clearValidation();
+  const client = getCurrentClient();
+  if(!client){
+    setFlash("Bitte zuerst einen Klienten speichern oder laden.", "error");
+    switchTab("client");
+    return;
+  }
+  const dateEl = byId("entryDate-" + name);
+  const textEl = byId("entryText-" + name);
+  const editEl = byId("entryEditId-" + name);
+  const date = canonicalDateShort(dateEl.value);
+  const text = String(textEl.value || "").trim();
+  if(!date){
+    markInvalid(dateEl);
+    setFlash("Bitte Datum im Format TT.MM.JJ eintragen.", "error");
+    return;
+  }
+  if(!text){
+    markInvalid(textEl);
+    setFlash("Bitte zuerst einen Text eingeben.", "error");
+    return;
+  }
+  const store = readStore();
+  const target = store.clients.find(c => c.id === client.id);
+  const arr = target.fieldEntries[name] || [];
+  const entry = {
+    id: editEl.value || uid("entry"),
+    date,
+    text,
+    updatedAt: new Date().toISOString()
+  };
+  const idx = arr.findIndex(e => e.id === entry.id);
+  if(idx >= 0) arr[idx] = entry; else arr.push(entry);
+  target.fieldEntries[name] = arr;
+  target.updatedAt = new Date().toISOString();
+  writeStore(store);
+  clearEntryEditor(name);
+  fillClientForm(target);
+  setFlash(FIELD_LABELS[name] + " gespeichert.", "ok");
+}
+
+function editFieldEntry(name, id){
+  const client = getCurrentClient();
+  if(!client) return;
+  const entry = (client.fieldEntries[name] || []).find(e => e.id === id);
+  if(!entry) return;
+  byId("entryDate-" + name).value = entry.date || todayShort();
+  byId("entryText-" + name).value = entry.text || "";
+  byId("entryEditId-" + name).value = entry.id;
+  switchTab("client");
+  setFlash(FIELD_LABELS[name] + " zum Bearbeiten geladen.", "ok");
+}
+
+function deleteFieldEntry(name, id){
+  const client = getCurrentClient();
+  if(!client) return;
+  if(!confirm("Diesen Eintrag wirklich löschen?")) return;
+  const store = readStore();
+  const target = store.clients.find(c => c.id === client.id);
+  target.fieldEntries[name] = (target.fieldEntries[name] || []).filter(e => e.id !== id);
+  target.updatedAt = new Date().toISOString();
+  writeStore(store);
+  fillClientForm(target);
+  setFlash(FIELD_LABELS[name] + " gelöscht.", "ok");
+}
+
+function showAllFieldEntries(name){
+  const client = getCurrentClient();
+  if(!client){
+    setFlash("Bitte zuerst einen Klienten speichern oder laden.", "error");
+    return;
+  }
+  const entries = getFieldEntries(client, name);
+  byId("modalTitle").textContent = FIELD_LABELS[name] + " – alle Einträge";
+  byId("modalBody").innerHTML = entries.length ? entries.map(e => `
+    <div class="entry-card" style="margin-bottom:10px">
+      <div class="entry-date">${displayDate(e.date)}</div>
+      <div class="entry-text">${esc(e.text)}</div>
+    </div>
+  `).join("") : `<div class="empty">Noch keine Einträge vorhanden.</div>`;
+  byId("overlay").classList.add("show");
+}
+
+function renderDatedFields(){
+  const host = byId("datedFieldsHost");
+  const client = getCurrentClient();
+  host.innerHTML = FIELD_NAMES.map(name => {
+    const entries = client ? getFieldEntries(client, name).slice(0,3) : [];
+    const cards = entries.length ? entries.map(e => `
+      <div class="entry-card">
+        <div class="entry-head">
+          <div class="entry-date">${displayDate(e.date)}</div>
+          <div>
+            <button class="tiny-btn tiny-edit" type="button" onclick="app.editFieldEntry('${name}','${e.id}')">Bearbeiten</button>
+            <button class="tiny-btn tiny-delete" type="button" onclick="app.deleteFieldEntry('${name}','${e.id}')">Löschen</button>
+          </div>
+        </div>
+        <div class="entry-text">${esc(e.text)}</div>
+      </div>
+    `).join("") : `<div class="empty">Bitte zuerst einen Klienten speichern oder laden.</div>`;
+
+    return `
+      <div class="entry-block">
+        <label style="font-size:16px;font-weight:700;color:var(--blue)">${FIELD_LABELS[name]}</label>
+        <div class="entry-top">
+          <input type="text" class="mini-date date-short" id="entryDate-${name}" placeholder="TT.MM.JJ" value="${todayShort()}">
+          <textarea id="entryText-${name}"></textarea>
+        </div>
+        <input type="hidden" id="entryEditId-${name}">
+        <div class="entry-actions">
+          <button class="btn primary slim" type="button" onclick="app.saveFieldEntry('${name}')">Speichern</button>
+          <button class="btn slim" type="button" onclick="app.clearEntryEditor('${name}')">Leeren</button>
+          <button class="btn slim" type="button" onclick="app.showAllFieldEntries('${name}')">Alle Einträge</button>
+        </div>
+        <div class="entry-list">${cards}</div>
+      </div>
+    `;
+  }).join("");
+}
+
+function latestThreeAcrossFields(client){
+  const all = [];
+  FIELD_NAMES.forEach(name => {
+    getFieldEntries(client, name).forEach(e => {
+      all.push({ field:name, date:e.date, text:e.text, updatedAt:e.updatedAt });
+    });
+  });
+  return all.sort((a,b) => {
+    const ak = dateSortKey(a.date), bk = dateSortKey(b.date);
+    if(ak !== bk) return bk.localeCompare(ak);
+    return String(b.updatedAt).localeCompare(String(a.updatedAt));
+  }).slice(0,3);
+}
+
+function renderSummary(){
+  const client = getCurrentClient();
+  if(!client){
+    byId("summaryDates").textContent = "Noch keine Datumsangaben vorhanden.";
+    byId("summaryVisits").textContent = "Noch keine Besuchsdokumentation vorhanden.";
+    byId("summaryTasks").textContent = "Noch keine Aufgaben vorhanden.";
+    byId("latestThree").innerHTML = '<div class="empty">Noch kein Klient geladen.</div>';
+    return;
+  }
+  const dates = [
+    client.naechsteUcla ? "UCLA: " + displayDate(client.naechsteUcla) : "",
+    client.naechstesInterview ? "Interview: " + displayDate(client.naechstesInterview) : "",
+    client.naechsteZufriedenheit ? "Zufriedenheit: " + displayDate(client.naechsteZufriedenheit) : ""
+  ].filter(Boolean);
+  byId("summaryDates").textContent = dates.length ? dates.join(" | ") : "Noch keine Datumsangaben vorhanden.";
+
+  const visits = sortByShortDateDesc(client.visits, "besuchAm");
+  byId("summaryVisits").textContent = visits.length ? "Letzter Besuch: " + displayDate(visits[0].besuchAm) + " | Gesamt: " + visits.length : "Noch keine Besuchsdokumentation vorhanden.";
+
+  const tasks = sortByShortDateDesc(client.tasks, "datum");
+  byId("summaryTasks").textContent = tasks.length ? "Gesamt: " + tasks.length + " | offen / ungeklärt: " + tasks.filter(t => t.erledigt !== "ja").length : "Noch keine Aufgaben vorhanden.";
+
+  const latest = latestThreeAcrossFields(client);
+  byId("latestThree").innerHTML = latest.length ? latest.map(item => `
+    <div class="record">
+      <div class="record-title">${esc(FIELD_LABELS[item.field])} | ${displayDate(item.date)}</div>
+      <div class="record-meta">${esc(item.text)}</div>
+    </div>
+  `).join("") : '<div class="empty">Noch keine datierten Einträge vorhanden.</div>';
+}
+
+function clearVisitForm(){
+  byId("visitId").value = "";
+  byId("besuchAm").value = todayShort();
+  byId("zeitVon").value = "";
+  byId("zeitBis").value = "";
+  byId("dokuBesuch").value = "";
+  byId("aufgabeFuerKlient").value = "";
+}
+function saveVisit(){
+  clearValidation();
+  const client = getCurrentClient();
+  if(!client){
+    setFlash("Bitte zuerst einen Klienten speichern oder laden.", "error");
+    switchTab("client");
+    return;
+  }
+  const date = canonicalDateShort(byId("besuchAm").value);
+  if(!date){
+    markInvalid(byId("besuchAm"));
+    setFlash("Bitte Besuchsdatum im Format TT.MM.JJ eintragen.", "error");
+    return;
+  }
+  const store = readStore();
+  const target = store.clients.find(c => c.id === client.id);
+  const visit = {
+    id: byId("visitId").value || uid("visit"),
+    besuchAm: date,
+    zeitVon: String(byId("zeitVon").value || "").trim(),
+    zeitBis: String(byId("zeitBis").value || "").trim(),
+    dokuBesuch: String(byId("dokuBesuch").value || "").trim(),
+    aufgabeFuerKlient: String(byId("aufgabeFuerKlient").value || "").trim(),
+    updatedAt: new Date().toISOString()
+  };
+  const idx = target.visits.findIndex(v => v.id === visit.id);
+  if(idx >= 0) target.visits[idx] = visit; else target.visits.push(visit);
+  target.updatedAt = new Date().toISOString();
+  writeStore(store);
+  clearVisitForm();
+  fillClientForm(target);
+  switchTab("visits");
+  setFlash("Besuch gespeichert.", "ok");
+}
+function editVisit(id){
+  const client = getCurrentClient();
+  if(!client) return;
+  const visit = client.visits.find(v => v.id === id);
+  if(!visit) return;
+  byId("visitId").value = visit.id;
+  byId("besuchAm").value = visit.besuchAm || todayShort();
+  byId("zeitVon").value = visit.zeitVon || "";
+  byId("zeitBis").value = visit.zeitBis || "";
+  byId("dokuBesuch").value = visit.dokuBesuch || "";
+  byId("aufgabeFuerKlient").value = visit.aufgabeFuerKlient || "";
+  switchTab("visits");
+  setFlash("Besuch zum Bearbeiten geladen.", "ok");
+}
+function deleteVisit(id){
+  const client = getCurrentClient();
+  if(!client) return;
+  if(!confirm("Diesen Besuch wirklich löschen?")) return;
+  const store = readStore();
+  const target = store.clients.find(c => c.id === client.id);
+  target.visits = target.visits.filter(v => v.id !== id);
+  target.updatedAt = new Date().toISOString();
+  writeStore(store);
+  fillClientForm(target);
+  switchTab("visits");
+  setFlash("Besuch gelöscht.", "ok");
+}
+function renderVisits(){
+  const client = getCurrentClient();
+  const list = byId("visitList");
+  if(!client){
+    list.innerHTML = '<div class="empty">Bitte zuerst einen Klienten speichern oder laden.</div>';
+    return;
+  }
+  const visits = sortByShortDateDesc(client.visits, "besuchAm");
+  list.innerHTML = visits.length ? visits.map(v => `
+    <div class="record">
+      <div class="record-head">
+        <div>
+          <div class="record-title">${displayDate(v.besuchAm)}</div>
+          <div class="record-meta">${[v.zeitVon ? "von " + esc(v.zeitVon) : "", v.zeitBis ? "bis " + esc(v.zeitBis) : ""].filter(Boolean).join(" | ")}</div>
+        </div>
+        <div>
+          <button class="tiny-btn tiny-edit" type="button" onclick="app.editVisit('${v.id}')">Bearbeiten</button>
+          <button class="tiny-btn tiny-delete" type="button" onclick="app.deleteVisit('${v.id}')">Löschen</button>
+        </div>
+      </div>
+      ${v.dokuBesuch ? `<div class="entry-text"><strong>Doku Besuch</strong><br>${esc(v.dokuBesuch)}</div>` : ""}
+      ${v.aufgabeFuerKlient ? `<div class="entry-text"><strong>Aufgabe für den Klienten bis nächster Termin</strong><br>${esc(v.aufgabeFuerKlient)}</div>` : ""}
+    </div>
+  `).join("") : '<div class="empty">Noch keine Besuche vorhanden.</div>';
+}
+
+function clearTaskForm(){
+  byId("taskId").value = "";
+  byId("taskTitel").value = "";
+  byId("taskDatum").value = todayShort();
+  byId("taskNotiz").value = "";
+  setBool("taskErledigt", "");
+}
+function saveTask(){
+  clearValidation();
+  const client = getCurrentClient();
+  if(!client){
+    setFlash("Bitte zuerst einen Klienten speichern oder laden.", "error");
+    switchTab("client");
+    return;
+  }
+  const date = canonicalDateShort(byId("taskDatum").value);
+  if(!date){
+    markInvalid(byId("taskDatum"));
+    setFlash("Bitte Aufgabendatum im Format TT.MM.JJ eintragen.", "error");
+    return;
+  }
+  const store = readStore();
+  const target = store.clients.find(c => c.id === client.id);
+  const task = {
+    id: byId("taskId").value || uid("task"),
+    titel: String(byId("taskTitel").value || "").trim(),
+    datum: date,
+    notiz: String(byId("taskNotiz").value || "").trim(),
+    erledigt: byId("taskErledigt").value,
+    updatedAt: new Date().toISOString()
+  };
+  const idx = target.tasks.findIndex(t => t.id === task.id);
+  if(idx >= 0) target.tasks[idx] = task; else target.tasks.push(task);
+  target.updatedAt = new Date().toISOString();
+  writeStore(store);
+  clearTaskForm();
+  fillClientForm(target);
+  switchTab("tasks");
+  setFlash("Aufgabe gespeichert.", "ok");
+}
+function editTask(id){
+  const client = getCurrentClient();
+  if(!client) return;
+  const task = client.tasks.find(t => t.id === id);
+  if(!task) return;
+  byId("taskId").value = task.id;
+  byId("taskTitel").value = task.titel || "";
+  byId("taskDatum").value = task.datum || todayShort();
+  byId("taskNotiz").value = task.notiz || "";
+  setBool("taskErledigt", task.erledigt || "");
+  switchTab("tasks");
+  setFlash("Aufgabe zum Bearbeiten geladen.", "ok");
+}
+function deleteTask(id){
+  const client = getCurrentClient();
+  if(!client) return;
+  if(!confirm("Diese Aufgabe wirklich löschen?")) return;
+  const store = readStore();
+  const target = store.clients.find(c => c.id === client.id);
+  target.tasks = target.tasks.filter(t => t.id !== id);
+  target.updatedAt = new Date().toISOString();
+  writeStore(store);
+  fillClientForm(target);
+  switchTab("tasks");
+  setFlash("Aufgabe gelöscht.", "ok");
+}
+function renderTasks(){
+  const client = getCurrentClient();
+  const list = byId("taskList");
+  if(!client){
+    list.innerHTML = '<div class="empty">Bitte zuerst einen Klienten speichern oder laden.</div>';
+    return;
+  }
+  const tasks = sortByShortDateDesc(client.tasks, "datum");
+  list.innerHTML = tasks.length ? tasks.map(t => `
+    <div class="record">
+      <div class="record-head">
+        <div>
+          <div class="record-title">${esc(t.titel || "ohne Titel")}</div>
+          <div class="record-meta">${displayDate(t.datum)}${t.erledigt ? " | Erledigt: " + esc(t.erledigt) : ""}</div>
+        </div>
+        <div>
+          <button class="tiny-btn tiny-edit" type="button" onclick="app.editTask('${t.id}')">Bearbeiten</button>
+          <button class="tiny-btn tiny-delete" type="button" onclick="app.deleteTask('${t.id}')">Löschen</button>
+        </div>
+      </div>
+      ${t.notiz ? `<div class="entry-text">${esc(t.notiz)}</div>` : ""}
+    </div>
+  `).join("") : '<div class="empty">Noch keine Aufgaben vorhanden.</div>';
+}
+
+function renderClientList(){
+  const list = byId("clientList");
+  const clients = sortedClients();
+  list.innerHTML = clients.length ? clients.map(c => `
+    <div class="record">
+      <div class="record-head">
+        <div>
+          <div class="record-title">${esc(c.kuerzel || "(ohne Kürzel)")}</div>
+          <div class="record-meta">${[
+            c.letzterUclaWert ? "letzter UCLA-Wert: " + esc(c.letzterUclaWert) : "",
+            c.naechsteUcla ? "nächste UCLA: " + displayDate(c.naechsteUcla) : "",
+            "Besuche: " + c.visits.length,
+            "Aufgaben: " + c.tasks.length
+          ].filter(Boolean).join(" | ")}</div>
+        </div>
+        <div>
+          <button class="small-btn small-load" type="button" onclick="app.loadClient('${c.id}')">Laden</button>
+          <button class="small-btn small-delete" type="button" onclick="app.deleteClientById('${c.id}')">Löschen</button>
+        </div>
+      </div>
+    </div>
+  `).join("") : '<div class="empty">Noch keine Klienten gespeichert.</div>';
+}
+function deleteClientById(id){
+  const c = getClientById(id);
+  if(!c) return;
+  if(!confirm("Diesen Klienten wirklich löschen?")) return;
+  const store = readStore();
+  store.clients = store.clients.filter(x => x.id !== id);
+  writeStore(store);
+  if(state.currentClientId === id){
+    state.currentClientId = null;
+    state.mode = "empty";
+  }
+  renderAll();
+  setFlash("Klient gelöscht.", "ok");
+}
+
+function renderSearch(){
+  const kuerzel = normalizeText(byId("searchKuerzel").value);
+  const fromRaw = byId("searchVon").value;
+  const toRaw = byId("searchBis").value;
+  const from = canonicalDateShort(fromRaw);
+  const to = canonicalDateShort(toRaw);
+  const sort = byId("searchSort").value;
+  const info = byId("searchInfo");
+  const fieldBox = byId("searchFieldResults");
+  const visitBox = byId("searchVisitResults");
+
+  if(!kuerzel){
+    info.textContent = "Kein Filter aktiv.";
+    fieldBox.innerHTML = '<div class="empty">Bitte Kürzel eingeben oder auswählen.</div>';
+    visitBox.innerHTML = '<div class="empty">Bitte Kürzel eingeben oder auswählen.</div>';
+    return;
+  }
+
+  if(fromRaw && !from){
+    info.textContent = "Zeitraum von ist ungültig. Bitte TT.MM.JJ verwenden.";
+    fieldBox.innerHTML = '<div class="empty">Kein Ergebnis.</div>';
+    visitBox.innerHTML = '<div class="empty">Kein Ergebnis.</div>';
+    return;
+  }
+  if(toRaw && !to){
+    info.textContent = "Zeitraum bis ist ungültig. Bitte TT.MM.JJ verwenden.";
+    fieldBox.innerHTML = '<div class="empty">Kein Ergebnis.</div>';
+    visitBox.innerHTML = '<div class="empty">Kein Ergebnis.</div>';
+    return;
+  }
+
+  const client = sortedClients().find(c => normalizeText(c.kuerzel) === kuerzel);
+  if(!client){
+    info.textContent = "Kein Klient mit diesem Kürzel gefunden.";
+    fieldBox.innerHTML = '<div class="empty">Kein Treffer.</div>';
+    visitBox.innerHTML = '<div class="empty">Kein Treffer.</div>';
+    return;
+  }
+
+  info.textContent = "Klient " + client.kuerzel + " | " + [
+    from ? "von " + displayDate(from) : "",
+    to ? "bis " + displayDate(to) : ""
+  ].filter(Boolean).join(" | ");
+
+  let fieldEntries = [];
+  FIELD_NAMES.forEach(name => {
+    getFieldEntries(client, name).forEach(e => {
+      const key = dateSortKey(e.date);
+      if(from && key < dateSortKey(from)) return;
+      if(to && key > dateSortKey(to)) return;
+      fieldEntries.push({ title:FIELD_LABELS[name], date:e.date, text:e.text, updatedAt:e.updatedAt });
+    });
+  });
+  fieldEntries.sort((a,b) => sort === "asc"
+    ? dateSortKey(a.date).localeCompare(dateSortKey(b.date))
+    : dateSortKey(b.date).localeCompare(dateSortKey(a.date))
+  );
+  fieldBox.innerHTML = fieldEntries.length ? fieldEntries.map(e => `
+    <div class="record">
+      <div class="record-title">${esc(e.title)} | ${displayDate(e.date)}</div>
+      <div class="record-meta">${esc(e.text)}</div>
+    </div>
+  `).join("") : '<div class="empty">Keine Klientenfeld-Einträge im gewählten Intervall.</div>';
+
+  let visits = (client.visits || []).filter(v => {
+    const key = dateSortKey(v.besuchAm);
+    if(from && key < dateSortKey(from)) return false;
+    if(to && key > dateSortKey(to)) return false;
+    return true;
+  });
+  visits.sort((a,b) => sort === "asc"
+    ? dateSortKey(a.besuchAm).localeCompare(dateSortKey(b.besuchAm))
+    : dateSortKey(b.besuchAm).localeCompare(dateSortKey(a.besuchAm))
+  );
+  visitBox.innerHTML = visits.length ? visits.map(v => `
+    <div class="record">
+      <div class="record-title">${displayDate(v.besuchAm)}</div>
+      <div class="record-meta">${[v.zeitVon ? "von " + esc(v.zeitVon) : "", v.zeitBis ? "bis " + esc(v.zeitBis) : ""].filter(Boolean).join(" | ")}</div>
+      ${v.dokuBesuch ? `<div class="entry-text"><strong>Doku Besuch</strong><br>${esc(v.dokuBesuch)}</div>` : ""}
+      ${v.aufgabeFuerKlient ? `<div class="entry-text"><strong>Aufgabe für den Klienten bis nächster Termin</strong><br>${esc(v.aufgabeFuerKlient)}</div>` : ""}
+    </div>
+  `).join("") : '<div class="empty">Keine Besuche im gewählten Zeitraum.</div>';
+}
+
+function renderAll(){
+  updateNotice();
+  updateKpis();
+  renderDatedFields();
+  renderSummary();
+  renderVisits();
+  renderTasks();
+  renderClientList();
+  renderSearch();
+}
+
+function exportJson(){
+  const content = JSON.stringify(readStore(), null, 2);
+  const stamp = new Date().toISOString().slice(0,10);
+  downloadFile("kontaktdokumentation_clean_backup_" + stamp + ".json", content, "application/json");
+  setFlash("JSON-Export erstellt.", "ok");
+}
+function importJson(file){
+  const reader = new FileReader();
+  reader.onload = e => {
+    try{
+      const parsed = JSON.parse(e.target.result);
+      writeStore(migrateStore(parsed));
+      state.currentClientId = null;
+      state.mode = "empty";
+      renderAll();
+      setFlash("JSON erfolgreich importiert.", "ok");
+    }catch{
+      setFlash("Import fehlgeschlagen.", "error");
+    }
+  };
+  reader.readAsText(file, "UTF-8");
+}
+function downloadFile(filename, content, mime){
+  const blob = new Blob([content], { type:mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+const app = {
+  saveFieldEntry,
+  clearEntryEditor,
+  showAllFieldEntries,
+  editFieldEntry,
+  deleteFieldEntry,
+  editVisit,
+  deleteVisit,
+  editTask,
+  deleteTask,
+  loadClient: id => {
+    const client = getClientById(id);
+    if(client) fillClientForm(client);
+  },
+  deleteClientById
+};
+window.app = app;
+
+document.addEventListener("DOMContentLoaded", () => {
+  bindBools();
+
+  byId("btnSaveClient").addEventListener("click", saveClient);
+  byId("btnNewClient").addEventListener("click", clearClientForm);
+  byId("btnShowClients").addEventListener("click", () => switchTab("clients"));
+  byId("btnDeleteClient").addEventListener("click", deleteCurrentClient);
+  byId("btnPrint").addEventListener("click", () => window.print());
+  byId("btnExportJson").addEventListener("click", exportJson);
+  byId("btnImportJson").addEventListener("click", () => byId("fileJson").click());
+  byId("fileJson").addEventListener("change", e => {
+    const f = e.target.files && e.target.files[0];
+    if(f) importJson(f);
+    e.target.value = "";
+  });
+
+  byId("btnSaveVisit").addEventListener("click", saveVisit);
+  byId("btnClearVisit").addEventListener("click", clearVisitForm);
+  byId("btnSaveTask").addEventListener("click", saveTask);
+  byId("btnClearTask").addEventListener("click", clearTaskForm);
+
+  byId("searchKuerzel").addEventListener("input", renderSearch);
+  byId("searchVon").addEventListener("input", renderSearch);
+  byId("searchBis").addEventListener("input", renderSearch);
+  byId("searchSort").addEventListener("change", renderSearch);
+  byId("btnResetSearch").addEventListener("click", () => {
+    byId("searchKuerzel").value = "";
+    byId("searchVon").value = "";
+    byId("searchBis").value = "";
+    byId("searchSort").value = "desc";
+    renderSearch();
+  });
+
+  document.querySelectorAll(".tab").forEach(btn => btn.addEventListener("click", () => switchTab(btn.dataset.tab)));
+  byId("btnCloseModal").addEventListener("click", () => byId("overlay").classList.remove("show"));
+  byId("overlay").addEventListener("click", e => { if(e.target === byId("overlay")) byId("overlay").classList.remove("show"); });
+
+  clearVisitForm();
+  clearTaskForm();
+  renderAll();
+  switchTab("client");
+  state.mode = "empty";
+  updateNotice();
+  setFlash("Komplett neu aufgebaute Basisdatei geladen.", "ok");
+});
+</script>
+</body>
+</html>
