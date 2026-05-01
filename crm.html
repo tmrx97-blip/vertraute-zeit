@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mini-CRM – Vertraute Zeit</title>
+  <style>
+    :root{
+      --bg:#f7f3ec;
+      --card:#ffffff;
+      --text:#173651;
+      --muted:#5b6b7c;
+      --line:#d8cfc1;
+      --accent:#b9834f;
+      --accent-2:#e9dfd2;
+      --danger:#9b3d2f;
+      --ok:#2d6a4f;
+      --warn:#9a6700;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: Georgia, serif;
+      background:var(--bg);
+      color:var(--text);
+      line-height:1.4;
+    }
+    .wrap{
+      max-width:1100px;
+      margin:0 auto;
+      padding:24px 16px 40px;
+    }
+    h1{
+      margin:0 0 8px;
+      font-size:32px;
+    }
+    .sub{
+      color:var(--muted);
+      margin-bottom:20px;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 360px 1fr;
+      gap:16px;
+    }
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:16px;
+      box-shadow:0 1px 2px rgba(0,0,0,.04);
+    }
+    h2{
+      margin:0 0 14px;
+      font-size:22px;
+    }
+    label{
+      display:block;
+      font-weight:700;
+      margin:10px 0 6px;
+    }
+    input, select, textarea, button{
+      font:inherit;
+    }
+    input, select, textarea{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:10px;
+      padding:10px 12px;
+      background:#fff;
+      color:var(--text);
+    }
+    textarea{
+      min-height:90px;
+      resize:vertical;
+    }
+    .row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+    .btns{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:14px;
+    }
+    button{
+      border:none;
+      border-radius:10px;
+      padding:10px 14px;
+      cursor:pointer;
+      background:var(--text);
+      color:#fff;
+    }
+    button.secondary{
+      background:var(--accent-2);
+      color:var(--text);
+      border:1px solid var(--line);
+    }
+    button.danger{
+      background:var(--danger);
+    }
+    button.small{
+      padding:7px 10px;
+      font-size:14px;
+    }
+    .toolbar{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr .8fr auto auto;
+      gap:10px;
+      margin-bottom:14px;
+      align-items:end;
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+    }
+    th, td{
+      text-align:left;
+      padding:10px 8px;
+      border-bottom:1px solid var(--line);
+      vertical-align:top;
+      font-size:15px;
+    }
+    th{
+      font-size:14px;
+      color:var(--muted);
+    }
+    .status{
+      display:inline-block;
+      border-radius:999px;
+      padding:4px 9px;
+      font-size:13px;
+      font-weight:700;
+      white-space:nowrap;
+    }
+    .status-offen{ background:#f3e8d7; color:#6a4a1a; }
+    .status-wartet{ background:#ece7fb; color:#493892; }
+    .status-erledigt{ background:#dcefe5; color:var(--ok); }
+    .status-keine-rueckmeldung{ background:#f5e2df; color:var(--danger); }
+    .muted{color:var(--muted)}
+    .hint{
+      margin-top:12px;
+      font-size:14px;
+      color:var(--muted);
+    }
+    .empty{
+      padding:20px 8px;
+      color:var(--muted);
+      text-align:center;
+    }
+    .topline{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:flex-start;
+      margin-bottom:8px;
+    }
+    .count{
+      font-size:14px;
+      color:var(--muted);
+      white-space:nowrap;
+      margin-top:10px;
+    }
+    @media (max-width: 900px){
+      .grid{ grid-template-columns:1fr; }
+      .toolbar{ grid-template-columns:1fr 1fr; }
+    }
+    @media (max-width: 640px){
+      .row, .toolbar{ grid-template-columns:1fr; }
+      h1{font-size:26px}
+      th:nth-child(5), td:nth-child(5){ display:none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topline">
+      <div>
+        <h1>Mini-CRM</h1>
+        <div class="sub">Vertraute Zeit – Kontakte einfach nachverfolgen: Kontakt, Datum, nächster Schritt, Status</div>
+      </div>
+      <div class="count" id="countBox">0 Einträge</div>
+    </div>
+
+    <div class="grid">
+      <section class="card">
+        <h2>Eintrag</h2>
+        <form id="crmForm">
+          <input type="hidden" id="entryId" />
+
+          <label for="kontakt">Kontakt</label>
+          <input id="kontakt" type="text" placeholder="z. B. Dr. Hoffmann / WBG Einheit / Frau Müller" required />
+
+          <div class="row">
+            <div>
+              <label for="datum">Datum</label>
+              <input id="datum" type="date" required />
+            </div>
+            <div>
+              <label for="status">Status</label>
+              <select id="status" required>
+                <option value="offen">Offen</option>
+                <option value="wartet">Wartet</option>
+                <option value="erledigt">Erledigt</option>
+                <option value="keine-rueckmeldung">Keine Rückmeldung</option>
+              </select>
+            </div>
+          </div>
+
+          <label for="naechsterSchritt">Nächster Schritt</label>
+          <textarea id="naechsterSchritt" placeholder="z. B. in 5 Tagen anrufen / Mail mit Flyer senden / Termin vereinbaren" required></textarea>
+
+          <label for="notiz">Notiz (optional)</label>
+          <textarea id="notiz" placeholder="kurze Zusatzinfo"></textarea>
+
+          <div class="btns">
+            <button type="submit" id="saveBtn">Speichern</button>
+            <button type="button" class="secondary" id="resetBtn">Zurücksetzen</button>
+          </div>
+        </form>
+
+        <div class="hint">
+          Alles wird lokal im Browser gespeichert. Für GitHub Pages geeignet. Keine Cloud, kein Login.
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Kontakte</h2>
+
+        <div class="toolbar">
+          <div>
+            <label for="search">Suche</label>
+            <input id="search" type="text" placeholder="Kontakt oder nächster Schritt durchsuchen" />
+          </div>
+          <div>
+            <label for="filterStatus">Status filtern</label>
+            <select id="filterStatus">
+              <option value="">Alle</option>
+              <option value="offen">Offen</option>
+              <option value="wartet">Wartet</option>
+              <option value="erledigt">Erledigt</option>
+              <option value="keine-rueckmeldung">Keine Rückmeldung</option>
+            </select>
+          </div>
+          <div>
+            <label for="sortBy">Sortierung</label>
+            <select id="sortBy">
+              <option value="datum-desc">Datum absteigend</option>
+              <option value="datum-asc">Datum aufsteigend</option>
+              <option value="kontakt-asc">Kontakt A–Z</option>
+              <option value="status-asc">Status A–Z</option>
+            </select>
+          </div>
+          <button type="button" class="secondary" id="exportBtn">CSV exportieren</button>
+          <button type="button" class="danger" id="clearAllBtn">Alles löschen</button>
+        </div>
+
+        <div style="overflow:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Kontakt</th>
+                <th>Datum</th>
+                <th>Status</th>
+                <th>Nächster Schritt</th>
+                <th>Notiz</th>
+                <th>Aktion</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+        <div id="emptyState" class="empty">Noch keine Einträge vorhanden.</div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "vertraute_zeit_mini_crm_v1";
+
+    const form = document.getElementById("crmForm");
+    const entryId = document.getElementById("entryId");
+    const kontakt = document.getElementById("kontakt");
+    const datum = document.getElementById("datum");
+    const status = document.getElementById("status");
+    const naechsterSchritt = document.getElementById("naechsterSchritt");
+    const notiz = document.getElementById("notiz");
+
+    const search = document.getElementById("search");
+    const filterStatus = document.getElementById("filterStatus");
+    const sortBy = document.getElementById("sortBy");
+    const tableBody = document.getElementById("tableBody");
+    const emptyState = document.getElementById("emptyState");
+    const countBox = document.getElementById("countBox");
+
+    const resetBtn = document.getElementById("resetBtn");
+    const exportBtn = document.getElementById("exportBtn");
+    const clearAllBtn = document.getElementById("clearAllBtn");
+
+    function loadEntries() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveEntries(entries) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+    }
+
+    function escapeHtml(str) {
+      return String(str || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function statusLabel(value) {
+      const map = {
+        "offen": "Offen",
+        "wartet": "Wartet",
+        "erledigt": "Erledigt",
+        "keine-rueckmeldung": "Keine Rückmeldung"
+      };
+      return map[value] || value;
+    }
+
+    function resetForm() {
+      form.reset();
+      entryId.value = "";
+      if (!datum.value) {
+        datum.value = new Date().toISOString().slice(0, 10);
+      }
+      kontakt.focus();
+    }
+
+    function currentFilteredEntries() {
+      let entries = loadEntries();
+      const q = search.value.trim().toLowerCase();
+      const statusFilter = filterStatus.value;
+
+      if (q) {
+        entries = entries.filter(e =>
+          e.kontakt.toLowerCase().includes(q) ||
+          e.naechsterSchritt.toLowerCase().includes(q) ||
+          (e.notiz || "").toLowerCase().includes(q)
+        );
+      }
+
+      if (statusFilter) {
+        entries = entries.filter(e => e.status === statusFilter);
+      }
+
+      const sort = sortBy.value;
+      entries.sort((a, b) => {
+        if (sort === "datum-asc") return a.datum.localeCompare(b.datum);
+        if (sort === "datum-desc") return b.datum.localeCompare(a.datum);
+        if (sort === "kontakt-asc") return a.kontakt.localeCompare(b.kontakt, "de");
+        if (sort === "status-asc") return statusLabel(a.status).localeCompare(statusLabel(b.status), "de");
+        return 0;
+      });
+
+      return entries;
+    }
+
+    function render() {
+      const entries = currentFilteredEntries();
+      tableBody.innerHTML = "";
+
+      entries.forEach(e => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><strong>${escapeHtml(e.kontakt)}</strong></td>
+          <td>${escapeHtml(e.datum)}</td>
+          <td><span class="status status-${escapeHtml(e.status)}">${escapeHtml(statusLabel(e.status))}</span></td>
+          <td>${escapeHtml(e.naechsterSchritt)}</td>
+          <td class="muted">${escapeHtml(e.notiz || "")}</td>
+          <td>
+            <button class="small secondary" onclick="editEntry('${e.id}')">Bearbeiten</button>
+            <button class="small danger" onclick="deleteEntry('${e.id}')">Löschen</button>
+          </td>
+        `;
+        tableBody.appendChild(tr);
+      });
+
+      emptyState.style.display = entries.length ? "none" : "block";
+      const total = loadEntries().length;
+      countBox.textContent = `${total} ${total === 1 ? "Eintrag" : "Einträge"}`;
+    }
+
+    form.addEventListener("submit", (ev) => {
+      ev.preventDefault();
+
+      const payload = {
+        id: entryId.value || crypto.randomUUID(),
+        kontakt: kontakt.value.trim(),
+        datum: datum.value,
+        status: status.value,
+        naechsterSchritt: naechsterSchritt.value.trim(),
+        notiz: notiz.value.trim()
+      };
+
+      if (!payload.kontakt || !payload.datum || !payload.status || !payload.naechsterSchritt) {
+        alert("Bitte Kontakt, Datum, Status und nächsten Schritt ausfüllen.");
+        return;
+      }
+
+      const entries = loadEntries();
+      const index = entries.findIndex(e => e.id === payload.id);
+
+      if (index >= 0) {
+        entries[index] = payload;
+      } else {
+        entries.push(payload);
+      }
+
+      saveEntries(entries);
+      resetForm();
+      render();
+    });
+
+    window.editEntry = function(id) {
+      const entries = loadEntries();
+      const e = entries.find(x => x.id === id);
+      if (!e) return;
+
+      entryId.value = e.id;
+      kontakt.value = e.kontakt;
+      datum.value = e.datum;
+      status.value = e.status;
+      naechsterSchritt.value = e.naechsterSchritt;
+      notiz.value = e.notiz || "";
+      kontakt.focus();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    window.deleteEntry = function(id) {
+      if (!confirm("Diesen Eintrag wirklich löschen?")) return;
+      const entries = loadEntries().filter(e => e.id !== id);
+      saveEntries(entries);
+      render();
+    }
+
+    resetBtn.addEventListener("click", resetForm);
+    [search, filterStatus, sortBy].forEach(el => el.addEventListener("input", render));
+    [filterStatus, sortBy].forEach(el => el.addEventListener("change", render));
+
+    exportBtn.addEventListener("click", () => {
+      const entries = loadEntries();
+      const header = ["Kontakt", "Datum", "Status", "Naechster Schritt", "Notiz"];
+      const rows = entries.map(e => [
+        e.kontakt, e.datum, statusLabel(e.status), e.naechsterSchritt, e.notiz || ""
+      ]);
+      const csv = [header, ...rows]
+        .map(row => row.map(v => `"${String(v).replaceAll('"', '""')}"`).join(";"))
+        .join("\n");
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "mini-crm-vertraute-zeit.csv";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    });
+
+    clearAllBtn.addEventListener("click", () => {
+      if (!confirm("Wirklich alle Einträge löschen?")) return;
+      localStorage.removeItem(STORAGE_KEY);
+      resetForm();
+      render();
+    });
+
+    resetForm();
+    render();
+  </script>
+</body>
+</html>
